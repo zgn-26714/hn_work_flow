@@ -1,0 +1,41 @@
+# Simulation box dimensions (in nanometers)
+xbox    = 5          # Box length in X direction (nm)
+ybox    = 6          # Box length in Y direction (nm)
+zbox    = 10         # Box length in Z direction (nm)
+
+# GROMACS environment setup
+GMXRC   = "/share/home/app/gromacs-2020.4/bin/GMXRC"  # Path to GROMACS environment script (GMXRC)
+
+# Topology and index file prefixes (without extensions)
+TOP     = "topology"  # Prefix for topology file (e.g., 'topology.top')
+INDEX   = "index"     # Prefix for index file (e.g., 'index.ndx')
+
+# Parallelization settings
+NPOS    = 4           # Number of OpenMP threads for CPU parallelization
+GPU     = 1           # Enable GPU acceleration: 1=yes, 0=no
+
+# Density analysis parameters
+NZ      = 100         # Number of slices along Z-axis for density profile calculation
+BE_TIME = 1000        # Start time for density analysis (in ps, to skip equilibration)
+BE_Z    = 21          # Start Z-position for density analysis (in Ångstroms)
+END_Z   = 29          # End Z-position for density analysis (in Ångstroms)
+
+# GROMACS grompp settings
+maxWarn = 1           # Maximum number of warnings allowed during grompp preprocessing
+
+# System density control parameters (for iterative adjustment)
+set_density = 940     # Target system density (kg/m³)
+error       = 5       # Allowed density error threshold (%)
+max_iter    = 3       # Maximum number of iterations for density adjustment
+factor      = 0.1     # Scaling factor per iteration for box resizing
+
+# Molecule/Group names for analysis or indexing
+MOL_name = "aACN Na CLO"  # Space-separated list of molecule/ion names (e.g., for density groups)
+
+# Simulation step settings
+nsteps_equ = 100          # Number of steps for equilibration run (e.g., 20 ns @ 2 fs/step)
+nsteps_ini = 100          # Number of steps for product initial frames run 
+num_intialframes = 100    # Number of initial frames 
+
+# Thermostat setting
+Temperature = 298     # Target simulation temperature (in Kelvin)
