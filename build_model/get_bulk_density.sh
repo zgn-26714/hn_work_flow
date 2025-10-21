@@ -2,12 +2,12 @@
 
 {
 echo -e "${BLUE}"
-echo "**********************************************************************">&2
-echo "    0.   Before the formal simulation">&2
-echo "⚙️  Parameters: nsteps = ${nsteps_bulk}">&2
-echo "**********************************************************************">&2
+echo "**********************************************************************"
+echo "    0.   Before the formal simulation"
+echo "⚙️  Parameters: nsteps = ${nsteps_bulk}"
+echo "**********************************************************************"
 echo -e "${NC}"
-} | tee -a ./result/b_model.log 
+} | tee -a ./result/b_model.log >&2
 if [[ -f "$GMXRC" ]]; then
     source "$GMXRC"
 else

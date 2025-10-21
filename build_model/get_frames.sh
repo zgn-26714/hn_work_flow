@@ -23,10 +23,10 @@ echo -e "${OK}" | tee -a ./result/b_model.log >&2
 
 cp "${MDP}.mdp" ./initial/grompp.mdp
 sed -i "s/^[[:space:]]*nsteps[[:space:]]*=.*/nsteps = ${nsteps_ini}/" ./initial/grompp.mdp
-old_nstxtcout=$(grep -E '^[[:space:]]*nstxtcout[[:space:]]*=' ./initial/grompp.mdp | sed -E 's/.*=[[:space:]]*([0-9]+).*/\1/')
+
 sed -i -E \
     -e "s/^([[:space:]]*nstxtcout[[:space:]]*=[[:space:]]*)[0-9]+/\10/" \
-    -e "s/^([[:space:]]*nstxout[[:space:]]*=[[:space:]]*)[0-9]+/\1$old_nstxtcout/" \
+    -e "s/^([[:space:]]*nstxout[[:space:]]*=[[:space:]]*)[0-9]+/\1${XOUT_FRAMES}/" \
     ./initial/grompp.mdp
 
 echo "[step 2] genenrate .tpr (grompp)" | tee -a ./result/b_model.log >&2
