@@ -47,3 +47,30 @@ num_intialframes = 100    # Number of initial frames
 
 # Thermostat setting
 Temperature = 298     # Target simulation temperature (in Kelvin)
+initialframes=initialframes
+matrixdata=matrixdata
+basicfile=basicfile
+#slowdir=/data1/huangnan/scanratepotential
+V=2                   # 电压值
+ic=0                  # 扫描速率（scan rate）
+Temperature=298
+START=1
+END=10  
+num=1               # 每次处理多少个 case
+queue=new           # PBS 队列名
+ismakecase=1
+ismakejob=1
+mdoe=default
+TIME=10000     
+DT=0.002
+SKIPTIME_PS=400
+TAO=0
+mode=default
+# Arguments:
+# START        Start case number (e.g., 10)
+# END          End case number (exclusive, e.g., 20)
+# NUM          Number of cases per job [default: 1]
+# QUEUE        PBS queue: short / new / fast [default: new]
+# MAKECASE     1 to create case dirs, 0 to skip [default: 1]
+# MAKEJOB      1 to generate & submit job, 0 to skip [default: 1]
+# mode         append to run md with append mode(default: default)
