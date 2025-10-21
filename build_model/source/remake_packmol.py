@@ -166,14 +166,15 @@ def main():
 Script    : {script_name}
 ===================================================================================================""")
 
-    inp_file = os.environ['INP_FILE']
     top_file = os.environ['TOP']
     mol_name = os.environ['MOL_name']
     target_molecules = mol_name.split()
+
     # Read scaling factor from environment variable
 
     try:
         factor = float(sys.argv[1])
+        inp_file = sys.argv[2]
         if factor < 0:
             print("Error: SCALE_FACTOR must be non-negative")
             exit(1)
@@ -182,6 +183,7 @@ Script    : {script_name}
         exit(1)
 
     # Modify packmol input
+    inp_file = inp_file+".inp"
     try:
         modify_packmol(inp_file, inp_file, target_molecules, factor)
     except Exception as e:

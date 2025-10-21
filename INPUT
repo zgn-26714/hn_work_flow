@@ -7,8 +7,12 @@ zbox    = 10         # Box length in Z direction (nm)
 GMXRC   = "/share/home/app/gromacs-2020.4/bin/GMXRC"  # Path to GROMACS environment script (GMXRC)
 
 # Topology and index file prefixes (without extensions)
-TOP     = "topology"  # Prefix for topology file (e.g., 'topology.top')
-INDEX   = "index"     # Prefix for index file (e.g., 'index.ndx')
+TOP     = topology  # Prefix for topology file (e.g., 'topology.top')
+bulk_top= bulk_topol# Prefix for bulk topology file (e.g., 'topology.top')
+MDP     = grompp    # Prefix for mdp file (e.g., 'grompp.mdp')
+mini_MDP= mini     # Prefix for Energy Minimization mdp file (e.g., 'mini.mdp')
+packmol = packmol
+bulk_pa = bulk_pack
 
 # Parallelization settings
 NPOS    = 4           # Number of OpenMP threads for CPU parallelization
@@ -24,7 +28,7 @@ END_Z   = 29          # End Z-position for density analysis (in Ångstroms)
 maxWarn = 1           # Maximum number of warnings allowed during grompp preprocessing
 
 # System density control parameters (for iterative adjustment)
-set_density = 940     # Target system density (kg/m³)
+#set_density = 940     # Target system density (kg/m³)
 error       = 5       # Allowed density error threshold (%)
 max_iter    = 3       # Maximum number of iterations for density adjustment
 factor      = 0.1     # Scaling factor per iteration for box resizing
@@ -33,8 +37,12 @@ factor      = 0.1     # Scaling factor per iteration for box resizing
 MOL_name = "aACN Na CLO"  # Space-separated list of molecule/ion names (e.g., for density groups)
 
 # Simulation step settings
-nsteps_equ = 100          # Number of steps for equilibration run (e.g., 20 ns @ 2 fs/step)
+nsteps_bulk= 100          # Number of steps for get bulk density run (2 fs/step)
+nsteps_den = 100          # Number of steps for check_density run
+nsteps_equ = 100          # Number of steps for equilibration run
 nsteps_ini = 100          # Number of steps for product initial frames run 
+
+#nums of initial frames 
 num_intialframes = 100    # Number of initial frames 
 
 # Thermostat setting

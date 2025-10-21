@@ -1,6 +1,17 @@
 #!/bin/bash
+rm setting.log
+
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 INPUT_FILE="INPUT"
+
+export BLUE='\033[0;34m'
+export RED='\033[0;31m'
+export GREEN='\033[0;32m'
+export YELLOW='\033[1;33m'
+export NC='\033[0m'
+export OK="${GREEN}[OK]${NC}"
+export ERROR="${RED}[ERROR]"
 
 while IFS= read -r line || [[ -n "$line" ]]; do
     line="${line%%#*}"
@@ -14,10 +25,10 @@ while IFS= read -r line || [[ -n "$line" ]]; do
         export "$lhs=$rhs"
         echo "Exported: $lhs=$rhs" >> setting.log
     else
-        echo "Warning: Invalid line (no '='): $line" >&2
+        echo -e "${YELLOW}Warning: Invalid line (no '='): ${line}${NC}" >&2
     fi
 done < "$INPUT_FILE"
-
+echo -e "${GREEN}Finish reading INPUT${NC}"
 
 ACTION="${1:-help}"
 
