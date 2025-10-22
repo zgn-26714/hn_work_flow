@@ -17,7 +17,7 @@ if (( ${ismakecase} == 1 )); then
     fi
 fi
 
-if (( ${ismakecase} == 1 )); then
+if (( ${ismakejob} == 1 )); then
     if bash "${bash_dir}"/sub_job.sh; then
         echo -e "${GREEN}"
         echo "  ✅success! sub_job.sh completed" | tee -a ./result/run_md.log >&2

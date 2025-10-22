@@ -4,7 +4,7 @@ ybox    = 6          # Box length in Y direction (nm)
 zbox    = 10         # Box length in Z direction (nm)
 
 # GROMACS environment setup
-GMXRC   = "/share/home/app/gromacs-2020.4/bin/GMXRC"  # Path to GROMACS environment script (GMXRC)
+GMXRC   = /share/home/app/gromacs-2020.4/bin/GMXRC  # Path to GROMACS environment script (GMXRC)
 
 # Topology and index file prefixes (without extensions)
 TOP     = topology  # Prefix for topology file (e.g., 'topology.top')
@@ -34,7 +34,7 @@ max_iter    = 3       # Maximum number of iterations for density adjustment
 factor      = 0.1     # Scaling factor per iteration for box resizing
 
 # Molecule/Group names for analysis or indexing
-MOL_name = "aACN Na CLO"  # Space-separated list of molecule/ion names (e.g., for density groups)
+MOL_name = ACN Na CLO  # Space-separated list of molecule/ion names (e.g., for density groups)
 
 # Simulation step settings
 nsteps_bulk= 100          # Number of steps for get bulk density run (2 fs/step)
@@ -66,6 +66,19 @@ DT=0.002
 SKIPTIME_PS=400
 TAO=0
 mode=default
+server_machine=eninstein
+LOW_ONFLY=0 0 20
+UP_ONFLY=4.3 4.3 30
+NBIN_ONFLY=1 1 1000
+MODE_ONFLY=3
+
+analysis_begin_t=0
+analysis_end_t=${8:-0}
+analysis_ONFLY_isD=1
+analysis_ONFLY_isGeo=1             # 几何参数，传给 MATLAB
+analysis_ONFLY_in=densMNC3D.onfly
+
+DEFFNM=slownvt
 # Arguments:
 # START        Start case number (e.g., 10)
 # END          End case number (exclusive, e.g., 20)

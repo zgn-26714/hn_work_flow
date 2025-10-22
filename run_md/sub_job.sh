@@ -28,10 +28,11 @@ make_job() {
             /workdir=/s|.*|workdir=$rundir|;
             /mode=/s|.*|mode=$mode|
         " "$objjob" 
+        sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         case "$queue" in
             short)  sed -i '6s/.*/#PBS -l walltime=36:00:00/' "$objjob" ;;
             new)    sed -i '5s/.*/#PBS -l nodes=1:ppn=32/' "$objjob" ;;
-            fast)   sed -i '5s/.*/#PBS -l nodes=1:ppn=48/' "$objjob" ;;
+            fast)   sed -i '5s/.*/#PBS -l nodes=1:ppn=16/' "$objjob" ;;
             long)   sed -i '6s/.*/#PBS -l walltime=720:00:00/' "$objjob" ;;
         esac
         cd "$rundir"/case"$start_case"
@@ -47,6 +48,7 @@ make_job() {
             /workdir=/s|.*|workdir=$rundir|;
             /mode=/s|.*|mode=$mode|
         " "$objjob" 
+        sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         cd "$rundir"/case"$start_case"
         sbatch "$objjob"
         cd -
@@ -59,6 +61,7 @@ make_job() {
             /workdir=/s|.*|workdir=$rundir|;
             /mode=/s|.*|mode=$mode|
         " "$objjob" 
+        sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         chmod +x $objjob
         cd "$rundir"/case"$start_case"
         dsub -s $objjob

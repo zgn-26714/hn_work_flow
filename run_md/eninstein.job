@@ -30,7 +30,7 @@ while [ "$i" -lt "$h" ]; do
         rm -rf *.xvg
         rm -rf *.o*
     fi
-    export ONFLY_DENSITY3D="-low [0 0 20] -up [4.3 4.3 30] -nbin [1 1 1] -n index.ndx -sel [Na]  -calc 3"
+    export ONFLY_DENSITY3D="-low [0 0 20] -up [4.3 4.3 30] -nbin [1 1 1000] -n index.ndx -sel [Na CLO PC]  -calc 3"
     $mdbin grompp -f grompp.mdp -p topol.top -c "frame${k}.gro" -o "$name" -maxwarn 2 -n index.ndx
     if [ "$mode" == "append" ]; then
         $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp "$nofp" -append -cpi "${name}.cpt"

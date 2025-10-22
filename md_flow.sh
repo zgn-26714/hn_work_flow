@@ -45,7 +45,7 @@ case "$ACTION" in
 
     analyze)
         echo ">>> Entering analyze branch..."
-        bash "$SCRIPT_DIR"/analyze/run.sh
+        bash "$SCRIPT_DIR"/analyze/run.sh $2
         ;;
 
     # all)
