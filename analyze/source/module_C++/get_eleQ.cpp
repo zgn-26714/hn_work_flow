@@ -56,8 +56,8 @@ int main(int argc, char *argv[]){
         charge[i] /= (stoi(end) - stoi(begin) + 1);
     }
     
-    string outfile = molecule + "_eleCharge" + string(getenv("analyze_V")) + "V" +
-                                        string(getenv("analyze_tau")) + "ps_" + begin + "-" + end + ".dat";
+    string outfile = "./deal_data/mdHeat/" + molecule + "_eleCharge" + string(getenv("analyze_V")) + "V" +
+                                string(getenv("analyze_tau")) + "ps_" + begin + "-" + end + ".dat";
     ofstream output(outfile);
     output << "# ElecCharge averaged from case " << begin << " to " << end << endl;
     output << "# V = " << string(getenv("analyze_V")) << " V" << endl;

@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>
-#include <matio.h>
+#include "matio.h"
 
 
 namespace matlab{

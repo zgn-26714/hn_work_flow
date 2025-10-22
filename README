@@ -12,6 +12,10 @@
     matrixdata文件夹 matrixdata （里面放置matrix数据文件）
     basicfile文件夹 basicfile （里面放置力场、index和grompp文件）
 1.3 分析模块
+    分析模块是个开放性的框架，使用者可以自行往内部添加分析脚本，详细见  ./analysis/analysis.sh
+    在analysis.sh添加自己的分支后，使用./md_flow.sh [analysis] [your_analysis_name] 来调用
+    建议维持框架风格，在analysis.sh仅仅调用下一层级的sh文件，在下一层级sh文件中调用具体cpp/python/matlab代码
+    使用INPUT文件，将所需参数传递给分析脚本
 2.使用方法：
     修改INPUT中的参数
     bash md_flow.sh 

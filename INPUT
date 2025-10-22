@@ -1,84 +1,92 @@
+#########################################
+######### INPUT for build_model #########
+#########################################
 # Simulation box dimensions (in nanometers)
-xbox    = 5          # Box length in X direction (nm)
+xbox    = 5                 # Box length in X direction (nm)
 ybox    = 6          # Box length in Y direction (nm)
 zbox    = 10         # Box length in Z direction (nm)
+bulk_xbox    = 5          # Box length in bulk_X direction (nm)
+bulk_ybox    = 6          # Box length in bulk_Y direction (nm)
+bulk_zbox    = 10         # Box length in bulk_Z direction (nm)
 
-# GROMACS environment setup
+# input file prefixes (without extensions)
+TOP     = topology  # Prefix for topology file (e.g., 'topology')
+bulk_top= bulk_topol# Prefix for bulk topology file (e.g., 'topology')
+MDP     = grompp    # Prefix for mdp file (e.g., 'grompp')
+mini_MDP= mini     # Prefix for Energy Minimization mdp file (e.g., 'mini')
+packmol = packmol   # Prefix for packmol inp file (e.g., 'packmol')
+bulk_pa = bulk_pack # Prefix for bulk packmol inp file (e.g., 'packmol')
+
+# gromacs settings
 GMXRC   = /share/home/app/gromacs-2020.4/bin/GMXRC  # Path to GROMACS environment script (GMXRC)
-
-# Topology and index file prefixes (without extensions)
-TOP     = topology  # Prefix for topology file (e.g., 'topology.top')
-bulk_top= bulk_topol# Prefix for bulk topology file (e.g., 'topology.top')
-MDP     = grompp    # Prefix for mdp file (e.g., 'grompp.mdp')
-mini_MDP= mini     # Prefix for Energy Minimization mdp file (e.g., 'mini.mdp')
-packmol = packmol
-bulk_pa = bulk_pack
-
-# Parallelization settings
 NPOS    = 4           # Number of OpenMP threads for CPU parallelization
 GPU     = 1           # Enable GPU acceleration: 1=yes, 0=no
+maxWarn = 1           # Maximum number of warnings allowed during grompp preprocessing
+nsteps_bulk= 100          # Number of steps for get bulk density run (2 fs/step)
+nsteps_den = 100          # Number of steps for check_density run
+nsteps_equ = 100          # Number of steps for equilibration run
+nsteps_ini = 100          # Number of steps for product initial frames run 
+num_intialframes = 100    # Number of initial frames 
+Temperature = 298     # Target simulation temperature (in Kelvin)
 
 # Density analysis parameters
 NZ      = 100         # Number of slices along Z-axis for density profile calculation
 BE_TIME = 1000        # Start time for density analysis (in ps, to skip equilibration)
 BE_Z    = 21          # Start Z-position for density analysis (in Ångstroms)
 END_Z   = 29          # End Z-position for density analysis (in Ångstroms)
-
-# GROMACS grompp settings
-maxWarn = 1           # Maximum number of warnings allowed during grompp preprocessing
-
-# System density control parameters (for iterative adjustment)
 #set_density = 940     # Target system density (kg/m³)
 error       = 5       # Allowed density error threshold (%)
 max_iter    = 3       # Maximum number of iterations for density adjustment
 factor      = 0.1     # Scaling factor per iteration for box resizing
 
-# Molecule/Group names for analysis or indexing
+
+
+#################  NOTICE : Molecule names for md_run and modeling
 MOL_name = ACN Na CLO  # Space-separated list of molecule/ion names (e.g., for density groups)
 
-# Simulation step settings
-nsteps_bulk= 100          # Number of steps for get bulk density run (2 fs/step)
-nsteps_den = 100          # Number of steps for check_density run
-nsteps_equ = 100          # Number of steps for equilibration run
-nsteps_ini = 100          # Number of steps for product initial frames run 
 
-#nums of initial frames 
-num_intialframes = 100    # Number of initial frames 
-
-# Thermostat setting
-Temperature = 298     # Target simulation temperature (in Kelvin)
-initialframes=initialframes
-matrixdata=matrixdata
-basicfile=basicfile
+#########################################
+######### INPUT for md_run #########
+#########################################
+# input file folder prefixes
+initialframes   =initialframes # Prefix for initial frames folder (e.g., 'initialframes')
+matrixdata      =matrixdata    # Prefix for electrode matrix data folder (e.g., 'matrixdata')
+basicfile       =basicfile     # Prefix for basic files(top, itp, mdp, ndx) folder (e.g., 'basicfile')
 #slowdir=/data1/huangnan/scanratepotential
-V=2                   # 电压值
-ic=0                  # 扫描速率（scan rate）
-Temperature=298
-START=1
-END=10  
-num=1               # 每次处理多少个 case
-queue=new           # PBS 队列名
-ismakecase=1
-ismakejob=1
-mdoe=default
-TIME=10000     
-DT=0.002
-SKIPTIME_PS=400
-TAO=0
-mode=default
-server_machine=eninstein
-LOW_ONFLY=0 0 20
-UP_ONFLY=4.3 4.3 30
-NBIN_ONFLY=1 1 1000
-MODE_ONFLY=3
+V=2                            # voltage of simulation (V)
+ic=0                           # 
+Temperature=298                # Target simulation temperature (in Kelvin)
+START=1                        # initial case number
+END=10                         # end case number
+num=1                          # each job simulate case number
+queue=new                      # PBS queue: short / new / fast / long (4090:normal/fast)
+ismakecase=1                   # 1 to create case dirs, 0 to skip
+ismakejob=1                    # 1 to generate & submit job, 0 to skip
+mode=default                   # append to run md with append mode(default: default)
+DT=0.002                       # time step for simulation(ps)
+DEFFNM=slownvt                 # default outfile name for simulation
 
+TIME=10000                     # total time for generate scan file time(not simulation time)(ps)
+SKIPTIME_PS=400                # skip time for generate scan file time(not simulation time)(ps)
+TAO=0                          # scan rate (V/ps)
+
+server_machine=eninstein       # server machine name (eninstein / 4090 / wuchao)
+
+LOW_ONFLY=0 0 20               # onfly_setting
+UP_ONFLY=4.3 4.3 30             # onfly_setting
+NBIN_ONFLY=1 1 1000             # onfly_setting
+MODE_ONFLY=3                    # onfly_setting
+
+#########################################
+######### INPUT for analysis ############
+#########################################(待完善)
 analysis_begin_t=0
 analysis_end_t=${8:-0}
 analysis_ONFLY_isD=1
 analysis_ONFLY_isGeo=1             # 几何参数，传给 MATLAB
 analysis_ONFLY_in=densMNC3D.onfly
 
-DEFFNM=slownvt
+
 # Arguments:
 # START        Start case number (e.g., 10)
 # END          End case number (exclusive, e.g., 20)

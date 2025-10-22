@@ -120,7 +120,7 @@ int main(int argc, char** argv)
 	double numFile = 1;
 	int dynamic = 1;
 	int output_mode = 0;
-	std::string outputFnm = "onflyEnergy";
+	std::string outputFnm = "./deal_data/onfly/onflyEnergy";
 
 	itp::Getopt getopt(argc, argv, "Onfly PostAnalysis Code");
 	getopt.getFixPos(inputFnm, 1, true, "input file name");

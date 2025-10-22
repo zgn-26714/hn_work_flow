@@ -24,7 +24,7 @@ g++ -o onflyPost_dens3D_dynamic ${bash_dir}/module_C++/onflyPost_densANDBALJ3D_d
 
 analyze_num=((${analyze_end_case}-${analyze_begin_case}+1))
 ./onflyPost_dens3D_dynamic "./case${analyze_begin_case}/${analysis_ONFLY_in}.onfly" \
--n "${analyze_num}" -d "${analysis_ONFLY_isD}" -o onfly"${analyze_begin_case}-${analyze_end_case}".dat \
+-n "${analyze_num}" -d "${analysis_ONFLY_isD}" -o ./deal_data/onfly/onfly"${analyze_begin_case}-${analyze_end_case}".dat \
 -b "${analysis_begin_t}" -e "${analysis_end_t}"
 
 

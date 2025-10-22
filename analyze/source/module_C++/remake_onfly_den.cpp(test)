@@ -12,9 +12,10 @@ using namespace std;
 
 // 4D数组: [nx][ny][nz][col]
 using Matrix4D = vector<vector<vector<vector<double>>>>;
+using Matrix3D = vector<vector<vector<double>>>;
 
 struct LoadDataResult {
-    vector<Matrix4D> ret;  // 每帧是一个4D矩阵 (对于nRegion=1时)
+    vector<vector<Matrix4D>> ret;
     vector<vector<double>> xyzRange;
     vector<int> nbin;
     vector<double> lowPos;
@@ -41,12 +42,15 @@ vector<string> readTextData(const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
         cerr << "Error: Cannot open file " << filename << endl;
-        return textData;
+        exit(1);
     }
     string line;
     while (getline(file, line)) {
         if (!line.empty() && (line[0] == '%' || line[0] == '#')) {
             textData.push_back(line);
+        }
+        else {
+            break;  // Stop reading on first non-comment line,it's mean you shoudn't modified the data file format
         }
     }
     file.close();
@@ -58,7 +62,7 @@ vector<vector<double>> readDataFile(const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
         cerr << "Error: Cannot open file " << filename << endl;
-        return data;
+        exit(1);
     }
     string line;
     while (getline(file, line)) {
@@ -78,29 +82,58 @@ vector<vector<double>> readDataFile(const string& filename) {
     return data;
 }
 
-// MATLAB的reshape是列优先(column-major): 先z, 再y, 再x变化
-// 输入: tmpData [totNbin rows][col], 输出: [nx][ny][nz][col]
-Matrix4D reshapeColumnMajor(const vector<vector<double>>& tmpData, 
-                            int nx, int ny, int nz, int col) {
-    Matrix4D result(nx, vector<vector<vector<double>>>(
-                    ny, vector<vector<double>>(
-                    nz, vector<double>(col, 0.0))));
-    
-    int linearIdx = 0;
-    for (int x = 0; x < nx; ++x) {
-        for (int y = 0; y < ny; ++y) {
-            for (int z = 0; z < nz; ++z) {
-                if (linearIdx < static_cast<int>(tmpData.size())) {
-                    for (int c = 0; c < col && c < static_cast<int>(tmpData[linearIdx].size()); ++c) {
-                        result[x][y][z][c] = tmpData[linearIdx][c];
+vector<Matrix4D> reshapeColumnMajor(
+    const vector<vector<double>>& tmpData,
+    int nRegion,
+    const vector<int>& nbin,
+    int col)
+{
+    vector<Matrix4D> ret;
+    ret.reserve(nRegion);
+
+    size_t tmpIndex = 0;
+    size_t totalRows = tmpData.size();
+
+    for (int ii = 0; ii < nRegion; ++ii)
+    {
+        int n1 = nbin[3 * ii];       // 对应 nbinX
+        int n2 = nbin[3 * ii + 1];   // 对应 nbinY
+        int n3 = nbin[3 * ii + 2];   // 对应 nbinZ
+        size_t eachNbin = static_cast<size_t>(n1) * n2 * n3;
+
+        if (tmpIndex + eachNbin > totalRows)
+            throw runtime_error("tmpData size not sufficient for nbin region");
+
+        // 分配 4D 容器
+        Matrix4D regionData(
+            n1, vector<vector<vector<double>>>(
+            n2, vector<vector<double>>(
+            n3, vector<double>(col, 0.0))));
+
+        // MATLAB 是列主序: x 最快，y 次，z 次，col 最慢
+        size_t idx = 0;
+        for (int c = 0; c < col; ++c)
+            for (int z = 0; z < n3; ++z)
+                for (int y = 0; y < n2; ++y)
+                    for (int x = 0; x < n1; ++x)
+                    {
+                        regionData[x][y][z][c] = tmpData[tmpIndex + idx][c];
+                        ++idx;
                     }
-                }
-                ++linearIdx;
-            }
-        }
+
+        tmpIndex += eachNbin;
+        ret.push_back(std::move(regionData));
     }
-    return result;
+
+    // 若只有一个 region，则直接返回它（模拟 MATLAB 的 ret{1}）
+    if (nRegion == 1)
+        return { ret[0] };
+    else
+        return ret;
 }
+
+
+
 
 LoadDataResult loadOnflyData3D(const string& fnm) {
     LoadDataResult result;
@@ -140,8 +173,22 @@ LoadDataResult loadOnflyData3D(const string& fnm) {
     // 生成xyzRange (linspace)
     for (size_t ii = 0; ii < result.nbin.size(); ++ii) {
         vector<double> range;
-        double start = (ii < result.lowPos.size()) ? result.lowPos[ii] : 0.0;
-        double end = (ii < result.upPos.size()) ? result.upPos[ii] : 0.0;
+        double start;
+        if (ii < result.lowPos.size()) {
+            start = result.lowPos[ii];
+        } else {
+            std::cerr << "Error: lowPos size mismatch!" << std::endl;
+            exit(1);
+        }
+
+        double end;
+        if (ii < result.upPos.size()) {
+            end = result.upPos[ii];
+        } else {
+            std::cerr << "Error: upPos size mismatch!" << std::endl;
+            exit(1);
+        }
+
         int points = result.nbin[ii];
         if (points > 1) {
             double step = (end - start) / (points - 1);
@@ -149,15 +196,15 @@ LoadDataResult loadOnflyData3D(const string& fnm) {
                 range.push_back(start + j * step);
             }
         } else {
-            range.push_back(start);
+            range.push_back(end);
         }
         result.xyzRange.push_back(range);
     }
     
-    // 处理数据 (假设nRegion==1, 如您的文件)
-    if (result.nRegion != 1) {
-        cerr << "Warning: Multiple regions not fully implemented. Assuming nRegion=1." << endl;
-    }
+    // 处理数据
+    // if (result.nRegion != 1) {
+    //     cerr << "Warning: Multiple regions not fully implemented. Assuming nRegion=1." << endl;
+    // }
     int nx = (result.nRegion >= 1) ? result.nbin[0] : 1;
     int ny = (result.nRegion >= 1) ? result.nbin[1] : 1;
     int nz = (result.nRegion >= 1) ? result.nbin[2] : 1;
@@ -175,7 +222,7 @@ LoadDataResult loadOnflyData3D(const string& fnm) {
             }
         }
         
-        result.ret[ii] = reshapeColumnMajor(frameData, nx, ny, nz, col);
+        result.ret[ii] = reshapeColumnMajor(frameData, result.nRegion, result.nbin, col);
     }
     
     return result;
@@ -185,12 +232,14 @@ int main() {
     double V = 2.0;
     double scanrate = 0.0;
     
-    string filename = "/data1/huangnan/ACN/charging/298k/2V/0ps/xvgdata/onfly/onfly1_54.dat_dens.dat";
+    string filename = "./deal_data/onfly/onfly" + string(getenv("analyze_begin_case")) + "-" + 
+                        string(getenv("analyze_end_case")) + ".dat";
     
-    cout << "Loading data..." << endl;
+    std::cout << "Loading data..." << endl;
     
     LoadDataResult data = loadOnflyData3D(filename);
     
+    //添加对数组降维的支持
     if (data.ret.empty() || data.totFrames == 0) {
         cerr << "Error: No data loaded or unexpected format!" << endl;
         return -1;
