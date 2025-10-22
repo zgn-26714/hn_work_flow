@@ -30,11 +30,11 @@ make_job() {
         " "$objjob" 
         case "$queue" in
             short)  sed -i '6s/.*/#PBS -l walltime=36:00:00/' "$objjob" ;;
-            new)    sed -i '5s/.*/#PBS -l nodes=1:ppn=64/' "$objjob" ;;
+            new)    sed -i '5s/.*/#PBS -l nodes=1:ppn=32/' "$objjob" ;;
             fast)   sed -i '5s/.*/#PBS -l nodes=1:ppn=48/' "$objjob" ;;
             long)   sed -i '6s/.*/#PBS -l walltime=720:00:00/' "$objjob" ;;
         esac
-        cd "$rundir"
+        cd "$rundir"/case"$start_case"
         qsub "$objjob"
         cd -
         ;;
@@ -47,7 +47,7 @@ make_job() {
             /workdir=/s|.*|workdir=$rundir|;
             /mode=/s|.*|mode=$mode|
         " "$objjob" 
-        cd "$rundir"
+        cd "$rundir"/case"$start_case"
         sbatch "$objjob"
         cd -
         ;;
@@ -60,7 +60,7 @@ make_job() {
             /mode=/s|.*|mode=$mode|
         " "$objjob" 
         chmod +x $objjob
-        cd "$rundir"
+        cd "$rundir"/case"$start_case"
         dsub -s $objjob
         cd -
         ;;
