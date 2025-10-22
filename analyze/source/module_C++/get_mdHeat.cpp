@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>
+#include "./include/matlab_to_C.h"
 
 // 简单的二维数组结构来存储数据
 struct Matrix {
@@ -17,39 +18,6 @@ struct Matrix {
     const std::vector<double>& operator[](size_t index) const { return data[index]; }
 };
 
-// 模拟MATLAB的xvgread函数
-Matrix xvgread(const std::string& filename) {
-    Matrix result;
-    std::ifstream file(filename);
-    std::string line;
-    
-    if (!file.is_open()) {
-        std::cerr << "Error: Cannot open file " << filename << std::endl;
-        return result;
-    }
-    
-    // 跳过注释行（以#、@开头的行）
-    while (std::getline(file, line)) {
-        if (line.empty() || line[0] == '#' || line[0] == '@') {
-            continue;
-        }
-        
-        std::vector<double> row;
-        std::istringstream iss(line);
-        double value;
-        
-        while (iss >> value) {
-            row.push_back(value);
-        }
-        
-        if (!row.empty()) {
-            result.data.push_back(row);
-        }
-    }
-    
-    file.close();
-    return result;
-}
 
 int main() {
     const int begin_case = std::stoi(getenv("analyze_begin_case"));
@@ -59,6 +27,7 @@ int main() {
     Matrix data;
     bool first_case = true;
     
+    int count = 0;
     for (int i = begin_case; i <= end_case; ++i) {
         // 构建edr文件路径
         
@@ -82,19 +51,23 @@ int main() {
         }
         
         // 读取xvg文件
-        data = xvgread(outedr);
+        data.data = matlab::xvgread(outedr);
         
         if (data.rows() == 0) {
             std::cerr << "Warning: No data read for case " << i << std::endl;
             continue;
         }
-        
+
         // 处理数据
         if (first_case) {
             heat.resize(data.rows());
             for (size_t j = 0; j < data.rows(); ++j) {
                 if (data[j].size() >= 3) {
                     heat[j] = data[j][1] - data[j][2];  // 第2列 - 第3列
+                }
+                else {
+                    std::cerr << "Warning: data is error! " << i << std::endl;
+                    return 1;
                 }
             }
             first_case = false;
@@ -103,17 +76,20 @@ int main() {
                 if (data[j].size() >= 3) {
                     heat[j] += data[j][1] - data[j][2];
                 }
+                else {
+                    std::cerr << "Warning: data is error! " << i << std::endl;
+                    return 1;//可以改掉
+                }
             }
         }
-        
+        count++;
         // 清理临时文件
-        system("rm *~ *# 2>/dev/null");
+        system("rm #*# 2>/dev/null");
     }
     
     // 计算平均值
-    int num_cases = end_case - begin_case + 1;
     for (size_t i = 0; i < heat.size(); ++i) {
-        heat[i] /= num_cases;
+        heat[i] /= count;
     }
     
     // 提取时间数据
@@ -123,24 +99,22 @@ int main() {
             if (!data[i].empty()) {
                 time.push_back(data[i][0]);  // 第一列是时间
             }
+            else{
+                std::cerr << "Warning: data is error when extracting time!" << std::endl;
+                return 1;
+            }
         }
     }
     
-    // 保存数据到文件（简化版本）
-    std::ofstream outfile("./meandata/ACNHeat2V0ps.txt");
-    if (outfile.is_open()) {
-        outfile << "Time\tHeat" << std::endl;
-        for (size_t i = 0; i < time.size() && i < heat.size(); ++i) {
-            outfile << std::scientific << std::setprecision(6) 
-                   << time[i] << "\t" << heat[i] << std::endl;
-        }
-        outfile.close();
+
+        // 保存为MAT文件
+    std::string molName;
+    std::string mat_filename = "./meandata/" + molName + "mdHeat" + getenv("V") + "V" + getenv("tau") + "ps.mat";
+    if (matlab::saveMatFile(mat_filename, time, heat)) {
+        std::cout << "MATLAB data saved to " <<mat_filename << std::endl;
+    } else {
+        std::cerr << "Failed to save MAT file" << std::endl;
     }
-    
-    // 如果需要MATLAB格式，可以添加MAT文件输出
-    // 这里需要额外的库如matio来写入.mat文件
-    
-    std::cout << "Processing completed. Results saved to ./meandata/ACNHeat2V0ps.txt" << std::endl;
     
     return 0;
 }

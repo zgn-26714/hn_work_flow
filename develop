@@ -4,5 +4,9 @@
 4. 增加跳过bulk的选项
 5. 为什么不能自动识别md_flow可能的选项
 6. 分析模块
-7. 整理INPUT文件
+7. 整理INPUT文件重写README文件
 8. remake_onfly验证并重写
+9. 完成整个JE模型的重写
+    安装matlab模块
+    序号8
+    序号7
