@@ -103,7 +103,10 @@ Available Commands:
                   → Executes: $SCRIPT_DIR/run_md/run.sh
 
   analyze         Analyze output data from MD simulations (e.g., energy, force).
-                  → Executes: $SCRIPT_DIR/analyze/run.sh
+                  command: $0 analyze [elecharge|onfly|mdheat|MP_PP]
+                  → Executes: $SCRIPT_DIR/analyze/run.sh [elecharge|onfly|mdheat|MP_PP]
+
+  deal_data       this module need matlab!
 
   help            Show this help message (default).
 

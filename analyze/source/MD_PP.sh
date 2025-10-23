@@ -6,7 +6,7 @@ bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 num=${analyze_begin_case}
 end_num=${analyze_end_case}
-PP_command="-f "./case$num/${DEFFNM}.xtc" -s "./case$num/${DEFFNM}.tpr" -n "./case$num/index.ndx""
+PP_command="-f "./case$num/${DEFFNM}.${xtcORtrr}" -s "./case$num/${DEFFNM}.tpr" -n "./case$num/index.ndx""
 out_command="-o "./deal_data/dipole_ang/${num}angle_dipole_z.xvg""
 count=0
 

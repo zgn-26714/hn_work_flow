@@ -2,103 +2,102 @@
 ######### INPUT for build_model #########
 #########################################
 # Simulation box dimensions (in nanometers)
-xbox    = 5                 # Box length in X direction (nm)
-ybox    = 6          # Box length in Y direction (nm)
-zbox    = 10         # Box length in Z direction (nm)
-bulk_xbox    = 5          # Box length in bulk_X direction (nm)
-bulk_ybox    = 6          # Box length in bulk_Y direction (nm)
-bulk_zbox    = 10         # Box length in bulk_Z direction (nm)
+xbox           = 5             # Box length in X direction (nm)
+ybox           = 6             # Box length in Y direction (nm)
+zbox           = 10            # Box length in Z direction (nm)
+bulk_xbox      = 5             # Box length in bulk_X direction (nm)
+bulk_ybox      = 6             # Box length in bulk_Y direction (nm)
+bulk_zbox      = 10            # Box length in bulk_Z direction (nm)
 
 # input file prefixes (without extensions)
-TOP     = topology  # Prefix for topology file (e.g., 'topology')
-bulk_top= bulk_topol# Prefix for bulk topology file (e.g., 'topology')
-MDP     = grompp    # Prefix for mdp file (e.g., 'grompp')
-mini_MDP= mini     # Prefix for Energy Minimization mdp file (e.g., 'mini')
-packmol = packmol   # Prefix for packmol inp file (e.g., 'packmol')
-bulk_pa = bulk_pack # Prefix for bulk packmol inp file (e.g., 'packmol')
+TOP            = topology      # Prefix for topology file (e.g., 'topology')
+bulk_top       = bulk_topol    # Prefix for bulk topology file (e.g., 'topology')
+MDP            = grompp        # Prefix for mdp file (e.g., 'grompp')
+mini_MDP       = mini          # Prefix for Energy Minimization mdp file (e.g., 'mini')
+packmol        = packmol       # Prefix for packmol inp file (e.g., 'packmol')
+bulk_pa        = bulk_pack     # Prefix for bulk packmol inp file (e.g., 'packmol')
 
 # gromacs settings
-GMXRC   = /share/home/app/gromacs-2020.4/bin/GMXRC  # Path to GROMACS environment script (GMXRC)
-NPOS    = 4           # Number of OpenMP threads for CPU parallelization
-GPU     = 1           # Enable GPU acceleration: 1=yes, 0=no
-maxWarn = 1           # Maximum number of warnings allowed during grompp preprocessing
-nsteps_bulk= 100          # Number of steps for get bulk density run (2 fs/step)
-nsteps_den = 100          # Number of steps for check_density run
-nsteps_equ = 100          # Number of steps for equilibration run
-nsteps_ini = 100          # Number of steps for product initial frames run 
-num_intialframes = 100    # Number of initial frames 
-Temperature = 298     # Target simulation temperature (in Kelvin)
+GMXRC          = /share/home/app/gromacs-2020.4/bin/GMXRC  # Path to GROMACS environment script (only modeling module)
+NPOS           = 4             # Number of OpenMP threads for CPU parallelization
+GPU            = 1             # Enable GPU acceleration: 1=yes, 0=no
+maxWarn        = 1             # Maximum number of warnings allowed during grompp preprocessing
+nsteps_bulk    = 100           # MD steps for get bulk density run (2 fs/step)
+nsteps_den     = 100           # MD steps for check_density run (electrode)
+nsteps_equ     = 100           # MD steps for equilibration run
+nsteps_ini     = 100           # MD steps for product initial frames run
+num_intialframes = 100         # Numbers of initial frames
+### The temperature here can be directly read from the MDP file.
+Temperature    = 298           # Target temperature to generate initial frames (in Kelvin)
 
 # Density analysis parameters
-NZ      = 100         # Number of slices along Z-axis for density profile calculation
-BE_TIME = 1000        # Start time for density analysis (in ps, to skip equilibration)
-BE_Z    = 21          # Start Z-position for density analysis (in Ångstroms)
-END_Z   = 29          # End Z-position for density analysis (in Ångstroms)
-#set_density = 940     # Target system density (kg/m³)
-error       = 5       # Allowed density error threshold (%)
-max_iter    = 3       # Maximum number of iterations for density adjustment
-factor      = 0.1     # Scaling factor per iteration for box resizing
+NZ             = 100           # Number of slices along Z-axis for density calculation
+BE_TIME        = 1000          # Start time for density analysis (in ps, to skip equilibration)
+BE_Z           = 21            # Start Z-position for density analysis (in nm)
+END_Z          = 29            # End Z-position for density analysis (in nm)
+#set_density   = 940           # Target system density (kg/m³)
+error          = 5             # Allowed density error threshold (%)
+max_iter       = 3             # Maximum number of iterations for density adjustment
+factor         = 0.1           # Scaling factor per iteration for box resizing (0.1 mean: low 0.9; up 1.1)
 
-
-
-#################  NOTICE : Molecule names for md_run and modeling
-MOL_name = ACN Na CLO  # Space-separated list of molecule/ion names (e.g., for density groups)
-
+#################  NOTICE : Molecule names for 'md_run' onfly setting and modeling
+MOL_name       = ACN Na CLO    # Space-separated list of molecule/ion names (e.g., for density groups)
 
 #########################################
-######### INPUT for md_run #########
+######### INPUT for md_run ##############
 #########################################
 # input file folder prefixes
-initialframes   =initialframes # Prefix for initial frames folder (e.g., 'initialframes')
-matrixdata      =matrixdata    # Prefix for electrode matrix data folder (e.g., 'matrixdata')
-basicfile       =basicfile     # Prefix for basic files(top, itp, mdp, ndx) folder (e.g., 'basicfile')
-#slowdir=/data1/huangnan/scanratepotential
-V=2                            # voltage of simulation (V)
-ic=0                           # 
-Temperature=298                # Target simulation temperature (in Kelvin)
-START=1                        # initial case number
-END=10                         # end case number
-num=1                          # each job simulate case number
-queue=new                      # PBS queue: short / new / fast / long (4090:normal/fast)
-ismakecase=1                   # 1 to create case dirs, 0 to skip
-ismakejob=1                    # 1 to generate & submit job, 0 to skip
-mode=default                   # append to run md with append mode(default: default)
-DT=0.002                       # time step for simulation(ps)
-DEFFNM=slownvt                 # default outfile name for simulation
+initialframes  = ./initialframes # Prefix for initial frames folder (e.g., 'initialframes')
+matrixdata     = ./matrixdata    # Prefix for electrode matrix data folder (e.g., 'matrixdata')
+basicfile      = ./basicfile     # Prefix for basic files(top, itp, mdp, ndx) folder (e.g., 'basicfile')
+#slowdir       = /data1/huangnan/scanratepotential
+V              = 2             # voltage of simulation (V)
+ic             = 0             # scan rate of simulation(Rise Time, ps)
+Temperature    = 298           # Target simulation temperature (in Kelvin)
+START          = 1             # initial case number
+END            = 10            # end case number
+num            = 1             # each job simulate case number
+queue          = new           # PBS queue: short / new / fast / long (4090:normal/fast)
+ismakecase     = 1             # 1 to create case dirs, 0 to skip
+ismakejob      = 1             # 1 to generate & submit job, 0 to skip
+mode           = default       # default/append (append: run md with append mode; default: default)
+DT             = 0.002         # time step for simulation(ps)
+DEFFNM         = slownvt       # outfile name for simulation
 
-TIME=10000                     # total time for generate scan file time(not simulation time)(ps)
-SKIPTIME_PS=400                # skip time for generate scan file time(not simulation time)(ps)
-TAO=0                          # scan rate (V/ps)
+TIME           = 10000         # total time for generate scan file time(not simulation time)(ps)
+SKIPTIME_PS    = 400           # skip time for generate scan file time(not simulation time)(ps)
+TAO            = 0             # Rise Time for generate scan rate file time(ps, it can be write "0 10 20 ..." ) 
 
-server_machine=eninstein       # server machine name (eninstein / 4090 / wuchao)
+server_machine = eninstein     # server machine name (eninstein / 4090 / wuchao)
 
-LOW_ONFLY=0 0 20               # onfly_setting
-UP_ONFLY=4.3 4.3 30             # onfly_setting
-NBIN_ONFLY=1 1 1000             # onfly_setting
-MODE_ONFLY=3                    # onfly_setting
+LOW_ONFLY      = 0 0 20        # onfly_setting
+UP_ONFLY       = 4.3 4.3 30    # onfly_setting
+NBIN_ONFLY     = 1 1 1000      # onfly_setting
+MODE_ONFLY     = 3             # onfly_setting
 
 #########################################
 ######### INPUT for analysis ############
 #########################################(待完善)
-analysis_begin_t=0
-analysis_end_t=${8:-0}
-analysis_ONFLY_isD=1
-analysis_ONFLY_isGeo=1             # 几何参数，传给 MATLAB
-analysis_ONFLY_in=densMNC3D.onfly
-analyze_begin_case=1
-analyze_end_case=1
-analyze_V=2
-analyze_mol=ACN
-analyze_tau=0
-analyze_cpp=orientationwater2dmap_dynamic2
-analysis_extra_command=-sl 1 -zmin 21 -zmax 29 -n2ave 20 
-build_gmx=
+analysis_begin_t      = 0        # Start time for analysis (in ps)
+analysis_end_t        = 0        # End time for analysis (in ps, with default value 0 mean all time)
+analysis_ONFLY_isD    = 1        # Enable dynamic output in onfly analysis: 1=yes, 0=no
+#analysis_ONFLY_isGeo  = 1       #
+analysis_ONFLY_in     = densMNC3D.onfly  # Input file name for onfly analysis file
 
-# Arguments:
-# START        Start case number (e.g., 10)
-# END          End case number (exclusive, e.g., 20)
-# NUM          Number of cases per job [default: 1]
-# QUEUE        PBS queue: short / new / fast [default: new]
-# MAKECASE     1 to create case dirs, 0 to skip [default: 1]
-# MAKEJOB      1 to generate & submit job, 0 to skip [default: 1]
-# mode         append to run md with append mode(default: default)
+analyze_begin_case    = 1        # Starting case number for analysis
+analyze_end_case      = 1        # Ending case number for analysis
+analyze_V             = 2        # Voltage value for analysis (in V)
+analyze_mol           = ACN      # Target molecule name for analysis(it can be write by "ACN Na CLO ..." ) 
+analyze_tau           = 0        # Rise time parameter for analysis (in ps)
+
+# Analysis program settings (MD_PP)
+analyze_cpp           = orientationwater2dmap_dynamic2  # Name of analysis C++ program
+build_gmx             = /share/home/huangnan_n/app/code-gmx-onfly/bin/GMXRC  # GMX environment needed to compile the above C++ code
+xtcORtrr              = xtc
+############################################################################################################
+# Additional command line arguments for analysis program #
+# Classic post-processing commands including -f -s -n -o are already configured. 
+# Note that the filenames required for -f and -s should remain consistent and use the DEFFNM parameter for specification.
+# Additional custom command parameters need to be entered here.
+analysis_extra_command = -sl 1 -zmin 21 -zmax 29 -n2ave 20
+

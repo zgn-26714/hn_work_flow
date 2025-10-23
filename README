@@ -16,9 +16,19 @@
     在analysis.sh添加自己的分支后，使用./md_flow.sh [analysis] [your_analysis_name] 来调用
     建议维持框架风格，在analysis.sh仅仅调用下一层级的sh文件，在下一层级sh文件中调用具体cpp/python/matlab代码
     使用INPUT文件，将所需参数传递给分析脚本
+    notice: 分析模块中完成了一个可以集成所有MDcpp后处理文件的框架 ./analysis/source/MD_PP.sh
+            使用者需要将cpp文件的文件名和路径（或是将cpp文件置于./analysis/source/module_C++）写在INPUT文件中
+            别忘了指定编译需要的gmx环境
+            参数设置见INPUT注释
+###########################################################################################################################
+# Additional command line arguments for analysis program #
+# Classic post-processing commands including -f -s -n -o are already configured. 
+# Note that the filenames required for -f and -s should remain consistent and use the DEFFNM parameter for specification.
+# Additional custom command parameters need to be entered here.
+###########################################################################################################################
 2.使用方法：
     修改INPUT中的参数
-    bash md_flow.sh 
-    查看详细使用说明
+    bash md_flow.sh 查看详细使用说明
+    
 3.输出日志：
     生成在 ./result 文件夹中
