@@ -96,6 +96,8 @@ Available Commands:
 
   frames          Generate initial frames for simulation(nvt).
                   → Executes: $SCRIPT_DIR/build_model/run.sh
+                    if modeling bulk
+                     → command: $0 frames bulk
 
   run             Submit job to perform MD simulation.
                   → Executes: $SCRIPT_DIR/run_md/run.sh
