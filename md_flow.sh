@@ -35,7 +35,16 @@ ACTION="${1:-help}"
 case "$ACTION" in
     frames)
         echo ">>> Entering get frames branch..."
-        bash "$SCRIPT_DIR"/build_model/run.sh
+        setting="${2:-default}"
+        case "$setting" in
+          default) 
+            bash "$SCRIPT_DIR"/build_model/run.sh
+            ;;
+          bulk)
+            export TOP=${bulk_top}
+            bash "$SCRIPT_DIR"/build_model/run_for_bulk.sh
+          ;;
+        esac
         ;;
 
     run)

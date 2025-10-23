@@ -6,6 +6,9 @@ rm -rf build
 rm -rf nvt20
 rm -rf initial
 
+
+
+
 bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 rm -rf result
 mkdir -p result
@@ -41,6 +44,10 @@ mkdir -p build
 mv bulk/bulk.gro build/pre_eq.gro
     
 # 执行 equilibration.sh
+cp grompp.mdp grompp_bak.mdp
+sed -i "s/Pcoupl[[:space:]]*=[[:space:]]*no/Pcoupl = Berendsen/" grompp.mdp
+sed -i '/^[[:space:]]*freezegrps/s/^/;/; /^[[:space:]]*freezedim/s/^/;/' grompp.mdp
+sed -i '/^[[:space:]]*ewald-geometry/s/^/;/' grompp.mdp
 if sh "${bash_dir}/equilibration.sh"; then
     echo -e "${GREEN}"
     echo "##############################################">&2
@@ -51,6 +58,7 @@ if sh "${bash_dir}/equilibration.sh"; then
     if sh "${bash_dir}/get_frames.sh"; then
         cp "${TOP}".top result.top
         mv baktop1.top "${TOP}".top
+        mv grompp_bak.mdp grompp.mdp
         echo ""
         echo -e "\033[1;32m🎉🎉🎉  ALL STEPS COMPLETED SUCCESSFULLY!  🎉🎉🎉\033[0m">&2
         echo -e "\033[1;36m      ____  ____  ____  ____  ____  ____       \033[0m">&2

@@ -76,7 +76,7 @@ echo -e "${OK}" | tee -a ./result/b_model.log >&2
 echo "[step 4] get frames"  | tee -a ./result/b_model.log >&2
 
 bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-get_frame_bin="${bash_dir}/source/get_frame"
+get_frame_bin=./get_frame
 
 # 检查可执行文件是否存在
 if [[ ! -x "${get_frame_bin}" ]]; then
