@@ -85,7 +85,14 @@ analysis_end_t=${8:-0}
 analysis_ONFLY_isD=1
 analysis_ONFLY_isGeo=1             # 几何参数，传给 MATLAB
 analysis_ONFLY_in=densMNC3D.onfly
-
+analyze_begin_case=1
+analyze_end_case=1
+analyze_V=2
+analyze_mol=ACN
+analyze_tau=0
+analyze_cpp=orientationwater2dmap_dynamic2
+analysis_extra_command=-sl 1 -zmin 21 -zmax 29 -n2ave 20 
+build_gmx=
 
 # Arguments:
 # START        Start case number (e.g., 10)

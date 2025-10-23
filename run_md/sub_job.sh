@@ -26,7 +26,8 @@ make_job() {
             /k=/s|.*|k=$start_case|;
             /h=/s|.*|h=$num|;
             /workdir=/s|.*|workdir=$rundir|;
-            /mode=/s|.*|mode=$mode|
+            /mode=/s|.*|mode=$mode|;
+            /name=/s|.*|name=$DEFFNM
         " "$objjob" 
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         case "$queue" in
@@ -46,7 +47,8 @@ make_job() {
             /k=/s|.*|k=$start_case|;
             /h=/s|.*|h=$num|;
             /workdir=/s|.*|workdir=$rundir|;
-            /mode=/s|.*|mode=$mode|
+            /mode=/s|.*|mode=$mode|;
+            /name=/s|.*|name=$DEFFNM
         " "$objjob" 
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         cd "$rundir"/case"$start_case"
@@ -59,7 +61,8 @@ make_job() {
             /k=/s|.*|k=$start_case|;
             /h=/s|.*|h=$num|;
             /workdir=/s|.*|workdir=$rundir|;
-            /mode=/s|.*|mode=$mode|
+            /mode=/s|.*|mode=$mode|;
+            /name=/s|.*|name=$DEFFNM
         " "$objjob" 
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         chmod +x $objjob

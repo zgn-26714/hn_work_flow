@@ -30,14 +30,9 @@ case "$command" in
         echo "calculate mdheat data"
         bash ${bash_dir}/source/get_mdHeat.sh
         ;;
-    angle)
-        echo "calculate angle of 2 vector..."
-        bash xxx
-        ;;
-
-    angD)
-        echo "calculate elecharge data"
-        bash xxx
+    MD_PP)
+        echo "Run the MD post-processing module..."
+        bash ${bash_dir}/source/MD_PP.sh
         ;;
     *)
         echo "not found command: $command"
