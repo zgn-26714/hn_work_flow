@@ -28,8 +28,9 @@ fi
 
 echo q | gmx make_ndx -f "${bulk_name}s".gro >> ./result/b_model.log 2>&1
 
-echo "Setting box vectors in "${bulk_name}s".gro to: 5 x 5 x 5 nm" | tee -a ./result/b_model.log >&2
-sed -i '$ s/^.*$/        5.0000   5.0000   5.0000             /' "${bulk_name}s".gro
+echo "Setting box vectors in "${bulk_name}s".gro to: ${bulk_xbox} x ${bulk_ybox} x ${bulk_zbox} nm" | tee -a ./result/b_model.log >&2
+formatted_line=$(printf "%8.4f%8.4f%8.4f" $bulk_xbox $bulk_ybox $bulk_zbox)
+sed -i "\$ s/^.*$/      $formatted_line/" "${bulk_name}s".gro
 echo -e "${OK}${GREEN}Pipeline completed successfully!${NC}" | tee -a ./result/b_model.log >&2
 echo "Final structure: "${bulk_name}s".gro"
 

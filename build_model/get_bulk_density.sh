@@ -129,7 +129,10 @@ fi
 # =============================
 # Step 4: Extract average density in Z range
 # =============================
-echo "[STEP 6] Analyzing density in Z range [1 - 4] nm" | tee -a ./result/b_model.log >&2
-density=$(gmx analyze -f ./bulk/density.xvg -b 1 -e 4 2>/dev/null | grep "^SS1" | awk '{print $2}')
+
+low_bound=$(echo "$bulk_zbox * 0.1" | bc)
+up_bound=$(echo "$bulk_zbox * 0.9" | bc)
+echo "[STEP 6] Analyzing density in Z range [${low_bound} - ${up_bound}] nm" | tee -a ./result/b_model.log >&2
+density=$(gmx analyze -f ./bulk/density.xvg -b ${low_bound} -e ${up_bound} 2>/dev/null | grep "^SS1" | awk '{print $2}')
 
 echo "OUTPUT: $density" 

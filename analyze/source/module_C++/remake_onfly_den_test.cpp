@@ -14,6 +14,80 @@ using namespace std;
 using Matrix4D = vector<vector<vector<vector<double>>>>;
 using Matrix3D = vector<vector<vector<double>>>;
 
+class remake_data
+{
+struct mol_data
+{
+    vector<vector<double>> zt;
+    Matrix3D xyz;
+    Matrix4D allData;
+
+    vector<vector<double>>& get_Matrix(int dim1, int dim2) {
+        zt.resize(dim1, vector<double>(dim2, 0.0));
+        return zt;
+    }
+
+    Matrix3D& get_xyz(int dim1, int dim2, int dim3) {
+        xyz.resize(dim1, vector<vector<double>>(dim2, vector<double>(dim3, 0.0)));
+        return xyz;
+    }
+
+    Matrix4D& get_allData(int dim1, int dim2, int dim3, int dim4) {
+        allData.resize(dim1, vector<vector<vector<double>>>(dim2, vector<vector<double>>(dim3, vector<double>(dim4, 0.0))));
+        return allData;
+    }
+
+    mol_data& operator=(const mol_data& other) {
+        if (this != &other) {
+            zt = other.zt;
+            xyz = other.xyz;
+            allData = other.allData;
+        }
+        return *this;
+    }
+
+    mol_data& operator+=(const mol_data& other){
+        if (this != &other) {
+            // Assuming same dimensions for simplicity
+            for (size_t i = 0; i < zt.size(); ++i) {
+                for (size_t j = 0; j < zt[i].size(); ++j) {
+                    zt[i][j] += other.zt[i][j];
+                }
+            }
+            // Similar addition can be implemented for xyz and allData if needed
+            for (size_t i = 0; i < xyz.size(); ++i) {
+                for (size_t j = 0; j < xyz[i].size(); ++j) {
+                    for (size_t k = 0; k < xyz[i][j].size(); ++k) {
+                        xyz[i][j][k] += other.xyz[i][j][k];
+                    }
+                }
+            }
+            for (size_t i = 0; i < allData.size(); ++i) {
+                for (size_t j = 0; j < allData[i].size(); ++j) {
+                    for (size_t k = 0; k < allData[i][j].size(); ++k) {
+                        for (size_t l = 0; l < allData[i][j][k].size(); ++l) {
+                            allData[i][j][k][l] += other.allData[i][j][k][l];
+                        }
+                    }
+                }
+            }
+        }
+        return *this;
+    }
+};
+
+public:
+    vector<vector<mol_data>> data;
+    remake_data(int nRegion, int nMolecule) {
+        data.resize(nRegion, vector<mol_data>(nMolecule));
+    }
+    vector<mol_data>& get_region(int region) {
+        return data[region]; 
+    }
+};
+
+
+
 struct LoadDataResult {
     vector<vector<Matrix4D>> ret;
     vector<vector<double>> xyzRange;
@@ -24,6 +98,7 @@ struct LoadDataResult {
     int totNbin;
     int totFrames;
     int nRegion;
+    int nGroups;
 };
 
 vector<double> extractNumbers(const string& str) {
@@ -112,7 +187,7 @@ vector<Matrix4D> reshapeColumnMajor(
 
         // MATLAB 是列主序: x 最快，y 次，z 次，col 最慢
         size_t idx = 0;
-        for (int c = 0; c < col; ++c)
+        for (int c = 0; c < col; ++c){
             for (int z = 0; z < n3; ++z)
                 for (int y = 0; y < n2; ++y)
                     for (int x = 0; x < n1; ++x)
@@ -120,16 +195,13 @@ vector<Matrix4D> reshapeColumnMajor(
                         regionData[x][y][z][c] = tmpData[tmpIndex + idx][c];
                         ++idx;
                     }
+            idx = 0;
+        }
 
         tmpIndex += eachNbin;
         ret.push_back(std::move(regionData));
     }
-
-    // 若只有一个 region，则直接返回它（模拟 MATLAB 的 ret{1}）
-    if (nRegion == 1)
-        return { ret[0] };
-    else
-        return ret;
+    return ret;
 }
 
 
@@ -169,6 +241,7 @@ LoadDataResult loadOnflyData3D(const string& fnm) {
     }
     
     result.nRegion = result.nbin.empty() ? 0 : result.nbin.size() / 3;
+   
     
     // 生成xyzRange (linspace)
     for (size_t ii = 0; ii < result.nbin.size(); ++ii) {
@@ -224,7 +297,7 @@ LoadDataResult loadOnflyData3D(const string& fnm) {
         
         result.ret[ii] = reshapeColumnMajor(frameData, result.nRegion, result.nbin, col);
     }
-    
+    result.nGroups = col / 4;  // Assuming 4 columns per group
     return result;
 }
 
@@ -232,7 +305,7 @@ int main() {
     double V = 2.0;
     double scanrate = 0.0;
     
-    string filename = "./deal_data/onfly/onfly" + string(getenv("analyze_begin_case")) + "-" + 
+    string filename = std::string("./deal_data/onfly/onfly") + string(getenv("analyze_begin_case")) + "-" + 
                         string(getenv("analyze_end_case")) + ".dat";
     
     std::cout << "Loading data..." << endl;
@@ -247,141 +320,38 @@ int main() {
     
     // 使用ret (多帧4D数组)
     auto& retData = data.ret;
-    
-    int num_frames = data.totFrames;
-    int nx = retData[0].size();
-    int ny = retData[0][0].size();
-    int nz = retData[0][0][0].size();
-    int total_cols = retData[0][0][0].size();  // col维度大小
-    int groups = total_cols / 4;  // 假设12 cols -> 3 groups
-    
-    cout << "Frames: " << num_frames << ", Groups: " << groups << endl;
-    cout << "Dimensions: " << nx << " x " << ny << " x " << nz << " x " << total_cols << endl;
-    cout << "Total spatial points: " << (nx * ny * nz) << endl;
-    
-    int total_spatial_points = nx * ny * nz;
-    
-    // charge_d 和 density_d: vector< vector< vector<double> > > (groups x (spatial x frames))
-    // 但为节省内存，用 vector< vector<double> > (spatial x frames) per group
-    vector< vector< vector<double> > > charge_d(groups);
-    vector< vector< vector<double> > > density_d(groups);
-    
-    // 初始化总charge/density
-    vector< vector<double> > charge(total_spatial_points, vector<double>(num_frames, 0.0));
-    vector< vector<double> > density(total_spatial_points, vector<double>(num_frames, 0.0));
-    
-    // 主循环: for n=1 to groups (0-based n=0 to groups-1)
-    for (int n = 0; n < groups; ++n) {
-        // 初始化当前group
-        charge_d[n] = vector< vector<double> >(total_spatial_points, vector<double>(num_frames, 0.0));
-        density_d[n] = vector< vector<double> >(total_spatial_points, vector<double>(num_frames, 0.0));
-        
-        // for i=1 to num_frames (0-based i=0 to num_frames-1)
-        for (int i = 0; i < num_frames; ++i) {
-            int spatial_idx = 0;
-            
-            // 按column-major顺序遍历spatial点: x-y-z
-            for (int x = 0; x < nx; ++x) {
-                for (int y = 0; y < ny; ++y) {
-                    for (int z = 0; z < nz; ++z) {
-                        // MATLAB col: (n-1)*4 + 3 for charge -> 0-based: n*4 + 2
-                        // (n-1)*4 + 2 for density -> n*4 + 1
-                        int charge_col = n * 4 + 2;
-                        int density_col = n * 4 + 1;
-                        
-                        if (charge_col < total_cols) {
-                            charge_d[n][spatial_idx][i] = retData[i][x][y][z][charge_col];
-                        }
-                        if (density_col < total_cols) {
-                            density_d[n][spatial_idx][i] = retData[i][x][y][z][density_col];
-                        }
-                        
-                        ++spatial_idx;
-                    }
+    remake_data charge_d(data.nRegion, data.nGroups), density_d(data.nRegion, data.nGroups);
+    remake_data density(data.nRegion, 1), charge(data.nRegion, 1);
+
+    int xindex = 0;
+    int yindex = 0;//写成函数
+    for (int region = 0; region < data.nRegion; ++region) {
+        int nx = data.nbin[3 * region];       // 对应 nbinX
+        int ny = data.nbin[3 * region + 1];   // 对应 nbinY
+        int nz = data.nbin[3 * region + 2];   // 对应 nbinZ
+        for (int n=0; n < data.nGroups; n++){
+            for(int t=0; t<data.totFrames; t++){
+                auto & tmp_charge_d = charge_d.get_region(region)[n].get_Matrix(nz, data.totFrames);
+                auto & tmp_density_d = density_d.get_region(region)[n].get_Matrix(nz, data.totFrames);
+                for(int z=0; z<nz;z++){
+                    tmp_charge_d[z][t] = retData[t][region][xindex][yindex][z][n*4+2];
+                    tmp_density_d[z][t] = retData[t][region][xindex][yindex][z][n*4+1];
                 }
             }
-        }
-        
-        // 累加到总charge/density (MATLAB: if n==1 then = else += )
-        for (int sp = 0; sp < total_spatial_points; ++sp) {
-            for (int f = 0; f < num_frames; ++f) {
-                charge[sp][f] += charge_d[n][sp][f];
-                density[sp][f] += density_d[n][sp][f];
+            //
+            if(n == 0) {
+                density.get_region(region)[0] = density_d.get_region(region)[n];
+                charge.get_region(region)[0] = charge_d.get_region(region)[n];
+            }
+            else{
+                density.get_region(region)[0] += density_d.get_region(region)[n];
+                charge.get_region(region)[0] += charge.get_region(region)[n];
             }
         }
     }
-    
-    // 对应MATLAB: plot(charge(:,1)) - 打印第一帧charge的前20个spatial点值
-    cout << "\nCharge data (first frame, first 20 spatial points):" << endl;
-    for (int i = 0; i < min(20, total_spatial_points); ++i) {
-        cout << fixed << setprecision(8) << charge[i][0] << endl;
-    }
-    
-    // 保存数据到.txt (模拟.mat: 保存所有变量，space-separated)
-    // 为匹配MATLAB，保存charge, charge_d[0..2], density, density_d[0..2]
-    // 每个变量: 先header行 (dims), 然后数据行 (row-major: spatial x frames)
-    ostringstream oss;
-    oss << "./meandata/ACNcharge298k" << V << "V" << scanrate << "ps_1_54.txt";
-    string savedir = oss.str();
-    cout << "\nSaving data to: " << savedir << endl;
-    
-    ofstream outfile(savedir);
-    if (outfile.is_open()) {
-        outfile << scientific << setprecision(10);
-        
-        // 保存charge
-        outfile << "# charge: " << charge.size() << " x " << charge[0].size() << "\n";
-        for (const auto& row : charge) {
-            for (const auto& val : row) {
-                outfile << val << " ";
-            }
-            outfile << "\n";
-        }
-        outfile << "# --- END charge ---\n\n";
-        
-        // 保存charge_d (3 groups)
-        for (int g = 0; g < groups; ++g) {
-            outfile << "# charge_d[" << g << "]: " << charge_d[g].size() << " x " << charge_d[g][0].size() << "\n";
-            for (const auto& row : charge_d[g]) {
-                for (const auto& val : row) {
-                    outfile << val << " ";
-                }
-                outfile << "\n";
-            }
-            outfile << "# --- END charge_d[" << g << "] ---\n";
-        }
-        outfile << "# --- END charge_d ---\n\n";
-        
-        // 保存density (类似)
-        outfile << "# density: " << density.size() << " x " << density[0].size() << "\n";
-        for (const auto& row : density) {
-            for (const auto& val : row) {
-                outfile << val << " ";
-            }
-            outfile << "\n";
-        }
-        outfile << "# --- END density ---\n\n";
-        
-        // 保存density_d
-        for (int g = 0; g < groups; ++g) {
-            outfile << "# density_d[" << g << "]: " << density_d[g].size() << " x " << density_d[g][0].size() << "\n";
-            for (const auto& row : density_d[g]) {
-                for (const auto& val : row) {
-                    outfile << val << " ";
-                }
-                outfile << "\n";
-            }
-            outfile << "# --- END density_d[" << g << "] ---\n";
-        }
-        outfile << "# --- END density_d ---\n\n";
-        
-        outfile.close();
-        cout << "Data saved successfully." << endl;
-    } else {
-        cerr << "Error: Cannot save to " << savedir << endl;
-    }
-    
-    cout << "\nProcessing completed!" << endl;
-    
+
+   //savedata();
+    //几乎不可能储存成matlab的格式，至少以我的水平做不到。那这个的意义在哪里？
+
     return 0;
 }
