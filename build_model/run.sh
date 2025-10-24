@@ -10,25 +10,26 @@ bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 rm -rf result
 mkdir -p result
 
-output=$(sh "${bash_dir}/get_bulk_density.sh") 
+if [ -z "$set_density" ]; then
+    output=$(sh "${bash_dir}/get_bulk_density.sh") 
 
-if [ $? -ne 0 ] || ! echo "$output" | grep -q "^OUTPUT:"; then
-    echo -e "${ERROR} get_bulk_density.sh failed${NC}" | tee -a ./result/b_model.log  >&2
-    exit 1
-else
-    echo -e "${OK}success get bulk density ${output}" | tee -a ./result/b_model.log >&2
-    density=$(echo "$output" | grep "^OUTPUT:" | cut -d' ' -f2)
-    if ! [[ "$density" =~ ^[+-]?[0-9]*\.?[0-9]+([eE][+-]?[0-9]+)?$ ]]; then
-        echo -e "${ERROR}Error: Invalid density value returned: $density${NC}" | tee -a ./result/b_model.log >&2
+    if [ $? -ne 0 ] || ! echo "$output" | grep -q "^OUTPUT:"; then
         echo -e "${ERROR} get_bulk_density.sh failed${NC}" | tee -a ./result/b_model.log  >&2
         exit 1
     else
-        echo -e "${OK}success WRITE bulk density ${density}" | tee -a ./result/b_model.log >&2
+        echo -e "${OK}success get bulk density ${output}" | tee -a ./result/b_model.log >&2
+        density=$(echo "$output" | grep "^OUTPUT:" | cut -d' ' -f2)
+        if ! [[ "$density" =~ ^[+-]?[0-9]*\.?[0-9]+([eE][+-]?[0-9]+)?$ ]]; then
+            echo -e "${ERROR}Error: Invalid density value returned: $density${NC}" | tee -a ./result/b_model.log >&2
+            echo -e "${ERROR} get_bulk_density.sh failed${NC}" | tee -a ./result/b_model.log  >&2
+            exit 1
+        else
+            echo -e "${OK}success WRITE bulk density ${density}" | tee -a ./result/b_model.log >&2
+        fi
     fi
+    density=$(printf "%.10f" "$density")
+    export set_density="${density}"
 fi
-density=$(printf "%.10f" "$density")
-export set_density="${density}"
-
 
 
 if sh "${bash_dir}/build_model.sh"; then

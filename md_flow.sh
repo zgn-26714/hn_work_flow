@@ -121,9 +121,7 @@ Configuration:
   Format: KEY = VALUE   (comments with '#' are ignored)
 
   Example INPUT file:
-      TEMPERATURE = 300
-      STEPS       = 10000
-      OUTPUT_DIR  = ./results
+      ./INPUT
 
 ================================================================================
 EOF
