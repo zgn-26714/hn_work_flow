@@ -29,7 +29,7 @@ int main(int argc, char *argv[]){
 
     for (int i = stoi(begin); i <= stoi(end); i++){
         string CPMfile = "./case" + to_string(i) + "/CPM_electrodeCharge.dat";
-        cout<<"\rcase is "<<i<<endl;
+        cout<<"\rcase is "<<i<<flush;
         ifstream file(CPMfile);
         if (!file.is_open()) {
             cerr << "Error opening file: " << CPMfile << endl;
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
                 if(line[0] == '#') continue; // Skip comment lines
                 while (line[0] == ' ') line.erase(0, 1); // Remove leading spaces
                 real tmp = stod(line.substr(0, line.find(' '))); // Extract the first double value
-                // if ( tmp < 0) tmp = -tmp;
+                // if ( tmp < 0) tmp = -tmp; 
                 if(i == stoi(begin)){
                     charge.emplace_back(tmp);
                 } 
@@ -52,13 +52,20 @@ int main(int argc, char *argv[]){
             }
         }
     }
+    cout<<endl;
     for (int i = 0; i < charge.size(); i++){
         charge[i] /= (stoi(end) - stoi(begin) + 1);
     }
     
-    string outfile = "./deal_data/mdHeat/" + molecule + "_eleCharge" + string(getenv("analyze_V")) + "V" +
+    string outfile = "./deal_data/eleQ/" + molecule + "_eleCharge" + string(getenv("analyze_V")) + "V" +
                                 string(getenv("analyze_tau")) + "ps_" + begin + "-" + end + ".dat";
     ofstream output(outfile);
+    
+    if (!output) {
+        cerr << "Error: Cannot open file " << outfile << endl;
+        return 1;
+    }
+    
     output << "# ElecCharge averaged from case " << begin << " to " << end << endl;
     output << "# V = " << string(getenv("analyze_V")) << " V" << endl;
     output << "# tau = " << string(getenv("analyze_tau")) << " ps" << endl;

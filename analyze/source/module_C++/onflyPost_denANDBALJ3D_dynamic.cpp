@@ -181,7 +181,7 @@ int main(int argc, char** argv)
 	}
 	timeindex = totFrames;
 	if (0 == dynamic) totFrames = 1;
-	std::cout << totFrames << "\n";
+	std::cout << "totFrames: " <<totFrames << std::endl;
 	doubleMatrix	allLJ;
 	std::vector<realMatrix> massdens;
 	std::vector<realMatrix> numdensM;
@@ -222,9 +222,9 @@ int main(int argc, char** argv)
 	}//initial
 
 
-
+	std::cout<<std::endl;
 	for (int count = 0; count < numFile; count++) {
-		std::cout << inputFnm << std::endl;
+		std::cout << "\rAnalysis: " <<inputFnm <<" ..."<< std::fflush;
 		OnflyPostHandle hd(inputFnm);
 		hd.readHead();
 
@@ -237,7 +237,6 @@ int main(int argc, char** argv)
 			}
 		}
 
-		printf("Analysis ...\n");
 		size_t nowTime = 0;
 		if (1 == dynamic)
 		{
@@ -282,7 +281,7 @@ int main(int argc, char** argv)
 			}
 		}
 		else if (0 == dynamic) {
-			std::cout << "TotFrames: " << nowTime << '\n';
+			std::cout << "\tTotFrames: " << nowTime << std::fflush;
 			for (size_t t = 0; t < timeindex; t++)
 			{
 				while(true){
@@ -325,6 +324,8 @@ int main(int argc, char** argv)
 		}
 		inputFnm = get_inputFile(inputFnm);
 	}
+	printf("Analysis done.\n");
+
 	size_t averageNum = numFile;
 	if (0 == dynamic) averageNum *= timeindex;
 	for (size_t t = 0; t < totFrames; t++)
@@ -349,6 +350,7 @@ int main(int argc, char** argv)
 		}
 	}
 
+	std::cout<<"Writing output files ..."<<std::endl;
 	std::vector<std::ofstream> ofile(3);
 	for (int file_idnex = 0; file_idnex < outputFnms.size(); file_idnex++)
 	{
@@ -384,6 +386,7 @@ int main(int argc, char** argv)
 		ofile[file_idnex].precision(8);
 	}
 
+	std::cout<<"Writing den data ..."<<std::endl;
 	for (size_t t = 0; t < totFrames; t++) {
 		for (int j = 0; j < ini.totNbin; j++)
 		{
@@ -399,6 +402,7 @@ int main(int argc, char** argv)
 	}
 	ofile[0].close();
 
+	std::cout<<"Writing BA data ..."<<std::endl;
 	if (output_mode != 1 && output_mode != 3) {
 		for (size_t t = 0; t < totFrames; t++) {
 			for (int j = 0; j < ini.totNbin; j++)
@@ -414,6 +418,7 @@ int main(int argc, char** argv)
 		ofile[1].close();
 	}
 	
+	std::cout<<"Writing LJ data ..."<<std::endl;
 	if (output_mode != 2 && output_mode != 3) {
 		for (size_t t = 0; t < totFrames; t++) {
 			for (int j = 0; j < ini.nbin[2]; j++)
@@ -429,9 +434,7 @@ int main(int argc, char** argv)
 		ofile[2].close();
 	}
 
-
-
-	printf("Analysis done.\n");
+	std::cout<<"All done.\n";
 }
 
 OnflyPostHandle::OnflyPostHandle(std::string fnm)

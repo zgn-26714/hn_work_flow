@@ -101,7 +101,7 @@ fi
 
 # 执行程序
 echo "${num_intialframes}" >&2
-Temperature=${grep "ref_t" ./initial/grompp.mdp | awk -F'=' '{print $2}' | awk '{print $1}'}
+Temperature=$(grep "ref_t" ./initial/grompp.mdp | awk -F'=' '{print $2}' | awk '{print $1}')
 "${get_frame_bin}" -i ./initial/initial -t "${Temperature}" -n "${num_intialframes}" -o "${Temperature}k"
 if [[ $? -ne 0 ]]; then
     echo -e "${ERROR}Execution of 'get_frame' failed.${NC}" | tee -a ./result/b_model.log  >&2

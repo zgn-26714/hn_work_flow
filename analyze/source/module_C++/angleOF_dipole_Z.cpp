@@ -359,4 +359,5 @@ void dw_boundary(real *Lbox)
 int main(int argc, char** argv)
 {
 	return gmx_run_cmain(argc, argv, &main_func);
+	std::cout << " \n get end \n ";
 }

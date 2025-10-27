@@ -1,6 +1,6 @@
 #!/bin/bash
 rm setting.log
-
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 INPUT_FILE="INPUT"
@@ -32,6 +32,7 @@ echo -e "${GREEN}Finish reading INPUT${NC}"
 
 ACTION="${1:-help}"
 
+mkdir -p result
 case "$ACTION" in
     frames)
         echo ">>> Entering get frames branch..."
@@ -54,7 +55,7 @@ case "$ACTION" in
 
     analyze)
         echo ">>> Entering analyze branch..."
-        bash "$SCRIPT_DIR"/analyze/run.sh $2
+        bash "$SCRIPT_DIR"/analyze/analyze.sh $2
         ;;
 
     # all)
@@ -104,7 +105,7 @@ Available Commands:
 
   analyze         Analyze output data from MD simulations (e.g., energy, force).
                   command: $0 analyze [elecharge|onfly|mdheat|MP_PP]
-                  → Executes: $SCRIPT_DIR/analyze/run.sh [elecharge|onfly|mdheat|MP_PP]
+                  → Executes: $SCRIPT_DIR/analyze/analyze.sh [elecharge|onfly|mdheat|MP_PP]
 
   deal_data       this module need matlab!
 

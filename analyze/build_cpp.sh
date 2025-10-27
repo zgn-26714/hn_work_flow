@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-
+set -euo pipefail
 
 execu_bin=$2
 src_file=$1
@@ -12,7 +12,8 @@ if [[ ! -x "${execu_bin}" ]]; then
     fi
 
     # 尝试编译
-    installPrefix=${build_gmx}
+    gmx_path=$(dirname ${build_gmx})
+    installPrefix=${gmx_path}/..
     libdir=lib64
     # remove `-lonfly` if it is not onfly version
     g++ "$src_file" -o "$execu_bin" -I ${installPrefix}/include -L ${installPrefix}/${libdir} -lgromacs -O3 -std=c++17 -lonfly

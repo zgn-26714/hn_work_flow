@@ -85,12 +85,14 @@ analysis_end_t        = 0        # End time for analysis (in ps, with default va
 analysis_ONFLY_isD    = 1        # Enable dynamic output in onfly analysis: 1=yes, 0=no
 #analysis_ONFLY_isGeo  = 1       #
 analysis_ONFLY_in     = densMNC3D.onfly  # Input file name for onfly analysis file
+MODE_ONFLY            = 3             # onfly_setting
 
 analyze_begin_case    = 1        # Starting case number for analysis
 analyze_end_case      = 1        # Ending case number for analysis
 analyze_V             = 2        # Voltage value for analysis (in V)
 analyze_mol           = ACN      # Target molecule name for analysis(it can be write by "ACN Na CLO ..." ) 
 analyze_tau           = 0        # Rise time parameter for analysis (in ps)
+analyze_core          = 1
 
 # Analysis program settings (MD_PP)
 analyze_cpp           = orientationwater2dmap_dynamic2  # Name of analysis C++ program
