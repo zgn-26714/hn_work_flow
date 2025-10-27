@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>
-#include "matio.h"
 
 
 namespace matlab{
@@ -87,36 +86,10 @@ namespace matlab{
         return data;
     }
 
-    bool saveMatFile(const std::string& filename, 
+    bool saveDatFile(const std::string& filename, 
                  const std::vector<double>& time, 
                  const std::vector<double>& heat) {
-        mat_t *matfp;
-        matfp = Mat_CreateVer(filename.c_str(), NULL, MAT_FT_MAT5);
         
-        if (matfp == NULL) {
-            std::cerr << "Error creating MAT file " << filename << std::endl;
-            return false;
-        }
-        
-        // 创建时间变量
-        size_t dims_time[2] = {time.size(), 1};
-        matvar_t *matvar_time = Mat_VarCreate("time", MAT_C_DOUBLE, MAT_T_DOUBLE, 
-                                            2, dims_time, (void*)time.data(), 0);
-        if (matvar_time != NULL) {
-            Mat_VarWrite(matfp, matvar_time, MAT_COMPRESSION_ZLIB);
-            Mat_VarFree(matvar_time);
-        }
-        
-        // 创建heat变量
-        size_t dims_heat[2] = {heat.size(), 1};
-        matvar_t *matvar_heat = Mat_VarCreate("heat", MAT_C_DOUBLE, MAT_T_DOUBLE, 
-                                            2, dims_heat, (void*)heat.data(), 0);
-        if (matvar_heat != NULL) {
-            Mat_VarWrite(matfp, matvar_heat, MAT_COMPRESSION_ZLIB);
-            Mat_VarFree(matvar_heat);
-        }
-        
-        Mat_Close(matfp);
         return true;
     }
 }

@@ -7,7 +7,8 @@
 #include <iomanip>
 #include "./include/matlab_to_C.h"
 
-// 简单的二维数组结构来存储数据
+bool saveDatFile(std::string filename, std::vector<double> time, std::vector<double> heat);
+
 struct Matrix {
     std::vector<std::vector<double>> data;
     
@@ -84,7 +85,7 @@ int main() {
         }
         count++;
         // 清理临时文件
-        system("rm #*# 2>/dev/null");
+        system("rm *# 2>/dev/null");
     }
     
     // 计算平均值
@@ -105,16 +106,32 @@ int main() {
             }
         }
     }
-    
+    std::cout<<"Total cases processed: " << count << std::endl;
 
         // 保存为MAT文件
-    std::string molName;
-    std::string mat_filename = "./meandata/" + molName + "mdHeat" + getenv("V") + "V" + getenv("tau") + "ps.mat";
-    if (matlab::saveMatFile(mat_filename, time, heat)) {
-        std::cout << "MATLAB data saved to " <<mat_filename << std::endl;
+    std::string molName = getenv("analyze_mol");
+    std::string filename = "./deal_data/mdHeat/" + molName + "mdHeat"
+                     + getenv("analyze_V") + "V" + getenv("analyze_tau") + "ps.dat";
+                     
+    if (saveDatFile(filename, time, heat)) {
+        std::cout << "data saved to " <<filename << std::endl;
     } else {
-        std::cerr << "Failed to save MAT file" << std::endl;
+        std::cerr << "Failed to save file" << std::endl;
     }
     
     return 0;
+}
+
+bool saveDatFile(std::string filename, std::vector<double> time, std::vector<double> heat){
+    std::ofstream fid(filename);
+    if (!fid.is_open()) {
+        return false;
+    }
+    fid << "# Time(ps)    mdHeat\n";
+    fid << "# heat in kJ/mol\n";
+    for (size_t i = 0; i < time.size() && i < heat.size(); ++i) {
+        fid << time[i] << "\t" << heat[i] << "\n";
+    }
+    fid.close();
+    return true;
 }
