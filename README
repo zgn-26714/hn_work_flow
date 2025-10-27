@@ -20,6 +20,7 @@
             使用者需要将cpp文件的文件名和路径（或是将cpp文件置于./analysis/source/module_C++）写在INPUT文件中
             别忘了指定编译需要的gmx环境
             参数设置见INPUT注释
+1.4 deal_data模块当作备份使用，唯一的JE模块也只能在eninstein机器上运行
 ###########################################################################################################################
 # Additional command line arguments for analysis program #
 # Classic post-processing commands including -f -s -n -o are already configured. 

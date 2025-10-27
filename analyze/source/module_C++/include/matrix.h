@@ -11,6 +11,9 @@ private:
     Type data;
 
 public:
+
+    Matrix() = default;
+
     // 构造指定维度并初始化为 value
     Matrix(size_t dim1, size_t dim2, const T& value = T{})
         : data(dim1, std::vector<T>(dim2, value)) {}
@@ -59,6 +62,33 @@ public:
         return data[i];
     }
 
+    // 正确的 + 运算符重载（成员函数）
+    Matrix<T> operator+(const Matrix<T>& other) const {
+        if (this->rows() != other.rows() || this->cols() != other.cols()) {
+            throw std::invalid_argument("Matrix addition dimension mismatch");
+        }
+        
+        Matrix<T> result(this->rows(), this->cols());
+        for (size_t i = 0; i < this->rows(); i++) {
+            for (size_t j = 0; j < this->cols(); j++) {
+                result(i, j) = (*this)(i, j) + other(i, j);
+            }
+        }
+        return result;
+    }   
+
+    Matrix<T> operator+=(const Matrix<T>& other) {
+        if (this->rows() != other.rows() || this->cols() != other.cols()) {
+            throw std::invalid_argument("Matrix addition dimension mismatch");
+        }
+        
+        for (size_t i = 0; i < this->rows(); i++) {
+            for (size_t j = 0; j < this->cols(); j++) {
+                (*this)(i, j) += other(i, j);
+            }
+        }
+        return (*this);
+    }   
 
     // 获取尺寸
     size_t rows() const { return data.size(); }

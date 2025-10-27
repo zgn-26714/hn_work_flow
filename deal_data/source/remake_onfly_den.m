@@ -1,14 +1,13 @@
-clear
-V=2;
-scanrate=0;
-[ret, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D('/data1/huangnan/ACN/charging/298k/2V/0ps/xvgdata/onfly/onfly1_54.dat_dens.dat');
+function [charge, charge_d, density, density_d] = remake_onfly_den()
+inputFile=getenv('ongly_dat');
+[ret, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D(inputFile);
 
-
+%Here, the number 4 indicates that onfly will output mass density, number density, charge density and centroid number density.
+%The key to successful execution here is that on-the-fly (onfly) calculations are performed in only one region.
 for n=1:size(ret{1},2)/4
+    %3 and 2 represent charge density and centroid number density, respectively.
     for i=1:length(ret)
         charge_d{n}(:,i) = ret{i}(:,(n-1)*4+3);
-    end
-    for i=1:length(ret)
         density_d{n}(:,i) = ret{i}(:,(n-1)*4+2);
     end
     if n == 1
@@ -20,10 +19,14 @@ for n=1:size(ret{1},2)/4
     end
     
 end
-plot(charge(:,1))
-savedir=sprintf('./meandata/ACNcharge298k%gV%gps_1_54.mat',V,scanrate);
+
+mol=getenv('analy_mol');
+tem=getenv('analyze_T');
+V=str2double(getenv('analyze_V'));
+scanrate=str2double(getenv('analyze_tau'));
+savedir=sprintf('./deal_data/onfly/meandata/%scharge%sk%gV%gps.mat',mol,tem,V,scanrate);
 save(savedir,'charge','charge_d','density','density_d')
-exit
+end
 
 function [ret, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D(fnm)
 allData = importdata(fnm);

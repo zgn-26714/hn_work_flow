@@ -86,6 +86,36 @@ namespace matlab{
         return data;
     }
 
+    bool xvgsave(const std::string& filename, 
+                 const std::vector<std::string>& header, 
+                 const std::vector<std::vector<double>>& data) {
+        
+        std::ofstream fid(filename);
+        if (!fid.is_open()) {
+            return false;
+        }
+        
+        // Write header
+        for (const auto& line : header) {
+            fid << line << std::endl;
+        }
+        
+        // Write data
+        for (const auto& row : data) {
+            for (size_t j = 0; j < row.size(); ++j) {
+                fid << row[j];
+                if (j < row.size() - 1) {
+                    fid << " ";
+                }
+            }
+            fid << std::endl;
+        }
+        
+        fid.close();
+        return true;
+    }
+
+
     bool saveDatFile(const std::string& filename, 
                  const std::vector<double>& time, 
                  const std::vector<double>& heat) {

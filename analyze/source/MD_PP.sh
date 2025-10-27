@@ -56,4 +56,10 @@ done
 
 # Wait for all background tasks to complete
 wait
+rm -rf ./deal_data/${analyze_cpp}/*#
+g++ "${bash_dir}/module_C++/average_xvg.cpp" -o "${bash_dir}/../../bin/ave_xvg" -O3 -std=c++17
+
+${bash_dir}/../../bin/ave_xvg ./deal_data/${analyze_cpp}/${analyze_begin_case}angle_dipole_z.xvg
+
+rm ./deal_data/${analyze_cpp}/*.xvg
 echo -e "${GREEN}All tasks completed!${NC}"

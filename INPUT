@@ -89,6 +89,7 @@ MODE_ONFLY            = 3             # onfly_setting
 
 analyze_begin_case    = 1        # Starting case number for analysis
 analyze_end_case      = 1        # Ending case number for analysis
+analyze_T             = 298      # Temperature value for analysis (in K)   
 analyze_V             = 2        # Voltage value for analysis (in V)
 analyze_mol           = ACN      # Target molecule name for analysis(it can be write by "ACN Na CLO ..." ) 
 analyze_tau           = 0        # Rise time parameter for analysis (in ps)
