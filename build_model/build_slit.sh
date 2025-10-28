@@ -23,6 +23,8 @@ else
     exit 1
 fi
 
+
+
 # 2. 调密度
 if bash ${bash_dir}/build_model.sh; then
     echo -e "${GREEN}"
@@ -49,6 +51,9 @@ else
 fi
 
 mv build/pre_eq_merge.gro build/pre_eq.gro
+# change_top
+
+
 # 5. nvt20
 if bash ${bash_dir}/equilibration.sh; then
     echo -e "${GREEN}"
