@@ -11,12 +11,6 @@ echo -e "${BLUE}
   Script    : ${BASH_SOURCE[0]}
 ${NC}"  | tee -a ./result/b_model.log >&2
 
-# Check if GMXRC exists
-if [[ ! -f "$GMXRC" ]]; then
-    echo -e "${RED}[ERROR]GMXRC file not found: $GMXRC${NC}" | tee -a ./result/b_model.log >&2
-    exit 1
-fi
-source "$GMXRC"
 
 # Clean up old files safely
 echo "Cleaning up temporary files..." | tee -a ./result/b_model.log >&2

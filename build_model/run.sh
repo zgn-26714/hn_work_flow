@@ -10,6 +10,13 @@ bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 rm -rf result
 mkdir -p result
 
+# Check if GMXRC exists
+if [[ ! -f "$GMXRC" ]]; then
+    echo -e "${RED}[ERROR]GMXRC file not found: $GMXRC${NC}" | tee -a ./result/b_model.log >&2
+    exit 1
+fi
+source "$GMXRC"
+
 if [ -z "$set_density" ]; then
     output=$(sh "${bash_dir}/get_bulk_density.sh") 
 

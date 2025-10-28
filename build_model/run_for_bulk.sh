@@ -6,7 +6,12 @@ rm -rf build
 rm -rf nvt20
 rm -rf initial
 
-
+# Check if GMXRC exists
+if [[ ! -f "$GMXRC" ]]; then
+    echo -e "${RED}[ERROR]GMXRC file not found: $GMXRC${NC}" | tee -a ./result/b_model.log >&2
+    exit 1
+fi
+source "$GMXRC"
 
 
 bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)

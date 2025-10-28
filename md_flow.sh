@@ -44,7 +44,14 @@ case "$ACTION" in
           bulk)
             export TOP=${bulk_top}
             bash "$SCRIPT_DIR"/build_model/run_for_bulk.sh
-          ;;
+            ;;
+          slit)
+            bash "$SCRIPT_DIR"/build_model/build_slit.sh
+            ;;
+          *)
+            echo -e "${ERROR}Invalid frames setting: $setting${NC}" >&2
+            exit 1
+            ;;
         esac
         ;;
 
@@ -99,6 +106,8 @@ Available Commands:
                   → Executes: $SCRIPT_DIR/build_model/run.sh
                     if modeling bulk
                      → command: $0 frames bulk
+                    if modeling slit
+                     → command: $0 frames slit
 
   run             Submit job to perform MD simulation.
                   → Executes: $SCRIPT_DIR/run_md/run.sh

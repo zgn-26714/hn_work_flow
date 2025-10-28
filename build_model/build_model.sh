@@ -16,7 +16,7 @@ export iter
 cp "${packmol}".inp packmol_.inp
 # begin model
 echo "Initializing system with packmol..." | tee -a ./result/b_model.log >&2
-name_value=$(sh "$SCRIPT_DIR"/source/begin_packmol.sh | sed -n 's/^Final structure: \(.*\)\.gro$/\1/p' )
+name_value=$(bash "$SCRIPT_DIR"/source/begin_packmol.sh | sed -n 's/^Final structure: \(.*\)\.gro$/\1/p' )
 if [ -z "$name_value" ]; then
     echo -e "${ERROR}Error: Failed to run begin_packmol.sh or no valid output${NC}" | tee -a ./result/b_model.log >&2
     exit 1

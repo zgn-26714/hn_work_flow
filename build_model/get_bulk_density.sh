@@ -8,13 +8,6 @@ echo "⚙️  Parameters: nsteps = ${nsteps_bulk}"
 echo "**********************************************************************"
 echo -e "${NC}"
 } | tee -a ./result/b_model.log >&2
-if [[ -f "$GMXRC" ]]; then
-    source "$GMXRC"
-else
-    echo -e "${ERROR}GMXRC not found: $GMXRC${NC}"  | tee -a ./result/b_model.log >&2
-    exit 1
-fi
-
 
 bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 

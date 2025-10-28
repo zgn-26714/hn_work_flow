@@ -8,12 +8,6 @@ echo "⚙️  Parameters: nsteps = ${nsteps_ini}">&2
 echo "**********************************************************************">&2
 echo -e "${NC}"
 } | tee -a ./result/b_model.log 
-if [[ -f "$GMXRC" ]]; then
-    source "$GMXRC"
-else
-    echo -e "${ERROR}GMXRC not found: $GMXRC${NC}" | tee -a ./result/b_model.log  >&2
-    exit 1
-fi
 
 echo "[step 1] clear file" | tee -a ./result/b_model.log
 rm -f *#
