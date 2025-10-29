@@ -22,6 +22,11 @@ if [[ ! -x "${execu_bin}" ]]; then
     echo "Executable file compiled successfully." | tee -a ./result/b_model.log  >&2
 fi
 
+
+export BASH_DIR=$bash_dir
+${execu_bin} ./model/single_electrode.gro
+gmx editconf -f ./model/single_electrode.gro -o ./model/single_electrode.pdb >> ./result/b_model.log  2>&1
+
 #自动生成初始拓扑
 if [ "$is_auto_top" -eq 1 ]; then
     if bash ${bash_dir}/auto_topology.sh /model/single_electrode.gro; then
@@ -31,7 +36,3 @@ if [ "$is_auto_top" -eq 1 ]; then
         exit 1
     fi
 fi
-
-
-${execu_bin} -o ./model/single_electrode.gro
-gmx editconf -f ./model/single_electrode.gro -o ./model/single_electrode.pdb

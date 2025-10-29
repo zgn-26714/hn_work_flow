@@ -53,12 +53,13 @@ std::vector<std::vector<double>> loadUnitFile(const std::string& filename) {
 // 生成石墨烯电极结构
 void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList& Nlist) {
     // 加载单元结构文件
-    auto Unit1 = loadUnitFile("./database/Unit1_cvo.dat");
-    auto Unit2 = loadUnitFile("./database/Unit2_cv.dat");
-    auto Unit3 = loadUnitFile("./database/Unit3_cv.dat");
-    auto Unit4 = loadUnitFile("./database/Unit4_cpo.dat");
-    auto Unit5 = loadUnitFile("./database/Unit5_cp.dat");
-    auto Unit6 = loadUnitFile("./database/Unit6_cp.dat");
+    std::string bash_dir = getenv("BASH_DIR");
+    auto Unit1 = loadUnitFile(bash_dir+"/../database/Unit1_cvo.dat");
+    auto Unit2 = loadUnitFile(bash_dir+"/../database/Unit2_cv.dat");
+    auto Unit3 = loadUnitFile(bash_dir+"/../database/Unit3_cv.dat");
+    auto Unit4 = loadUnitFile(bash_dir+"/../database/Unit4_cpo.dat");
+    auto Unit5 = loadUnitFile(bash_dir+"/../database/Unit5_cp.dat");
+    auto Unit6 = loadUnitFile(bash_dir+"/../database/Unit6_cp.dat");
     
     // 参数设置
     const double Lx0 = 3.3;
@@ -102,7 +103,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
         for (int j = 1; j <= 28; j++) {
             if (j-1 < Unit4.size() && idx < Natom) {
                 Coor[idx].resNum = idx + 1;
-                Coor[idx].resName = "Cpo";
+                Coor[idx].resName = "CL";
                 Coor[idx].atomName = "C";
                 Coor[idx].atomNum = idx + 1;
                 Coor[idx].x = Unit4[j-1][0];  // MATLAB j对应C++ j-1
@@ -117,7 +118,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     for (int i = 1; i <= 14 && i-1 < Unit4.size(); i++) {
         if (idx < Natom) {
             Coor[idx].resNum = idx + 1;
-            Coor[idx].resName = "Cpo";
+            Coor[idx].resName = "CL";
             Coor[idx].atomName = "C";
             Coor[idx].atomNum = idx + 1;
             Coor[idx].x = Unit4[i-1][0];  // MATLAB i对应C++ i-1
@@ -131,7 +132,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     int startCpo = 0;
     for (int i = 1; i <= N4 && idx < Natom; i++) {
         Coor[idx].resNum = idx + 1;
-        Coor[idx].resName = "Cpo";
+        Coor[idx].resName = "CL";
         Coor[idx].atomName = "C";
         Coor[idx].atomNum = idx + 1;
         Coor[idx].x = Lx0 + (nx - 7) * dc;
@@ -140,6 +141,10 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
         idx++;
     }
     
+    int CL_idx = idx;
+    std::string command = "echo CL " + std::to_string(CL_idx) + " >tmp"; // 修复类型问题
+    system(command.c_str());
+
     // ===== Cvo 区域 =====
     int startCvo = idx;
     // MATLAB: for i=1:13+nx-7, for j=1:28
@@ -147,7 +152,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
         for (int j = 1; j <= 28; j++) {
             if (j-1 < Unit1.size() && idx < Natom) {
                 Coor[idx].resNum = idx + 1;
-                Coor[idx].resName = "Cvo";
+                Coor[idx].resName = "GRA";
                 Coor[idx].atomName = "C";
                 Coor[idx].atomNum = idx + 1;
                 Coor[idx].x = Unit1[j-1][0] + (i-1) * dc;
@@ -162,7 +167,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     for (int i = 1; i <= 14 && i-1 < Unit1.size(); i++) {
         if (idx < Natom) {
             Coor[idx].resNum = idx + 1;
-            Coor[idx].resName = "Cvo";
+            Coor[idx].resName = "GRA";
             Coor[idx].atomName = "C";
             Coor[idx].atomNum = idx + 1;
             Coor[idx].x = Unit1[i-1][0] + (13 + nx - 7) * dc;
@@ -175,7 +180,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     // MATLAB: for i=1:14*(2*(13+nx-7)+1)
     for (int i = 1; i <= N1 && idx < Natom; i++) {
         Coor[idx].resNum = idx + 1;
-        Coor[idx].resName = "Cvo";
+        Coor[idx].resName = "GRA";
         Coor[idx].atomName = "C";
         Coor[idx].atomNum = idx + 1;
         Coor[idx].x = Coor[startCvo + i - 1].x;
@@ -191,7 +196,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
         for (int j = 1; j <= 28; j++) {
             if (j-1 < Unit5.size() && idx < Natom) {
                 Coor[idx].resNum = idx + 1;
-                Coor[idx].resName = "Cp";
+                Coor[idx].resName = "GRA";
                 Coor[idx].atomName = "C";
                 Coor[idx].atomNum = idx + 1;
                 Coor[idx].x = Unit5[j-1][0];
@@ -206,7 +211,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     for (int i = 1; i <= 14 && i-1 < Unit5.size(); i++) {
         if (idx < Natom) {
             Coor[idx].resNum = idx + 1;
-            Coor[idx].resName = "Cp";
+            Coor[idx].resName = "GRA";
             Coor[idx].atomName = "C";
             Coor[idx].atomNum = idx + 1;
             Coor[idx].x = Unit5[i-1][0];
@@ -219,7 +224,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     // MATLAB: for i=1:14*(2*(21+nz-19)+1)
     for (int i = 1; i <= N5 && idx < Natom; i++) {
         Coor[idx].resNum = idx + 1;
-        Coor[idx].resName = "Cp";
+        Coor[idx].resName = "GRA";
         Coor[idx].atomName = "C";
         Coor[idx].atomNum = idx + 1;
         Coor[idx].x = Lx0 + (nx - 7) * dc - dg;
@@ -235,7 +240,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
         for (int j = 1; j <= 28; j++) {
             if (j-1 < Unit6.size() && idx < Natom) {
                 Coor[idx].resNum = idx + 1;
-                Coor[idx].resName = "Cp";
+                Coor[idx].resName = "GRA";
                 Coor[idx].atomName = "C";
                 Coor[idx].atomNum = idx + 1;
                 Coor[idx].x = Unit6[j-1][0];
@@ -250,7 +255,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     for (int i = 1; i <= 14 && i-1 < Unit6.size(); i++) {
         if (idx < Natom) {
             Coor[idx].resNum = idx + 1;
-            Coor[idx].resName = "Cp";
+            Coor[idx].resName = "GRA";
             Coor[idx].atomName = "C";
             Coor[idx].atomNum = idx + 1;
             Coor[idx].x = Unit6[i-1][0];
@@ -263,7 +268,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     // MATLAB: for i=1:14*(2*nz+1)
     for (int i = 1; i <= N6 && idx < Natom; i++) {
         Coor[idx].resNum = idx + 1;
-        Coor[idx].resName = "Cp";
+        Coor[idx].resName = "GRA";
         Coor[idx].atomName = "C";
         Coor[idx].atomNum = idx + 1;
         Coor[idx].x = Lx0 + (nx - 7) * dc - 2 * dg;
@@ -279,7 +284,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
         for (int j = 1; j <= 28; j++) {
             if (j-1 < Unit3.size() && idx < Natom) {
                 Coor[idx].resNum = idx + 1;
-                Coor[idx].resName = "Cv";
+                Coor[idx].resName = "GRA";
                 Coor[idx].atomName = "C";
                 Coor[idx].atomNum = idx + 1;
                 Coor[idx].x = Unit3[j-1][0] + (i-1) * dc;
@@ -294,7 +299,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     for (int i = 1; i <= 14 && i-1 < Unit3.size(); i++) {
         if (idx < Natom) {
             Coor[idx].resNum = idx + 1;
-            Coor[idx].resName = "Cv";
+            Coor[idx].resName = "GRA";
             Coor[idx].atomName = "C";
             Coor[idx].atomNum = idx + 1;
             Coor[idx].x = Unit3[i-1][0] + (10 + nx - 7) * dc;
@@ -307,7 +312,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     // MATLAB: for i=1:14*(2*(10+nx-7)+1)
     for (int i = 1; i <= N3 && idx < Natom; i++) {
         Coor[idx].resNum = idx + 1;
-        Coor[idx].resName = "Cv";
+        Coor[idx].resName = "GRA";
         Coor[idx].atomName = "C";
         Coor[idx].atomNum = idx + 1;
         Coor[idx].x = Coor[startCv3 + i - 1].x;
@@ -323,7 +328,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
         for (int j = 1; j <= 28; j++) {
             if (j-1 < Unit2.size() && idx < Natom) {
                 Coor[idx].resNum = idx + 1;
-                Coor[idx].resName = "Cv";
+                Coor[idx].resName = "GRA";
                 Coor[idx].atomName = "C";
                 Coor[idx].atomNum = idx + 1;
                 Coor[idx].x = Unit2[j-1][0] + (i-1) * dc;
@@ -338,7 +343,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     for (int i = 1; i <= 14 && i-1 < Unit2.size(); i++) {
         if (idx < Natom) {
             Coor[idx].resNum = idx + 1;
-            Coor[idx].resName = "Cv";
+            Coor[idx].resName = "GRA";
             Coor[idx].atomName = "C";
             Coor[idx].atomNum = idx + 1;
             Coor[idx].x = Unit2[i-1][0] + nx * dc;
@@ -351,7 +356,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     // MATLAB: for i=1:14*(2*nx+1)
     for (int i = 1; i <= N2 && idx < Natom; i++) {
         Coor[idx].resNum = idx + 1;
-        Coor[idx].resName = "Cv";
+        Coor[idx].resName = "GRA";
         Coor[idx].atomName = "C";
         Coor[idx].atomNum = idx + 1;
         Coor[idx].x = Coor[startCv2 + i - 1].x;
@@ -360,6 +365,8 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
         idx++;
     }
     
+    command = "echo GRA " + std::to_string(idx-CL_idx) + " >>tmp"; // 修复类型问题
+    system(command.c_str());
     // 调整实际生成的原子数
     Coor.resize(idx);
 }
@@ -393,44 +400,6 @@ void translate_pbc(const std::vector<Atom>& Coor_sq, const Box& box_sq, double d
     }
 }
 
-// 简化命名
-void simplename(const std::vector<Atom>& Coor2, const Box& box2, const NList& Nlist,
-                std::vector<Atom>& Coor4, Box& box4) {
-    Coor4 = Coor2;
-    box4 = box2;
-    
-    std::vector<std::string> Mname = {"CL2", "CR2", "CL1", "CR1"};
-    
-    int N = Coor2.size();
-    int N1 = Nlist.counts[0];
-    int sumN = 0;
-    for (int count : Nlist.counts) {
-        sumN += count;
-    }
-    
-    // 重命名不同区域的原子
-    // 区域1: 0 到 N1-1
-    for (int i = 0; i < N1 && i < Coor4.size(); i++) {
-        Coor4[i].resName = Mname[0];
-    }
-    
-    // 区域2: N1 到 2*N1-1
-    for (int i = N1; i < 2 * N1 && i < Coor4.size(); i++) {
-        Coor4[i].resName = Mname[1];
-    }
-    
-    // 区域3: 2*N1 到 N1+sumN-1
-    for (int i = 2 * N1; i < N1 + sumN && i < Coor4.size(); i++) {
-        Coor4[i].resName = Mname[2];
-    }
-    
-    // 区域4: N1+sumN 到 2*sumN-1
-    for (int i = N1 + sumN; i < 2 * sumN && i < Coor4.size(); i++) {
-        Coor4[i].resName = Mname[3];
-    }
-}
-
-// 写入.gro文件
 void growrite(const std::vector<Atom>& Coor, const Box& box, const std::string& fname) {
     std::ofstream fout(fname);
     if (!fout.is_open()) {
@@ -463,10 +432,10 @@ void growrite(const std::vector<Atom>& Coor, const Box& box, const std::string& 
 }
 
 // 主函数示例
-int main() {
-    double llx = 3.4;  // nm
-    double llz = 8.0;  // nm
-    double dslit = 0.8; // nm
+int main(int argc, char* argv[]) {
+    double llx = std::stod(getenv("LLX"));  // nm
+    double llz = std::stod(getenv("LLZ"));  // nm
+    double dslit = std::stod(getenv("dslit")); // nm
     
     std::vector<Atom> Coor_sq, Coor;
     Box box_sq, box;
@@ -479,7 +448,8 @@ int main() {
     translate_pbc(Coor_sq, box_sq, dslit, Coor, box);
     
     // 写入文件
-    growrite(Coor, box, "oneelectrode.gro");
+    std::string out_file = argv[1]; 
+    growrite(Coor, box, out_file);
     
     std::cout << "生成了 " << Coor.size() << " 个原子" << std::endl;
     std::cout << "盒子尺寸: " << box.x << " x " << box.y << " x " << box.z << " nm^3" << std::endl;

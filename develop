@@ -14,4 +14,4 @@ remake_angle
 rotate model
 
 slit代码
-    top问题
+    自动获取盒子的x,y,z

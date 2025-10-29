@@ -6,16 +6,9 @@
 #include <sstream>
 #include <algorithm>
 
-int main(int argc, char* argv[]) {
-    // 检查命令行参数
-    if (argc != 2) {
-        std::cerr << "用法: " << argv[0] << " <文件名>" << std::endl;
-        return 1;
-    }
-
-    std::string filename = argv[1];
+int main() {
+    std::string filename = getenv("TOP") + std::string(".top");
     
-    // 打开文件
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "错误: 无法打开文件 '" << filename << "'" << std::endl;
@@ -50,7 +43,7 @@ int main(int argc, char* argv[]) {
     std::cout << "找到 molecules 段落: 从第 " << start_line + 1 << " 行到文件末尾" << std::endl;
 
     // 处理 molecules 段落
-    std::map<std::string, int> moleculeCounts;
+    std::vector<std::pair<std::string, int>> moleculeCounts;
     std::string firstMolecule;
     int firstCount = 0;
     bool firstMoleculeSet = false;
@@ -66,7 +59,7 @@ int main(int argc, char* argv[]) {
 
         // 跳过可能的新段落标题
         if (currentLine.find('[') != std::string::npos) {
-            continue;
+            std::cerr << "error: find a [, check your file" << std::endl;
         }
 
         // 解析分子和数量
@@ -75,7 +68,15 @@ int main(int argc, char* argv[]) {
         int count;
         
         if (iss >> molecule >> count) {
-            moleculeCounts[molecule] += count;
+            std::pair<std::string, int> molPair = {molecule, count};
+            auto iter = find(moleculeCounts.begin(), moleculeCounts.end(), molPair);
+            if(iter == moleculeCounts.end()){
+                moleculeCounts.push_back(molPair);
+            }
+            else{
+                moleculeCounts[iter - moleculeCounts.begin()].second += count;
+            }
+            
             
             // 记录第一个分子
             if (!firstMoleculeSet) {
@@ -103,10 +104,10 @@ int main(int argc, char* argv[]) {
 
     // 输出处理后的 molecules 内容
     if (firstMoleculeSet) {
-        // 输出第一个分子（加L后缀）
-        outFile << firstMolecule << "L " << firstCount << std::endl;
-        // 输出第一个分子的复制品（加R后缀）
-        outFile << firstMolecule << "R " << firstCount << std::endl;
+        // 输出第一个分子(CL)
+        outFile << firstMolecule <<" "<< firstCount << std::endl;
+        // 输出第一个分子的复制品(CR)
+        outFile << "CR " << firstCount << std::endl;
     }
 
     // 输出其他分子，数量翻倍

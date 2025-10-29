@@ -6,7 +6,7 @@
 #include <iostream>
 using namespace std;
 
-void changeMol_name(vector<string>& mol_lines, int count);
+void changeMol_name(string& mol_lines);
 
 int main(int argc, char* argv[]) {
     string gro1 = argv[1];
@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
     string now_name;
     int count = 0;
     while (getline(file1, line)) {
+        
         if(count < 2){
             pre_head.push_back(line);
             count++;
@@ -42,23 +43,23 @@ int main(int argc, char* argv[]) {
             mol_name = mol_name.substr(pos);
         }
 
-        if(mol_name.empty()){
+        if(mol_name[0] == '.'){
             pre_end = line;
             continue;
         }
         //new mol stucture
         if(mol_name != now_name){
-            auto iter = find(all_name.begin(),all_name.end(),mol_name);
-            //new mol 
+            auto iter = find(all_name.begin(),all_name.end(),now_name);
+            //new mol
             if(iter == all_name.end()){
-                all_name.push_back(mol_name);
+                if(!now_name.empty())
+                    all_name.push_back(now_name);
                 if(!mol_lines.empty()){
                     merge_lines.push_back(mol_lines);
                     mol_lines.clear();
                 }
             }
-            //have mol with same name
-            else{
+            else{//have mol with same name
                 int index = iter - all_name.begin();
                 if(!mol_lines.empty()){
                     merge_lines[index].insert(merge_lines[index].end(), mol_lines.begin(), mol_lines.end());
@@ -67,13 +68,27 @@ int main(int argc, char* argv[]) {
             }
             now_name = mol_name;
         }
-        else{
+
             mol_lines.push_back(line);
-        }
+
     }
     file1.close();
-    merge_lines.push_back(mol_lines);
-    mol_lines.clear();
+    auto iter = find(all_name.begin(),all_name.end(),now_name);
+    if(iter == all_name.end()){
+        if(!merge_lines.empty()){
+            all_name.push_back(now_name);
+            merge_lines.push_back(mol_lines);
+            mol_lines.clear();
+        }
+    }
+    else{
+        int index = iter - all_name.begin();
+        if(!mol_lines.empty()){
+            merge_lines[index].insert(merge_lines[index].end(), mol_lines.begin(), mol_lines.end());
+            mol_lines.clear();
+        }
+    }
+    std::cout<<"Finished reading "<< gro1 << std::endl;
 
     count = 0;
     while (getline(file2, line)) {
@@ -89,7 +104,7 @@ int main(int argc, char* argv[]) {
         if (pos != string::npos) {
             mol_name = mol_name.substr(pos);
         }
-        if(mol_name.empty()){
+        if(mol_name[0] == '.'){
             pre_end = line;
             continue;
         }
@@ -98,11 +113,18 @@ int main(int argc, char* argv[]) {
             cerr << "Error: Molecule " << mol_name << " in " << gro2 << " not found in " << gro1 << endl;
             return 1;
         }
-        int index = iter - all_name.begin();
-        merge_lines[index].push_back(line);
+        else if(iter == all_name.begin()){
+            changeMol_name(line);
+            merge_lines[0].push_back(line);
+        }
+        else{
+            int index = iter - all_name.begin();
+            merge_lines[index].push_back(line);
+        }
+        
     }
     file2.close();
-
+    
 
     int num = stoi(pre_head[1]) + stoi(pre_head[3]);
     string outfile_name = gro1.substr(0, gro1.size()-4) + "_merge.gro";
@@ -111,26 +133,26 @@ int main(int argc, char* argv[]) {
     outfile << num << endl;
     count = 0;
     for(auto& mol_lines : merge_lines){
-        if (count < 2){
-            changeMol_name(mol_lines,count);
-            count++;
-        }
         for(string l : mol_lines)
             outfile << l << endl;
     }
-        
     outfile << pre_end;
 }
 
-void changeMol_name(vector<string>& mol_lines, int count){
-    for(auto& line : mol_lines){
-        std::istringstream iss(line);
-        string tmp;
-        iss>>tmp;
-        int num = line.find(tmp);
-        line = line.substr(num+tmp.size(),line.size());
-        string space(num, ' ');
-        char add = count ? 'L' : 'R';
-        line = space + tmp + add + line;
+void changeMol_name(string& line){
+    std::istringstream iss(line);
+    string tmp;
+    iss >> tmp;
+    int num = line.find(tmp);
+    line = line.substr(num + tmp.size(), line.size());
+    string space(num, ' ');
+    size_t pos = tmp.find_first_not_of("0123456789");
+    int space_add = tmp.size() - pos;
+    if (pos != string::npos) {
+        tmp = tmp.substr(0, pos);
     }
+    string space2;
+    if (space_add > 2)
+        space2 = string(space_add - 2, ' ');
+    line = space + tmp + "CR" + space2 + line;
 }
