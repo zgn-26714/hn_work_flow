@@ -18,11 +18,11 @@ export -f mrun
 
 
 command="$1"
+
 bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # 根据输入的命令执行不同操作
 case "$command" in
     JE)
-        export onfly_dat=$2
         echo "Calculate and store the data required for the JE model..."  | tee -a ./result/deal_data.log >&2
         bash ${bash_dir}/source/JE_model.sh  | tee -a ./result/deal_data.log >&2
         ;;

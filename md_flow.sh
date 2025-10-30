@@ -65,6 +65,10 @@ case "$ACTION" in
         bash "$SCRIPT_DIR"/analyze/analyze.sh $2
         ;;
 
+    d_data)
+        echo ">>> Entering deal_data branch..."
+        bash "$SCRIPT_DIR"/deal_data/deal_data.sh $2
+        ;;
     # all)
     #     echo ">>> Running ALL steps sequentially..."
     #     # Step 1: Build model
@@ -113,10 +117,11 @@ Available Commands:
                   → Executes: $SCRIPT_DIR/run_md/run.sh
 
   analyze         Analyze output data from MD simulations (e.g., energy, force).
-                  command: $0 analyze [elecharge|onfly|mdheat|MP_PP]
-                  → Executes: $SCRIPT_DIR/analyze/analyze.sh [elecharge|onfly|mdheat|MP_PP]
+                  command: $0 analyze [eleQ|onfly|mdheat|MD_PP|...]
+                  → Executes: $SCRIPT_DIR/analyze/analyze.sh [eleQ|onfly|mdheat|MD_PP|...]
 
-  deal_data       this module need matlab!
+  d_data          this module need matlab!
+                  → Executes: $SCRIPT_DIR/deal_data/deal_data.sh
 
   help            Show this help message (default).
 

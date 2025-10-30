@@ -8,7 +8,7 @@ clc
 %ie and q unit is ev/(nm3 ps)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 struct_input = struct();
-struct_input.mol = 'ACN';
+struct_input.mol = getenv('analyze_mol');;
 struct_input.T = 298; %K
 struct_input.V = 2; %V
 struct_input.scanrate = 0; %ps
@@ -25,18 +25,23 @@ analyze_input.dz = struct_input.lz / analyze_input.nbin;
 global issmooth isfit %switch
 issmooth=1;isfit=1;
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% calc dphi %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
-[charge, charge_d, density, density_d]=remake_onfly_den();
+onfly_file = getenv('onfly_dat');
+[charge, charge_d, density, density_d]=remake_onfly_den(onfly_file);
 onfly_den=struct();
 onfly_den.charge=charge;
 onfly_den.charge_d=charge_d;    
 onfly_den.density=density;
 onfly_den.density_d=density_d;
 %remake elecharge
-Vs=xvgread(sprintf('./deal_data/eleQ/ACN_eleCharge2V0ps.dat'));
-Vs_dt = Vs_dat.data;
-Vs_data = str2double(Vs_dat.textdata(2:end, 1));
-Vs_data = Vs_data/lx/ly;
-% den_dt = 
+analy_mol = getenv('analyze_mol');
+a_begin_case = getenv('analyze_begin_case');
+a_end_case = getenv('analyze_end_case');
+Vs=importdata(sprintf('./deal_data/eleQ/%s_eleCharge2V0ps_%s-%s.dat',analy_mol,a_begin_case,a_end_case));
+Vs_dt = Vs.data;
+Vs_data = str2double(Vs.textdata(2:end, 1));
+Vs_data = Vs_data/struct_input.lx/struct_input.ly;
+den_dt = str2double(getenv('den_dt')); %ps
+skip_t = 400; %ps
 elecharge = remake_eleQ(Vs_data,Vs_dt,den_dt,skip_t);
 
 %calc dphi
@@ -50,7 +55,7 @@ function elecharge = remake_eleQ(Vs_data,Vs_dt,den_dt,skip_t)
     if Vs_dt > den_dt
         error('The time step of electrostatic potential data should be less than that of density data!');
     end
-    if mod(den_dt / Vs_dt) ~= 0
+    if mod(den_dt ,Vs_dt) ~= 0
         error('The time step of density data should be integer multiples of that of electrostatic potential data!');
     end
 
@@ -135,5 +140,103 @@ function Nrate=getNrate(density,ntime,nbin,dt,dz)
     end
     if ~iscell(density)
         Nrate=Nrate{1};
+    end
+end
+
+
+function [charge, charge_d, density, density_d] = remake_onfly_den(inputFile)
+[ret, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D(inputFile);
+
+%Here, the number 4 indicates that onfly will output mass density, number density, charge density and centroid number density.
+%The key to successful execution here is that on-the-fly (onfly) calculations are performed in only one region.
+for n=1:size(ret{1},2)/4
+    %3 and 2 represent charge density and centroid number density, respectively.
+    for i=1:length(ret)
+        charge_d{n}(:,i) = ret{i}(:,(n-1)*4+3);
+        density_d{n}(:,i) = ret{i}(:,(n-1)*4+2);
+    end
+    if n == 1
+        charge = charge_d{1};
+        density = density_d{1};
+    else
+        charge=charge+charge_d{n};
+        density=density+density_d{n};
+    end
+    
+end
+
+mol=getenv('analy_mol');
+tem=getenv('analyze_T');
+V=str2double(getenv('analyze_V'));
+scanrate=str2double(getenv('analyze_tau'));
+savedir=sprintf('./deal_data/onfly/meandata/%scharge%sk%gV%gps.mat',mol,tem,V,scanrate);
+save(savedir,'charge','charge_d','density','density_d')
+end
+    
+function [ret, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D(fnm)
+allData = importdata(fnm);
+data = allData.data;
+textData = allData.textdata;
+Lbox = double(regexp(string(textData{2}), "[\d.+-]+", "match"));
+lowPos = double(regexp(string(textData{3}), "[\d.+-]+", "match"));
+upPos = double(regexp(string(textData{4}), "[\d.+-]+", "match"));
+nbin = double(regexp(string(textData{6}), "[\d.+-]+", "match"));
+totNbin = double(regexp(string(textData{8}), "[\d.+-]+", "match"));
+totFrames = double(regexp(string(textData{9}), "[\d.+-]+", "match"));
+xyzRange = cell(1);
+for ii=1:length(nbin)
+    xyzRange{ii} = linspace(lowPos(ii), upPos(ii), nbin(ii)); 
+end
+[~, col] = size(data);
+nRegion = length(nbin) / 3;
+ret = cell(1);
+for ii=1:totFrames
+    tmpData = data((ii-1)*totNbin+1 : ii*totNbin,:);
+    ret{ii} = getRet(tmpData,nRegion,nbin,col);
+end
+end
+    
+function ret=getRet(tmpData,nRegion,nbin,col)
+ret = cell(1);
+tmpIndex = 0;
+for ii = 1:nRegion
+    eachNbin = nbin(3*(ii-1)+1) * nbin(3*(ii-1)+2) * nbin(3*ii);
+    ret{ii} = squeeze(reshape(tmpData((tmpIndex+1):(tmpIndex+eachNbin), :), [nbin((3*(ii-1)+1):3*ii), col]));
+    tmpIndex = tmpIndex + eachNbin;
+end
+if nRegion == 1
+    ret = ret{1};
+end
+end
+
+function dphi=getE(elecharge,charge,lz,nbin)
+episi=8.85e-21;%F/nm%8.85×10^-12 F/m
+dz=lz/nbin;%nm
+inter=intergral(charge,dz,1);%e/nm^2
+elecharge=elecharge*1.6022e-19;%C/nm^2
+inter=inter*1.6022e-19;%C/nm^2
+for i=1:size(charge,2)
+    dphi(:,i)=-(1/episi)*((inter(:,i)-elecharge(i)));
+end
+end
+% 
+
+%dimension 1 is row, 2 is col
+function inter=intergral(fx,dx,dimension,control)
+    if dimension==2
+        fx=fx';%set the dimension of intergral,x is inter ,y is other 
+    end
+    [ldx,ldy]=size(fx);
+    inter=zeros(ldx,ldy);
+    for j=1:ldy
+        for i=2:ldx
+            inter(i,j)=inter(i-1,j)+(fx(i,j)+fx(i-1,j))*dx/2;
+        end
+    end
+    if exist('control','var')
+        inter=inter(size(inter,1),:);
+    end
+    if dimension==2
+        inter=inter';
     end
 end

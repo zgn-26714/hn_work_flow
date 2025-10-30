@@ -26,6 +26,7 @@ nsteps_bulk    = 100           # MD steps for get bulk density run (2 fs/step)
 nsteps_den     = 100           # MD steps for check_density run (electrode)
 nsteps_equ     = 100           # MD steps for equilibration run
 nsteps_ini     = 100           # MD steps for product initial frames run
+XOUT_FRAMES
 num_intialframes = 100         # Numbers of initial frames
 
 # Density analysis parameters

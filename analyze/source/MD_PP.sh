@@ -13,7 +13,7 @@ count=0
 execu_bin="${bash_dir}/../../bin/${analyze_cpp}"
 src_file="${bash_dir}/module_C++/${analyze_cpp}.cpp"
 mkdir -p ./deal_data/${analyze_cpp}
-bash ${bash_dir}/../build_cpp.sh "${src_file}" "${execu_bin}"
+bash ${bash_dir}/../build_gmx_cpp.sh "${src_file}" "${execu_bin}"
 
 # Process each case in loop
 

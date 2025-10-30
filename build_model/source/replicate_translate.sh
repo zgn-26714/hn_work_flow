@@ -11,7 +11,7 @@ fi
 
 cpp_src=${bash_dir}/merge_gro.cpp
 execu_bin=${bash_dir}/../../bin/replicate_translate
-bash ${bash_dir}/build_cpp.sh ${cpp_src} ${execu_bin}
+bash ${bash_dir}/../../bin/build_cpp.sh ${cpp_src} ${execu_bin}
 
 ${execu_bin} ./build/pre_eq.gro ./build/pre_eq2.gro
 
@@ -22,7 +22,7 @@ echo -e "${OK}${GREEN}merge two gro successfully!${NC}" | tee -a ./result/b_mode
 
 cpp_src=${bash_dir}/double_slit_top.cpp
 execu_bin=${bash_dir}/../../bin/double_slit_top
-bash ${bash_dir}/build_cpp.sh ${cpp_src} ${execu_bin}
+bash ${bash_dir}/../../build_cpp.sh ${cpp_src} ${execu_bin}
 ${execu_bin} >> ./result/b_model.log 2>&1
 mv ${TOP}.top.processed ${TOP}.top
 # #从generate_slit开始规范名字，关闭此功能
@@ -71,44 +71,4 @@ gmx mdrun \
     -v >> ./result/b_model.log  2>&1 \
     || { echo -e "${ERROR} gmx mdrun failed (mini_energy)${NC}" | tee -a ./result/b_model.log >&2; exit 1; }
 
-
-echo "[step 3] genenrate .tpr  (grompp)" | tee -a ./result/b_model.log >&2
-gmx grompp \
-    -f ./build/grompp_rebalance.mdp \
-    -c ./build/mini_re.gro \
-    -o ./build/pre_eq.tpr \
-    -maxwarn "${maxWarn}" \
-    -p "${TOP}.top" \
-    -n ./build/index.ndx  >> ./result/b_model.log  2>&1 \
-    || { echo -e "${ERROR} gmx grompp failed${NC}" | tee -a ./result/b_model.log >&2; exit 1; }
-
-echo "[step 4]  mdrun" | tee -a ./result/b_model.log >&2
-if [[ "$GPU" -eq 1 ]]; then
-    echo -e "\tUsing GPU acceleration"  | tee -a ./result/b_model.log >&2
-    mdrun_cmd=(
-        gmx mdrun
-        -s ./build/pre_eq.tpr
-        -deffnm ./build/pre_eq
-        -ntmpi 1
-        -ntomp "$NPOS"
-        -pme gpu
-        -pmefft gpu
-        -nb gpu
-        -tunepme no
-        -v
-    )
-else
-    echo -e "\tUsing CPU computation"  | tee -a ./result/b_model.log >&2
-    mdrun_cmd=(
-        gmx mdrun
-        -s ./build/pre_eq.tpr
-        -deffnm ./build/pre_eq
-        -ntmpi 1
-        -ntomp "$NPOS"
-        -v
-    )
-fi
-
-echo -e "\t${mdrun_cmd[*]}" | tee -a ./result/b_model.log >&2
-"${mdrun_cmd[@]}" >> ./result/b_model.log  2>&1
 echo -e "${GREEN}Successfully performed a balanced simulation..${NC}" | tee -a ./result/b_model.log >&2

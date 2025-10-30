@@ -12,7 +12,6 @@
 #include <gromacs/fileio/trxio.h>
 #include <gromacs/commandline/pargs.h>
 
-
 #ifdef HAVE_CONFIG_H
 #endif
 #include <numeric>
@@ -22,10 +21,10 @@
 #include <fstream>
 #include <chrono>
 #include <cfloat>
-
-
 #include "./include/matrix.h"
 #include <cmath>
+
+
 
 using std::string, std::vector;
 using namespace itp;
@@ -43,6 +42,7 @@ static int num2ave = 1;
 static real zmin = 20.0;
 static real zmax = 30.0;
 static int  dipoleBin = 90;
+static int out_sel=0;
 const char* title = "Calculate the angle of dipole array and z array";
 const string xaxis = "vertical-for time", yaxis = "dipole bin";
 
@@ -103,9 +103,11 @@ static void do_vcomponent(	const char *traj_file, t_topology *top, const char *n
 	FILE * outfile = xvgropen(filename.c_str(), title, xaxis, yaxis, oenv);
 	step = 0;
 	//auto start = std::chrono::high_resolution_clock::now();
+    Matrix<real>    angle(grpNum, nz, 0);
 	Matrix_3d<real>	angle_pro(grpNum, nz, dipoleBin, 0);
 	Matrix<int>		count(grpNum, nz, 0);
 	vector<double>	refArray = {0.0, 0.0, 1.0}; // reference array for angle calculation
+	std::ofstream debug_file("./result/debug_angleOFdipoleZ.log");
 	do
 	{
 		for (int i = 0; i < grpNum; i++) {
@@ -115,35 +117,74 @@ static void do_vcomponent(	const char *traj_file, t_topology *top, const char *n
 			loadMessageMol(posc, 0, &fr, index[i], N_mol[i], Natom_mol[i], 0, mass[i], charge[i]);
 			//#pragma omp parallel for num_threads(8)
 			for (int j = 0; j != N_mol[i]; j++) {
+
 				std::vector<double> ang_dipole(3, 0.0f);
 				/* transform the molecule index to position index */
 				if (zmin <= posc[j][2] && posc[j][2] < zmax) {
+					if(posc[j][2] == zmax)	std::cout<<zmax<<std::endl;
 					nowz = int((posc[j][2] - zmin) / dbinz);
+					if (nowz < 0 || nowz >= nz) {
+						debug_file << "[WARN] frame " << step
+								<< " group " << i << " molecule " << j
+								<< " nowz out of range: nowz=" << nowz
+								<< " posz=" << posc[j][2]
+								<< " range=[0," << nz-1 << "]" << std::endl;
+						continue;
+					}
+					//getRefArray(pos[j], refArray);
 					for (int num = 0; num < Natom_mol[i]; num++) {
 						for(int k = 0; k < 3; k++){
 							ang_dipole[k] += (pos[j][num][k] - posc[j][k]) * charge[i][num];
 						}
 					}
 					double tmp_ang = array_angle(ang_dipole, refArray);
+					if (!std::isfinite(tmp_ang)) {
+						debug_file << "[WARN] frame " << step
+								<< " group " << i << " molecule " << j
+								<< " invalid tmp_ang = " << tmp_ang << std::endl;
+						continue;
+					}
+                    angle[i][nowz] += tmp_ang;
 					int bin = int(tmp_ang / (180.0 / dipoleBin)); // 180.0 is the max angle
-					if(bin == 180)	std::cout<<180<<std::endl;
+					if (bin < 0) bin = 0;
+                    if (bin >= dipoleBin) {
+						debug_file << "[WARN] frame " << step
+								<< " group " << i << " molecule " << j
+								<< " bin out of range: bin=" << bin
+								<< " tmp_ang=" << tmp_ang
+								<< " clamp to " << dipoleBin-1 << std::endl;
+						bin = dipoleBin - 1;
+					}
+					// if(bin == 180)	std::cout<<180<<std::endl;
 					angle_pro[i][nowz][bin] ++;
 					count[i][nowz] ++;
 				}
+				
 			}
 		}
-
 		if (step%num2ave == (num2ave-1)){
 			//#pragma omp parallel for num_threads(32)
 			for (int i = 0; i < grpNum; i++) {
 				for (int j = 0; j < nz; j++) {
-					for (int k = 0; k < dipoleBin; k++) {
-						if(count[i][j] != 0)
-							angle_pro[i][j][k] /= num2ave * count[i][j];
-						fprintf(outfile, "%10g	", angle_pro[i][j][k]);
-						angle_pro[i][j][k] = 0;
-						count[i][j] = 0;
-					}
+                    if(out_sel){
+                        if(count[i][j] != 0)
+                            angle[i][j] /=  count[i][j];
+                        fprintf(outfile, "%10g	", angle[i][j]);
+                        std::cout<<angle[i][j]<<std::endl;
+                    }
+                    else{
+                        angle[i][j] = 0;
+                        for (int k = 0; k < dipoleBin; k++) {
+                            if(count[i][j] != 0)
+                                angle_pro[i][j][k] /= count[i][j];
+                            fprintf(outfile, "%10g	", angle_pro[i][j][k]);
+                            angle_pro[i][j][k] = 0;
+                            
+					    }
+                    }
+					count[i][j] = 0;
+                    angle[i][j] = 0;
+                    std::fill(angle_pro[i][j].begin(),angle_pro[i][j].end(), 0);
 					fprintf(outfile, "\n");
 				}
 			}
@@ -192,6 +233,10 @@ int main_func(int argc,char *argv[])
 		},
 		{
 			"-dBin",FALSE, etINT, {&dipoleBin},
+			"max z to calculate (nm),set to 0 when no limit"
+		},
+        {
+			"-out",FALSE, etINT, {&out_sel},
 			"max z to calculate (nm),set to 0 when no limit"
 		}
 	};
@@ -331,12 +376,12 @@ void loadMessageAtom(Matrix_3d<real>& data,  t_trxframe* fr, int* index,
 double array_angle(vector<double>& array1, vector<double>& array2)
 {
 	double up, down;
-	long double pi = std::acos(0.0) * 2;
+	long double pi = acos(0.0) * 2;
 	up = array1[0] * array2[0] + array1[1] * array2[1] + array1[2] * array2[2];
-	down =	std::sqrt(array1[0] * array1[0] + array1[1] * array1[1] + array1[2] * array1[2]) *
-			std::sqrt(array2[0] * array2[0] + array2[1] * array2[1] + array2[2] * array2[2]);
+	down =	sqrt(array1[0] * array1[0] + array1[1] * array1[1] + array1[2] * array1[2]) *
+			sqrt(array2[0] * array2[0] + array2[1] * array2[1] + array2[2] * array2[2]);
 
-	return (std::acos(up/down) * (180.0 / pi));//rad to deg
+	return (acos(up/down) * (180.0 / pi));//rad to deg
 	//return (acos(up / down));
 }
 
@@ -359,5 +404,4 @@ void dw_boundary(real *Lbox)
 int main(int argc, char** argv)
 {
 	return gmx_run_cmain(argc, argv, &main_func);
-	std::cout << " \n get end \n ";
 }

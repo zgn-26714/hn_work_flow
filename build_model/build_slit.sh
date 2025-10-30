@@ -78,6 +78,10 @@ else
 fi
 
 
+cp ${MDP}.mdp bak_${MDP}.mdp
+sed -i -e 's/^freezegrps.*$/freezegrps = CL  CR  GRA/' -e 's/^freezedim.*$/freezedim   = Y Y Y Y Y Y Y Y Y/' ${MDP}.mdp
+mv ./build/mini_re.gro ./build/pre_eq.gro
+
 # 5. nvt20
 if bash ${bash_dir}/equilibration.sh; then
     echo -e "${GREEN}"

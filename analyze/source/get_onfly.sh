@@ -26,7 +26,7 @@ g++ -o ${onfly_version} ${bash_dir}/module_C++/${onfly_version}.cpp -O3
 
 command="./${onfly_version} "./case${analyze_begin_case}/${analysis_ONFLY_in}.onfly" \
 -n "${analyze_num}" -d "${analysis_ONFLY_isD}" -o ./deal_data/onfly/onfly"${analyze_begin_case}-${analyze_end_case}".dat \
--b "${analysis_begin_t}" -e "${analysis_end_t}"" -om "${MODE_ONFLY}"
+-b "${analysis_begin_t}" -e "${analysis_end_t}" -om "${MODE_ONFLY}""
 
 
 if eval $command; then
