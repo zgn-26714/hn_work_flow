@@ -19,14 +19,7 @@ public:
         : data(dim1, std::vector<T>(dim2, value)) {}
 
     // 从已有二维矩阵复制结构，用新值初始化
-    Matrix(const Type& ori_matrix, const T& value = T{}) {
-        if (!ori_matrix.empty()) {
-            size_t dim1 = ori_matrix.size();
-            size_t dim2 = ori_matrix[0].size();
-            data = Type(dim1, std::vector<T>(dim2, value));
-        }
-        // 如果 ori_matrix 为空，则 data 保持为空
-    }
+    Matrix(const Type& ori_matrix) : data(ori_matrix){}
 
     // 提供对内部数据的访问
     const Type& get() const { return data; }
@@ -88,7 +81,26 @@ public:
             }
         }
         return (*this);
-    }   
+    }
+
+    Matrix<T> operator=(const Matrix<T>& other) {
+        if (this != &other) {
+            data = other.data;
+        }
+        return (*this);
+    }
+
+    Matrix<T> operator=(const Type& other) {
+        size_t dim1 = other.size();
+        size_t dim2 = dim1 > 0 ? other[0].size() : 0;
+        data = Type(dim1, std::vector<T>(dim2));
+        for (size_t i = 0; i < dim1; i++) {
+            for (size_t j = 0; j < dim2; j++) {
+                data[i][j] = other[i][j];
+            }
+        }
+        return (*this);
+    }
 
     // 获取尺寸
     size_t rows() const { return data.size(); }

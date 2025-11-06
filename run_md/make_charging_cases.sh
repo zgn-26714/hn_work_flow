@@ -71,7 +71,7 @@ main() {
     local bash_dir
     bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
     
-    if  bash "$bash_dir/source/generate_scanfile.sh" ; then
+    if  bash "$bash_dir/source/generate_scanfile.sh" | tee -a ./result/run_md.log; then
         echo -e "${GREEN}✅Success generating scan file...${NC}" | tee -a ./result/run_md.log >&2
     else
         echo -e "${ERROR} generate_scanfile.sh not found or error, exit!" | tee -a ./result/run_md.log >&2

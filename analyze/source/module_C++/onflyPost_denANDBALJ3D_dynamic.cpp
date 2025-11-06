@@ -548,10 +548,10 @@ int OnflyPostHandle::readNextFrame()
 			magicNumber = 0;
 			continue;
 		}
-                else if(magicNumber == 20250429)
-                {//end flag
-                        return 100;
-                }
+		else if(magicNumber == 20250429)
+		{//end flag
+				return 100;
+		}
 		else
 		{
 			return 0;

@@ -5,8 +5,13 @@ set -euo pipefail
 make_job() {
     local start_case=$1
     local end_case=$2
-    local objjob="$workdir/jobfile/j${V}V${ic}pscase${start_case}-${end_case}.job"
-
+    local rundir=$3
+    local workdir=$4
+    if [[ "${isRerun}" -eq 1 ]]; then
+        local objjob="$workdir/jobfile/rerun_j${V}V${ic}pscase${start_case}-${end_case}.job"
+    else
+        local objjob="$workdir/jobfile/j${V}V${ic}pscase${start_case}-${end_case}.job"
+    fi
     mkdir -p "$workdir/jobfile"
     local SCRIPT_PATH
     SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
@@ -17,7 +22,7 @@ make_job() {
         "wuchao")   cp "$SCRIPT_PATH/wuchao.job" "$objjob" ;;
     esac
     # 
-    local rundir=$3
+    
     case "$server_machine" in
     "eninstein") 
         sed -i "
@@ -27,16 +32,24 @@ make_job() {
             /h=/s|.*|h=$num|;
             /workdir=/s|.*|workdir=$rundir|;
             /mode=/s|.*|mode=$mode|;
+            /isRerun=/s|.*|isRerun=$isRerun|;
             /name=/s|.*|name=$DEFFNM|
         " "$objjob" 
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         case "$queue" in
             short)  sed -i '6s/.*/#PBS -l walltime=36:00:00/' "$objjob" ;;
-            new)    sed -i '5s/.*/#PBS -l nodes=1:ppn=32/' "$objjob" ;;
-            fast)   sed -i '5s/.*/#PBS -l nodes=1:ppn=24/' "$objjob" ;;
+            new)    sed -i '5s/.*/#PBS -l nodes=1:ppn=64/' "$objjob" ;;
+            fast)   sed -i '5s/.*/#PBS -l nodes=1:ppn=16/' "$objjob" ;;
             long)   sed -i '6s/.*/#PBS -l walltime=720:00:00/' "$objjob" ;;
         esac
-        cd "$rundir"/case"$start_case"
+
+        if [[ "${isRerun}" -eq 1 ]]; then
+            cd "$rundir"/case"$start_case"/rerun_case
+            sed -i "/casedir=/s|.*|casedir=\$workdir/case\$k/rerun_case|" "$objjob"
+        else
+            cd "$rundir"/case"$start_case"
+            pwd
+        fi
         qsub "$objjob"
         cd -
         ;;
@@ -48,10 +61,16 @@ make_job() {
             /h=/s|.*|h=$num|;
             /workdir=/s|.*|workdir=$rundir|;
             /mode=/s|.*|mode=$mode|;
+            /isRerun=/s|.*|isRerun=$isRerun|;
             /name=/s|.*|name=$DEFFNM|
         " "$objjob" 
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
-        cd "$rundir"/case"$start_case"
+        if [[ "${isRerun}" -eq 1 ]]; then
+            cd "$rundir"/case"$start_case"/rerun_case
+            sed -i "/casedir=/s|.*|casedir=\$workdir/case\$k/rerun_case|" "$objjob"
+        else
+            cd "$rundir"/case"$start_case"
+        fi
         sbatch "$objjob"
         cd -
         ;;
@@ -62,11 +81,17 @@ make_job() {
             /h=/s|.*|h=$num|;
             /workdir=/s|.*|workdir=$rundir|;
             /mode=/s|.*|mode=$mode|;
+            /isRerun=/s|.*|isRerun=$isRerun|;
             /name=/s|.*|name=$DEFFNM|
         " "$objjob" 
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         chmod +x $objjob
-        cd "$rundir"/case"$start_case"
+        if [[ "${isRerun}" -eq 1 ]]; then
+            cd "$rundir"/case"$start_case"/rerun_case
+            sed -i "/casedir=/s|.*|casedir=\$workdir/case\$k/rerun_case|" "$objjob"
+        else
+            cd "$rundir"/case"$start_case"
+        fi
         dsub -s $objjob
         cd -
         ;;
@@ -81,6 +106,7 @@ esac
 main() {
     # 
     workdir="$(pwd)"
+    echo $workdir |tee  /data1/huangnan/PC/charging/298k/2V/0ps/debug 
     local current_cas=${START}
     local batch_num=1
     
@@ -89,10 +115,13 @@ main() {
         if (( batch_end > ${END} )); then
             batch_end=${END}
         fi
-        
-        rundir="$workdir/charging/${Temperature}k/${V}V/${ic}ps"
+        if [[ "${isRerun}" -eq 1 ]]; then
+            rundir="$workdir"
+        else
+            rundir="$workdir/charging/${Temperature}k/${V}V/${ic}ps"
+        fi
         echo "📦 Creating job for cases ${current_cas}-${batch_end}..." | tee -a ./result/run_md.log >&2
-        make_job "$current_cas" "$batch_end" "$rundir"
+        make_job "$current_cas" "$batch_end" "$rundir" "$workdir"
         
         current_cas=$((batch_end + 1))
         ((batch_num++))

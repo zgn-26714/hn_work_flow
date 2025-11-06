@@ -6,7 +6,9 @@
 #include <string>
 #include <cstdlib> // for std::getenv, std::atof
 #include <sstream> // for std::istringstream
+#include <filesystem>
 
+namespace fs = std::filesystem;
 int main() {
     // 从环境变量获取值，如果不存在则使用默认值
     const char* v_str = std::getenv("V");
@@ -67,17 +69,21 @@ int main() {
             Vall.resize(static_cast<int>(endT_val), V);
         }
 
-        // 构建输出文件名
         std::string outfilename = std::string(slowdir) + "Dphis_control.dat" + std::to_string(static_cast<int>(V)) 
-                                + "_" + std::to_string(static_cast<int>(slow)) + "_" + std::to_string(std::stoi(skipTime_str));
-
+                    + "_" + std::to_string(static_cast<int>(slow)) + "_" + std::to_string(std::stoi(skipTime_str));
         // 打开输出文件
+        if (fs::exists(outfilename)) {
+            std::cout << "file exist " << outfilename << ", continue..." << std::endl;
+            continue;
+        }
+        std::cout << "file not exist " << outfilename << ", generate..." << std::endl;
+
         std::ofstream fout(outfilename);
         if (!fout.is_open()) {
             std::cerr << "Error opening file: " << outfilename << std::endl;
             continue;
         }
-	std::cout<<"max simulation step:\t"<<(Vall.size() - 1)<<'\n'<<"skipstep:\t"<<skipTime<<std::endl;
+	    std::cout<<"max simulation step:\t"<<(Vall.size() - 1)<<'\n'<<"skipstep:\t"<<skipTime<<std::endl;
         // 写入文件头
         fout << "numofdphis\t";
         fout << (Vall.size() - 1) + skipTime<<std::endl;

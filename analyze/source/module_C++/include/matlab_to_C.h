@@ -22,44 +22,38 @@ namespace matlab{
         int N = 0;
         std::string str;
         
-        // First pass: find the starting line of data and number of columns
-        while (std::getline(fid, str)) {
-            line++;
+        // // First pass: find the starting line of data and number of columns
+        // while (std::getline(fid, str)) {
+        //     line++;
             
-            if (str.empty()) continue;
+        //     if (str.empty()) continue;
             
-            char tmp = str[0];
+        //     char tmp = str[0];
             
-            // Skip comment lines and special lines
-            if (tmp != '#' && tmp != '@') {
-                if (lineex == 0) {
-                    // Count number of columns
-                    std::istringstream iss(str);
-                    double value;
-                    N = 0;
-                    while (iss >> value) {
-                        N++;
-                    }
-                    break;
-                } else {
-                    lineex--;
-                }
-            }
-        }
+        //     // Skip comment lines and special lines
+        //     if (tmp != '#' && tmp != '@') {
+        //         if (lineex == 0) {
+        //             // Count number of columns
+        //             std::istringstream iss(str);
+        //             double value;
+        //             N = 0;
+        //             while (iss >> value) {
+        //                 N++;
+        //             }
+        //             break;
+        //         } else {
+        //             lineex--;
+        //         }
+        //     }
+        // }
         
-        fid.close();
+        // fid.close();
         
-        // Second pass: read data
-        fid.open(filename);
-        if (!fid.is_open()) {
-            return data;
-        }
-        
-        // Skip header lines
-        int currentLine = 0;
-        while (currentLine < line - 1 && std::getline(fid, str)) {
-            currentLine++;
-        }
+        // // Second pass: read data
+        // fid.open(filename);
+        // if (!fid.is_open()) {
+        //     return data;
+        // }
         
         // Read data
         while (std::getline(fid, str)) {

@@ -15,6 +15,8 @@ nofp=$(sed -n '5p' "$BASH_SOURCE" | cut -b 21-23)
 name=slownvt
 mode=$1
 workdir="xxx"
+isRerun=0
+traj_to_rerun="../*.xtc"
 while [ "$i" -lt "$h" ]; do
     casedir="${workdir}/case"$k""
     cd "$casedir" || exit 1  
@@ -31,12 +33,23 @@ while [ "$i" -lt "$h" ]; do
         rm -rf *.o*
     fi
     export ONFLY_DENSITY3D="-low [0 0 20] -up [4.3 4.3 30] -nbin [1 1 1000] -n index.ndx -sel [Na CLO PC]  -calc 3"
-    $mdbin grompp -f grompp.mdp -p topol.top -c "frame${k}.gro" -o "$name" -maxwarn 2 -n index.ndx
-    if [ "$mode" == "append" ]; then
-        $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp "$nofp" -append -cpi "${name}.cpt"
+    
+    if [[ "${isRerun}" -eq 1 ]]; then
+        $mdbin grompp -f case_rerun.mdp -p topol.top -c "../frame${k}.gro" -o "$name" -maxwarn 2 -n index.ndx
+        if [ "$mode" == "append" ]; then
+            $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp "$nofp" -append -cpi "${name}.cpt" -rerun traj_to_rerun* -s "$name"
+        else
+            $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp "$nofp" -rerun traj_to_rerun* -s "$name"
+        fi
     else
-        $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp "$nofp"
+        $mdbin grompp -f grompp.mdp -p topol.top -c "frame${k}.gro" -o "$name" -maxwarn 2 -n index.ndx
+        if [ "$mode" == "append" ]; then
+            $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp "$nofp" -append -cpi "${name}.cpt" -s "$name"
+        else
+            $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp "$nofp" -s "$name"
+        fi
     fi
+
     wait
     ((k++))
     ((i++))

@@ -8,5 +8,5 @@ export SLOWDIR="${workdir}/slowdir/"
 
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-g++ -o generate_scanfile ${SCRIPT_DIR}/generate_scan.cpp -O3 
+g++ -o generate_scanfile ${SCRIPT_DIR}/generate_scan.cpp -O3  -std=c++17
 ./generate_scanfile >> ./result/run_md.log 2>&1

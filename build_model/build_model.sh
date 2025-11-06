@@ -1,5 +1,14 @@
 #!/bin/bash
 
+
+other_condition() {
+    if (( onlyUP == 1 )); then
+        [ $(echo "$density <= $set_density" | bc -l) -eq 1 ]
+    else
+        true
+    fi
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 abs_error=$(echo "scale=5; $set_density * $error / 100" | bc -l)
 {
@@ -41,14 +50,14 @@ echo "Initial density: $density" | tee -a ./result/b_model.log >&2
 
 cp "${TOP}".top baktop1.top
 # main iter circle
-while (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($density - $set_density) > $abs_error" | bc -l) )) && [ $iter -lt $max_iter ]; do
+while { (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($density - $set_density) > $abs_error" | bc -l) )) && [ $iter -lt $max_iter ]; } || other_condition; do
     iter=$((iter + 1))
     echo "Iteration $iter: Current density = $density, Target = $set_density" | tee -a ./result/b_model.log >&2
     # set factor
     diff=$(echo "$density - $set_density" | bc -l)
     if (( $(echo "$diff > 0" | bc -l) )); then
         scale_factor=$(echo "1 - $factor" | bc -l)
-        echo "Density too high, expanding system by factor $scale_factor"  | tee -a ./result/b_model.log >$2
+        echo "Density too high, expanding system by factor $scale_factor"  | tee -a ./result/b_model.log >&2
     else
         scale_factor=$(echo "1 + $factor" | bc -l)
         echo "Density too low, compressing system by factor $scale_factor" | tee -a ./result/b_model.log >&2

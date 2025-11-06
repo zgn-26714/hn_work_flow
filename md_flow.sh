@@ -56,8 +56,17 @@ case "$ACTION" in
         ;;
 
     run)
-        echo ">>> Entering RUN md branch..."
-        bash "$SCRIPT_DIR"/run_md/run.sh
+        command_rerun="${2:-default}"
+        : "${isRerun:=0}"
+        if [[ "$command_rerun" == "rerun" || "$isRerun" -eq 1 ]]; then
+          echo ">>> Entering RUN md rerun branch..."
+          export isRerun=1
+          bash "$SCRIPT_DIR"/run_md/rerun.sh
+        else
+          export isRerun=0
+          echo ">>> Entering RUN md branch..."
+          bash "$SCRIPT_DIR"/run_md/run.sh
+        fi
         ;;
 
     analyze)

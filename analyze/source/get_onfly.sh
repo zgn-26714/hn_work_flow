@@ -25,13 +25,13 @@ onfly_version="onflyPost_denANDBALJ3D_dynamic"
 g++ -o ${onfly_version} ${bash_dir}/module_C++/${onfly_version}.cpp -O3
 
 command="./${onfly_version} "./case${analyze_begin_case}/${analysis_ONFLY_in}.onfly" \
--n "${analyze_num}" -d "${analysis_ONFLY_isD}" -o ./deal_data/onfly/onfly"${analyze_begin_case}-${analyze_end_case}".dat \
+-n "${analyze_num}" -d "${analysis_ONFLY_isD}" -o ./deal_data/onfly/${analyze_mol}onfly"${analyze_begin_case}-${analyze_end_case}" \
 -b "${analysis_begin_t}" -e "${analysis_end_t}" -om "${MODE_ONFLY}""
 
 
 if eval $command; then
-    echo -e " ${EEROR} onflyPost_dens3D_dynamic fialed!"
-    exit 1
-else
     echo -e "${GREEN}Successfully completed onflyPost_dens3D_dynamic!${NC}"
+else
+    echo -e "${ERROR}onflyPost_dens3D_dynamic failed!${NC}"
+    exit 1
 fi

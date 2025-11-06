@@ -22,7 +22,7 @@ bash ${bash_dir}/../build_gmx_cpp.sh "${src_file}" "${execu_bin}"
 while (( "$num" <= "$end_num" )); do
     echo "Processing case$num..."
     PP_command="-f "./case$num/${DEFFNM}.${xtcORtrr}" -s "./case$num/${DEFFNM}.tpr" -n "./case$num/index.ndx""
-    out_command="-o "./deal_data/${analyze_cpp}/${num}angle_dipole_z.xvg""
+    out_command="-o "./deal_data/${analyze_cpp}/${num}${analyze_cpp}.xvg""
     if echo  ${analyze_mol} | ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command} -e 1 >> ./result/analyze.log 2>&1; then
         echo -e "${OK} command works fine. Starting analysis..."
     else
@@ -37,8 +37,10 @@ while (( "$num" <= "$end_num" )); do
             exit 1
         fi
     fi
-    echo ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command} | tee -a ./result/analyze.log >&2
-    echo  ${analyze_mol} | ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command} >> ./result/analyze.log 2>&1 & 
+    # echo ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command} | tee -a ./result/analyze.log >&2
+    {
+        echo  ${analyze_mol} | ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command}
+    } >> ./result/analyze.log 2>&1 & 
     #     echo "Processing case$num..."
     # else
     #     echo -e "${ERROR} command failed in case${num}!${NC}"
@@ -59,7 +61,7 @@ wait
 rm -rf ./deal_data/${analyze_cpp}/*#
 g++ "${bash_dir}/module_C++/average_xvg.cpp" -o "${bash_dir}/../../bin/ave_xvg" -O3 -std=c++17
 
-${bash_dir}/../../bin/ave_xvg ./deal_data/${analyze_cpp}/${analyze_begin_case}angle_dipole_z.xvg
+${bash_dir}/../../bin/ave_xvg
 
-rm ./deal_data/${analyze_cpp}/*.xvg
+# rm ./deal_data/${analyze_cpp}/*.xvg
 echo -e "${GREEN}All tasks completed!${NC}"

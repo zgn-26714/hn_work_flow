@@ -108,10 +108,10 @@ int main() {
     }
     std::cout<<"Total cases processed: " << count << std::endl;
 
-        // 保存为MAT文件
     std::string molName = getenv("analyze_mol");
     std::string filename = "./deal_data/mdHeat/" + molName + "mdHeat"
-                     + getenv("analyze_V") + "V" + getenv("analyze_tau") + "ps.dat";
+                     + getenv("analyze_V") + "V" + getenv("analyze_tau") + "ps_"
+                     + std::to_string(begin_case) + "-" + std::to_string(end_case) + "_.dat";
                      
     if (saveDatFile(filename, time, heat)) {
         std::cout << "data saved to " <<filename << std::endl;
