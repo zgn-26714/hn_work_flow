@@ -57,13 +57,16 @@ public:
 
     // 正确的 + 运算符重载（成员函数）
     Matrix<T> operator+(const Matrix<T>& other) const {
-        if (this->rows() != other.rows() || this->cols() != other.cols()) {
+        if (this->rows() != other.rows()) {
             throw std::invalid_argument("Matrix addition dimension mismatch");
         }
         
         Matrix<T> result(this->rows(), this->cols());
         for (size_t i = 0; i < this->rows(); i++) {
-            for (size_t j = 0; j < this->cols(); j++) {
+            if ((*this)[i].size() != other[i].size()) {
+                throw std::invalid_argument("Matrix addition dimension mismatch");
+            }
+            for (size_t j = 0; j < (*this)[i].size(); j++) {
                 result(i, j) = (*this)(i, j) + other(i, j);
             }
         }
@@ -71,12 +74,15 @@ public:
     }   
 
     Matrix<T> operator+=(const Matrix<T>& other) {
-        if (this->rows() != other.rows() || this->cols() != other.cols()) {
+        if (this->rows() != other.rows()) {
             throw std::invalid_argument("Matrix addition dimension mismatch");
         }
         
         for (size_t i = 0; i < this->rows(); i++) {
-            for (size_t j = 0; j < this->cols(); j++) {
+            if ((*this)[i].size() != other[i].size()) {
+                throw std::invalid_argument("Matrix addition dimension mismatch");
+            }
+            for (size_t j = 0; j < (*this)[i].size(); j++) {
                 (*this)(i, j) += other(i, j);
             }
         }

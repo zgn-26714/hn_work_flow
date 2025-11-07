@@ -48,8 +48,16 @@ int main() {
         itp::Matrix<double> tmp = matlab::xvgread(filename);
         if(i == stoi(begin_cas))
             data = tmp;
-        else
-         data += tmp;
+        else{
+            if (data.size() != tmp.size() || data[0].size() != tmp[0].size() || data[1].size() != tmp[1].size()){
+                cerr<<"Error: File "<<filename<<" has different data size!"<<endl;
+                cerr<<"size of pre_Data: "<<data.size()<<", size of curr_Data: "<<tmp.size()<<endl;
+                cerr<<"size of pre_Data first line: "<<data[0].size()<<", size of curr_Data first line: "<<tmp[0].size()<<endl;
+                cerr<<"size of pre_Data other line: "<<data[1].size()<<", size of curr_Data other line: "<<tmp[1].size()<<endl;
+                exit(1);
+            }
+             data += tmp;
+        }
     }
     for (int i=0; i<data.size(); i++){
         if(i == 0 && stoi(is_skip_first_line))

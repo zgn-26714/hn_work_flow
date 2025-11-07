@@ -70,6 +70,11 @@ case "$ACTION" in
         ;;
 
     analyze)
+        command_rerun="${3:-default}"
+        : "${isRerun:=0}"
+        if [[ "$command_rerun" == "rerun" ]]; then
+          export isRerun=1
+        fi
         echo ">>> Entering analyze branch..."
         bash "$SCRIPT_DIR"/analyze/analyze.sh $2
         ;;

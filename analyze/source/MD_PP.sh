@@ -21,7 +21,12 @@ bash ${bash_dir}/../build_gmx_cpp.sh "${src_file}" "${execu_bin}"
 
 while (( "$num" <= "$end_num" )); do
     echo "Processing case$num..."
-    PP_command="-f "./case$num/${DEFFNM}.${xtcORtrr}" -s "./case$num/${DEFFNM}.tpr" -n "./case$num/index.ndx""
+    if [[ ${isRerun} -eq 1 ]]; then
+        PP_command="-f "./case$num/rerun_case/${DEFFNM}.${xtcORtrr}" -s "./case$num/rerun_case/${DEFFNM}.tpr" -n "./case$num/rerun_case/index.ndx""
+    else
+        PP_command="-f "./case$num/${DEFFNM}.${xtcORtrr}" -s "./case$num/${DEFFNM}.tpr" -n "./case$num/index.ndx""
+    fi
+    
     out_command="-o "./deal_data/${analyze_cpp}/${num}${analyze_cpp}.xvg""
     if echo  ${analyze_mol} | ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command} -e 1 >> ./result/analyze.log 2>&1; then
         echo -e "${OK} command works fine. Starting analysis..."
@@ -61,7 +66,15 @@ wait
 rm -rf ./deal_data/${analyze_cpp}/*#
 g++ "${bash_dir}/module_C++/average_xvg.cpp" -o "${bash_dir}/../../bin/ave_xvg" -O3 -std=c++17
 
-${bash_dir}/../../bin/ave_xvg
+if ${bash_dir}/../../bin/ave_xvg | tee debug ; then
+    echo -e "${GREEN}Averaging xvg completed successfully!${NC}"
+else
+    echo "error in averaging xvg"
+    exit 1
+fi
 
-# rm ./deal_data/${analyze_cpp}/*.xvg
+for (( i=${analyze_begin_case}; i<=${analyze_end_case}; i++ )); do
+    rm ./deal_data/${analyze_cpp}/${i}${analyze_cpp}.xvg
+done
+
 echo -e "${GREEN}All tasks completed!${NC}"

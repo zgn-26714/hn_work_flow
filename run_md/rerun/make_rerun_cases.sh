@@ -229,6 +229,8 @@ change_mdp() {
         -e 's/^[[:space:]]*nstxtcout[[:space:]]*=.*/nstxtcout       = 0/' \
         -e 's/^[[:space:]]*nstxout[[:space:]]*=.*/nstxout       = 1/' \
         -e 's/^[[:space:]]*nstfout[[:space:]]*=.*/nstfout       = 1/' \
+        -e 's/^[[:space:]]*userint3[[:space:]]*=.*/userint3     = 1/' \
+        -e 's/^[[:space:]]*userint2[[:space:]]*=.*/userint2    = 10000/' \
         "$file"
 }
 
@@ -253,11 +255,12 @@ fi
 
 close_vdw ./rerun_basicfile
 close_bond ./rerun_basicfile
-change_mdp ./rerun_basicfile/rerun.mdp
+change_mdp ./rerun_basicfile/case_rerun.mdp
 
 echo "当前路径: $(pwd)"
 
 for (( i=$rerun_start; i<=$rerun_end; i++ )); do
+    rm -rf ./case$i/rerun_case
     mkdir -p ./case$i/rerun_case
     cp ./rerun_basicfile/* ./case$i/rerun_case
     #CPM
