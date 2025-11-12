@@ -8,104 +8,107 @@ close_vdw() {
     local search_dir=$1
     local itp_files=()
     local default_files=()
-    
-    # Check if directory exists
+
+    # 检查目录
     if [ ! -d "$search_dir" ]; then
-        echo -e "${ERROR}Error: Directory '$search_dir' does not exist${NC}"
+        echo "Error: Directory '$search_dir' does not exist"
         return 1
     fi
-    
-    # Find all .itp files
+
+    # 查找 .itp 文件
     itp_files=($(find "$search_dir" -name "*.itp" -type f))
-    
     if [ ${#itp_files[@]} -eq 0 ]; then
-        echo -e "${ERROR}No .itp files found in directory '$search_dir'${NC}"
+        echo "No .itp files found in directory '$search_dir'"
         return 1
     fi
-    
-    echo -e "${OK}Found ${#itp_files[@]} .itp files:"
-    
-    # Check each .itp file for "[ defaults ]" pattern
+
+    echo "Found ${#itp_files[@]} .itp files"
+
+    # 找出含 [ defaults ] 的文件
     for file in "${itp_files[@]}"; do
         if grep -q "\[ defaults \]" "$file" 2>/dev/null; then
             default_files+=("$file")
-            echo -e "${OK}Found file with '[ defaults ]': $file"
         fi
     done
-    
+
     if [ ${#default_files[@]} -eq 0 ]; then
-        echo -e "${ERROR}No .itp files containing '[ defaults ]' found${NC}"
+        echo "No .itp files containing '[ defaults ]' found"
         return 1
     fi
-    
-    echo -e "${OK}Total files with '[ defaults ]' found: ${#default_files[@]}"
-    
-    # Store result in global variable
-    CLOSE_VDW_RESULT=("${default_files[@]}")
-    
-    # 新增部分：如果只有一个文件，处理[ atomtypes ]部分
-    if [ ${#CLOSE_VDW_RESULT[@]} -eq 1 ]; then
-        local target_file="${CLOSE_VDW_RESULT[0]}"
-        echo "Processing single file: $target_file"
-        
-        # 创建临时文件
 
-        local temp_file=$(mktemp "${target_file}.XXXXXX")
-        
-        # 标志变量，用于跟踪是否在[ atomtypes ]部分
-        local in_atomtypes_section=false
-        
-        # 读取文件并处理
-        while IFS= read -r line; do
-            # 检查是否进入[ atomtypes ]部分
-            if [[ "$line" =~ ^\[[[:space:]]*atomtypes[[:space:]]*\] ]]; then
-                in_atomtypes_section=true
-                echo "$line"
+    # 若仅一个文件，则修改其 [ atomtypes ] 段
+    if [ ${#default_files[@]} -eq 1 ]; then
+        local target_file="${default_files[0]}"
+        echo "Processing single file: $target_file"
+
+        dos2unix "$target_file" 2>/dev/null || sed -i 's/\r$//' "$target_file" 2>/dev/null || true
+
+        local temp_file="${target_file}.tmp"
+        > "$temp_file"
+
+        local in_atomtypes=false
+
+        while IFS= read -r line || [ -n "$line" ]; do
+            line="${line%$'\r'}"
+
+            # 检查 section 开始
+            if [[ "$line" =~ ^[[:space:]]*\[[[:space:]]*atomtypes[[:space:]]*\] ]]; then
+                in_atomtypes=true
+                echo "$line" >> "$temp_file"
+                continue
+            elif [[ "$line" =~ ^[[:space:]]*\[.*\] ]]; then
+                in_atomtypes=false
+                echo "$line" >> "$temp_file"
                 continue
             fi
-            
-            # 检查是否离开[ atomtypes ]部分（遇到下一个[ section ]）
-            if [[ "$in_atomtypes_section" == true && "$line" =~ ^\[.*\] ]]; then
-                in_atomtypes_section=false
+
+            # 非目标段或注释/空行
+            if [[ "$in_atomtypes" == false ]] || [[ "$line" =~ ^[[:space:]]*\; ]] || [[ "$line" =~ ^[[:space:]]*$ ]]; then
+                echo "$line" >> "$temp_file"
+                continue
             fi
-            
-            # 如果在[ atomtypes ]部分且不是注释行或空行
-            if [[ "$in_atomtypes_section" == true && ! "$line" =~ ^[[:space:]]*\; && ! "$line" =~ ^[[:space:]]*$ ]]; then
-                # 使用awk将最后两个数字清零
-                local processed_line=$(echo "$line" | awk '{
-                    # 计算字段数
-                    nf = NF
-                    # 如果最后两个字段是数字，将它们清零
-                    if ($(nf-1) ~ /^[0-9.eE+-]+$/ && $nf ~ /^[0-9.eE+-]+$/) {
-                        $(nf-1) = "0.00000"
-                        $nf = "0.00000"
-                    } else if ($(nf) ~ /^[0-9.eE+-]+;$/) {
-                        # 处理以分号结尾的情况（如示例中的Cl行）
-                        $(nf-1) = "0.00000"
-                        $nf = "0.00000;"
-                    }
-                    # 打印处理后的行
-                    for (i=1; i<=nf; i++) {
-                        printf "%s", $i
-                        if (i < nf) printf " "
-                    }
-                    printf "\n"
-                }')
-                echo "$processed_line"
+
+            # 处理数据行：分离注释
+            local data_part=""
+            local comment_part=""
+
+            if [[ "$line" =~ \; ]]; then
+                data_part="${line%%;*}"
+                comment_part=" ;${line#*;}"
             else
-                echo "$line"
+                data_part="$line"
+                comment_part=""
             fi
-        done < "$target_file" > "$temp_file"
-        
-        # 用临时文件替换原文件
+
+            # 提取字段
+            local fields=($data_part)
+            local field_count=${#fields[@]}
+
+            # 如果字段数 < 2，不改动
+            if [ $field_count -lt 2 ]; then
+                echo "$line" >> "$temp_file"
+                continue
+            fi
+
+            # 将最后两个字段改为 0.00000
+            fields[$((field_count-2))]="0.00000"
+            fields[$((field_count-1))]="0.00000"
+
+            # 重新组合
+            local output="${fields[*]}$comment_part"
+            echo "$output" >> "$temp_file"
+
+        done < "$target_file"
+
         mv "$temp_file" "$target_file"
-        echo -e "${GREEN}Successfully processed [ atomtypes ] section in $target_file${NC}"
-        
-    elif [ ${#CLOSE_VDW_RESULT[@]} -gt 1 ]; then
-        echo -e "${ERROR}Multiple files found with '[ defaults ]', skipping processing${NC}"
-        echo "Files: ${CLOSE_VDW_RESULT[@]}"
+        echo "✓ Successfully processed [ atomtypes ] section in $target_file"
+
+    else
+        echo "Multiple files found with '[ defaults ]', skipping processing"
+        printf 'Files:\n%s\n' "${default_files[@]}"
     fi
 }
+
 
 close_bond() {
     local search_dir="$1"
@@ -237,16 +240,16 @@ change_mdp() {
 
 
 mkdir -p ./rerun_basicfile
-if cp case${START}/*.top ./rerun_basicfile/topol.top; then
+if cp case${rerun_start}/*.top ./rerun_basicfile/topol.top; then
     echo "top file copied successfully"
 else
     echo "top file copy failed, do you have more/less than one top in one case?"
     exit 1
 fi
-cp case${START}/*.itp ./rerun_basicfile
-cp case${START}/*.ndx ./rerun_basicfile/index.ndx
+cp case${rerun_start}/*.itp ./rerun_basicfile
+cp case${rerun_start}/*.ndx ./rerun_basicfile/index.ndx
 
-if cp case${START}/grompp.mdp ./rerun_basicfile/case_rerun.mdp; then
+if cp case${rerun_start}/grompp.mdp ./rerun_basicfile/case_rerun.mdp; then
     echo "mdp file copied successfully"
 else
     echo "mdp file copy failed, please make sure you have grompp.mdp."
@@ -254,13 +257,12 @@ else
 fi
 
 close_vdw ./rerun_basicfile
-close_bond ./rerun_basicfile
+# close_bond ./rerun_basicfile
 change_mdp ./rerun_basicfile/case_rerun.mdp
 
 echo "当前路径: $(pwd)"
 
 for (( i=$rerun_start; i<=$rerun_end; i++ )); do
-    rm -rf ./case$i/rerun_case
     mkdir -p ./case$i/rerun_case
     cp ./rerun_basicfile/* ./case$i/rerun_case
     #CPM
@@ -273,11 +275,12 @@ for (( i=$rerun_start; i<=$rerun_end; i++ )); do
     ##traj
     shopt -s nullglob 
 
-    traj_dir=( $(realpath case$i/*.xtc) )
+    traj_dir=(case$i/*.xtc)
 
     if [[ ${#traj_dir[@]} -eq 0 ]]; then
         echo -e "${YELLOW}⚠️  warning case$i! ln xtc failed, try to ln trr...${NC}"
         trr_traj_dir=(case$i/*.trr)
+        
         if [[ ${#trr_traj_dir[@]} -eq 0 ]]; then
             echo "❌ Error: No .trr files found in case$i/"
             exit 1
@@ -286,7 +289,8 @@ for (( i=$rerun_start; i<=$rerun_end; i++ )); do
             printf '  %s\n' "${trr_traj_dir[@]}"
             exit 1
         else
-            ln -sf "${trr_traj_dir[0]}" "./case$i/rerun_case/traj_to_rerun.trr"
+            trr_traj_dir=( $(realpath case$i/*.trr) )
+            ln -sf "${trr_traj_dir}" "./case$i/rerun_case/traj_to_rerun.trr"
             echo -e "${OK} trr for case$i" 
         fi
     elif (( ${#traj_dir[@]} > 1 )); then
@@ -294,7 +298,8 @@ for (( i=$rerun_start; i<=$rerun_end; i++ )); do
         printf '  %s\n' "${traj_dir[@]}"
         exit 1
     else
-        ln -sf "${traj_dir[0]}" "./case$i/rerun_case/traj_to_rerun.xtc"
+        traj_dir=( $(realpath case$i/*.xtc) )
+        ln -sf "${traj_dir}" "./case$i/rerun_case/traj_to_rerun.xtc"
         echo -e "${OK} xtc for case$i" 
     fi
 

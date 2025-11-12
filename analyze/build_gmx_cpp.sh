@@ -16,7 +16,7 @@ if [[ ! -x "${execu_bin}" ]]; then
     installPrefix=${gmx_path}/..
     libdir=lib64
     # remove `-lonfly` if it is not onfly version
-    g++ "$src_file" -o "$execu_bin" -I ${installPrefix}/include -L ${installPrefix}/${libdir} -lgromacs -O3 -std=c++17 -lonfly
+    g++ "$src_file" -o "$execu_bin" -I ${installPrefix}/include -L ${installPrefix}/${libdir} -DGMX_DOUBLE -lgromacs_d -O3 -std=c++17 -lonfly
     if [[ $? -ne 0 ]]; then
         echo -e "${ERROR}Compilation of Executable file failed.${NC}" | tee -a ./result/b_model.log  >&2
         exit 1

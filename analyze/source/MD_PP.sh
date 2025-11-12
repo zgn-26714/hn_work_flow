@@ -45,7 +45,7 @@ while (( "$num" <= "$end_num" )); do
     # echo ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command} | tee -a ./result/analyze.log >&2
     {
         echo  ${analyze_mol} | ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command}
-    } >> ./result/analyze.log 2>&1 & 
+    } >> ./result/analyze.log 2>&1 &
     #     echo "Processing case$num..."
     # else
     #     echo -e "${ERROR} command failed in case${num}!${NC}"
