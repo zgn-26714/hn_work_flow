@@ -256,7 +256,7 @@ else
     exit 1
 fi
 
-close_vdw ./rerun_basicfile
+# close_vdw ./rerun_basicfile
 # close_bond ./rerun_basicfile
 change_mdp ./rerun_basicfile/case_rerun.mdp
 
