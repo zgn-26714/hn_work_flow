@@ -38,11 +38,13 @@ case "$ACTION" in
         echo ">>> Entering get frames branch..."
         setting="${2:-default}"
         case "$setting" in
-          default) 
+          default)
+            export isBulk=0 
             bash "$SCRIPT_DIR"/build_model/run.sh
             ;;
           bulk)
             export TOP=${bulk_top}
+            export isBulk=1
             bash "$SCRIPT_DIR"/build_model/run_for_bulk.sh
             ;;
           slit)

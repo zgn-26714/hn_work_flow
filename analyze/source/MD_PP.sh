@@ -74,7 +74,7 @@ else
 fi
 
 for (( i=${analyze_begin_case}; i<=${analyze_end_case}; i++ )); do
-    rm ./deal_data/${analyze_cpp}/${i}${analyze_cpp}.xvg
+rm ./deal_data/${analyze_cpp}/${i}${analyze_cpp}.xvg
 done
 
 echo -e "${GREEN}All tasks completed!${NC}"

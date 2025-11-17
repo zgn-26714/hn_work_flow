@@ -50,7 +50,7 @@ echo "Initial density: $density" | tee -a ./result/b_model.log >&2
 
 cp "${TOP}".top baktop1.top
 # main iter circle
-while { (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($density - $set_density) > $abs_error" | bc -l) )) && [ $iter -lt $max_iter ]; } || other_condition; do
+while { (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($density - $set_density) > $abs_error" | bc -l) )) && [ $iter -lt $max_iter ]; } && other_condition; do
     iter=$((iter + 1))
     echo "Iteration $iter: Current density = $density, Target = $set_density" | tee -a ./result/b_model.log >&2
     # set factor
