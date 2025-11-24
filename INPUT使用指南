@@ -1,0 +1,46 @@
+1.frames部分
+    # Simulation box dimensions (in nanometers)
+    这里是gro最后一行的尺寸,包括电极体系`xbox`，以及体相`bulk_xbox`
+    # input file prefixes (without extensions)
+    README所说的一系列初始文件的名字
+    # gromacs settings
+    指定使用的gromacs版本并行参数,以及每一阶段模拟的步数
+    # Density analysis parameters
+    调密度时的目标参数,范围,其他参数(gmx density -b {BE_TIME} -nbin {NZ}),以及允许的误差,每次调整幅度等
+    # slit parameters
+    狭缝孔建模所需的孔长,宽,间距等参数,{is_auto_top}--是否自动生成拓扑
+    ## MOL_name       = ACN Na CLO    # Space-separated list of molecule/ion names (e.g., for density groups)
+    指定需要调节的分子名,注意提交任务时若需要设置onfly,那么onfly设置中的分子名也是这个
+    ## set_density   = 940            # Target system density (kg/m³)
+    目标密度,可以注释掉,见README
+
+2.run部分
+    # input file folder prefixes
+    README中所说的初始文件夹路径
+    # fold settings
+    运行时将会生成文件夹: ./charging/{Temperature}k/{V}V/{tau}ps/case1...caseN
+    # job settings
+    作业提交相关参数,包括使用的计算队列,每个节点任务数量{num},开始case和结束case编号,集群名称
+    gmx mdrun -s {DEFFNM}.tpr -deffnm {DEFFNM} []/[-cpi {DEFFNM}.cpt -append] -v -ntmpi 1 -ntomp {硬编码}
+    # job control settings  
+    是否生成case文件夹,是否提交任务
+    # scan settings
+    扫描电压文件生成相关参数,包括总时间{TIME},跳过时间{SKIPTIME_PS}(不加电的时间),电压上升时间{TAO}
+    # onfly settings
+    {MODE_ONFLY}只有使用改写的onfly时才需要这个参数,默认3
+
+
+3. INPUT for analysis
+    # onfly analysis settings
+    onfly分析相关参数,是否dynamic输出?{analysis_ONFLY_isD}
+    # MODE_ONFLY            = 3             # onfly_setting
+    和你任务中保持一致
+    # analysis case settings
+    分析的case范围
+    analyze_T analyze_V analyze_tau 为你自己case的T/V/tau值,影响最终输出文件的命名
+    analyze_mol  analyze_core   为分析的分子名称
+    # Analysis program settings (MD_PP)
+    并行执行多少个cpp程序?{analyze_core}
+    {analyze_is_skip_first_line}: 少数后处理程序的输出第一行不需要平均,强烈建议保持为0即可
+    其他参数见README:
+        <analyze_cpp> -f ./case1/slownvt.{xtcORtrr} -s ./case1/slownvt.tpr -o ./deal_data/<analyze_cpp>/1<analyze_cpp>.xvg {analysis_extra_command}

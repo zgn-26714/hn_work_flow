@@ -1,35 +1,98 @@
 使用说明：
 1.使用前准备：使用前新建一个文件夹，里面分别放置：
-1.1 自动建模+获取初始结构模块(NPT下进行体相建模)：
-    体相建模和电极建模需要的top文件（包括所有所需的itp文件）
-    能量最小化和模拟时所需的mdp文件（NPT模拟时会直接在用给模拟的mdp文件中打开压力耦合项，所以需要事先将压力耦合写好）
-    体相建模和电极建模需要的inp文件（用作packmol,packmol中的分子名称和top文件中的要保持一致）
+
+1.1 自动建模+获取初始结构模块：
+适用范围：
+    电极体系NVT建模
+    体相NPT建模
+    狭缝孔NVT建模
+模块流程介绍：
+    1. 根据INPUT文件中的set_density参数，跑电极体系的NVT模拟，自动按比例调整指定分子的数量，直到体系密度达到设定值
+    2. 随后继续跑一段NVT模型确保体系平衡
+    3. 最后跑一小段NVT模拟，获取轨迹中最接近设定温度的时刻的结构，作为后续电极体系模拟的初始结构
+    另外：也可以不设置set_density参数，而额外提供体相建模所需要的top和inp文件，程序会自动进行体相NPT模拟，获取平衡密度作为set_density参数
+
+    关于体相：当指定建立体相模型时，程序自动进行体相NPT模拟后自动跳过步骤1，使用体相预平衡后的gro进行步骤2
+
+    关于狭缝孔：如果需要进行狭缝孔建模，则需要在INPUT文件中添加孔相关的参数。
+                由于狭缝孔生成电极较为复杂，工作流集成了电极生成的脚本，其他步骤和channel电极类似
+                同时可以选择是否自动生成top文件（需要手动写好前面的 #include 部分）
+
+所需文件：
+    体相建模和电极建模需要的top文件，INPUT中的 `bulk_top` 和 `TOP`
+        ：  包括所有所需的itp文件
+    能量最小化和模拟时所需的mdp文件，INPUT中的 `mini_MDP` 和 `MDP`
+        ：如果不指定set_density，请在`MDP`中写好压力耦合项并将其关闭
+        ：只进行体相建模时，`MDP`中仍建议保留一行加注释的 `ewald-geometry = 3dc` ,否则可能导致未知错误
+    体相建模和电极建模需要的inp文件，INPUT中的`bulk_pa`和`packmol`
+        :::notice:::  packmol中的分子名称(pdb)和top文件中的分子名称要保持一致!!!
     所有所需的pdb文件
     INPUT文件
+
 1.2 自动提交任务：
-    (检查run_md下的job脚本文件是否为自己所需)
-    初始结构文件夹 initialframes （里面放置初始结构gro文件和top文件）
-    matrixdata文件夹 matrixdata （里面放置matrix数据文件）
-    basicfile文件夹 basicfile （里面放置力场、index和grompp文件）
+适用范围：
+    完美适配所有使用CPM充电的任务
+    其他的类型的任务也能提交，但会生成一些冗余文件或文件夹
+    或者需要自己改写生成扫面电压的cpp文件 [./run_md/source/generate_scan.cpp]
+
+模块流程介绍：
+    自动复制模拟所需的初始文件到指定文件夹并提交任务
+
+所需文件：
+    初始结构文件夹 initialframes
+        :里面放置初始结构gro文件和top文件
+    matrixdata文件夹 matrixdata 
+        :里面放置matrix数据文件
+        :如果不进行CPM模拟，应当设置一个空文件夹，否则可能产生未知错误
+    basicfile文件夹 basicfile 
+        :里面放置力场、index和grompp文件
+    INPUT文件
+
 1.3 分析模块
-    分析模块是个开放性的框架，使用者可以自行往内部添加分析脚本，详细见  ./analysis/analysis.sh
+适用范围：
+    几乎所有的后处理场景（cpp），特别是多个cases的批量处理
+    特别注意需要每个case的命名为 case1, case2, ..., caseN 的格式
+    ： 需要更改前往 ./analysis/source/MD_PP.sh （line：24-31） 或 ./analysis/source/module_C++ 中相应的cpp文件
+
+模块介绍：
+    分析模块是个开放性的框架，使用者可以自行往 ./analysis/analysis.sh 添加自己的分析分支
     在analysis.sh添加自己的分支后，使用./md_flow.sh [analysis] [your_analysis_name] 来调用
-    建议维持框架风格，在analysis.sh仅仅调用下一层级的sh文件，在下一层级sh文件中调用具体cpp/python/matlab代码
-    使用INPUT文件，将所需参数传递给分析脚本
-    notice: 分析模块中完成了一个可以集成所有MDcpp后处理文件的框架 ./analysis/source/MD_PP.sh
-            使用者需要将cpp文件的文件名和路径（或是将cpp文件置于./analysis/source/module_C++）写在INPUT文件中
-            别忘了指定编译需要的gmx环境
-            参数设置见INPUT注释
-1.4 deal_data模块当作备份使用，唯一的JE模块也只能在eninstein机器上运行
-###########################################################################################################################
-# Additional command line arguments for analysis program #
-# Classic post-processing commands including -f -s -n -o are already configured. 
-# Note that the filenames required for -f and -s should remain consistent and use the DEFFNM parameter for specification.
-# Additional custom command parameters need to be entered here.
-###########################################################################################################################
+    当前分支包括
+        : eleQ : 根据CPM_electrodeCharge.dat文件平均指定范围的case的电荷分布
+        : onfly: 平均平均指定范围的case的onfly输出数据
+        : mdpp: 使用<analyze_cpp>后处理并平均数据
+
+    框架风格
+        ： 在analysis.sh仅调用下一层级的sh文件，在下一层级sh文件中调用具体cpp/python/matlab代码
+        ： 工作流提供了build_gmx_cpp.sh脚本编译需要链接gromacs库编译的后处理cpp，使用INPUT中指定的 `build_gmx` 参数作为编译环境
+
+notice: 分析模块中的MD_PP
+    使用者需要将cpp文件的文件名写在INPUT中的 `analyze_cpp`，并将cpp文件放置于 ./analysis/source/module_C++中
+    MD_PP内置了-f -s -o 三个gmx后处理命令行参数，-f，-s，使用INPUT中的`deffnm`作为文件名
+    ：例如，若deffnm=slownvt，循环进行到case1时，执行的命令为
+        <analyze_cpp> -f ./case1/slownvt.{xtcORtrr} -s ./case1/slownvt.tpr -o ./deal_data/<analyze_cpp>/1<analyze_cpp>.xvg {analysis_extra_command}
+    :{xtcORtrr}和{analysis_extra_command}在INPUT中指定
+
+所需文件：
+    只需要INPUT文件，需要将INPUT放置在 case1 case2 ... caseN 文件夹的同级目录   
+        : 如<适用范围>中所述，需要每个case的命名为 case1, case2, ..., caseN 的格式
+
+1.4 deal_data模块当作备份使用，唯一的JE模块也只能在eninstein机器上运行,忽略这一部分
+
 2.使用方法：
-    修改INPUT中的参数
-    bash md_flow.sh 查看详细使用说明
-    
-3.输出日志：
-    生成在 ./result 文件夹中
+    无需安装, 直接下载整个工作流文件夹即可使用
+    chomd +x md_flow.sh # 赋予执行权限
+    将md_flow.sh所在的路径写进PATH中，或者在使用时指定完整路径
+    md_flow.sh #查看详细使用说明
+    md_flow.sh [module_name] [additional_arguments]
+        module_name: frames / run / analysis
+        additional_arguments: 根据不同模块的需要，填写相应的参数
+            initialframes: []/[bulk]/[slit]
+            run: []/[rerun]
+            analysis: [eleQ]/[onfly]/[mdpp]/[your_analysis_name] (需要和analysis.sh中对应分支名称一致)
+
+3. INPUT参数的简单介绍:
+    ./INPUT使用指南
+
+4.输出日志：
+    在与INPUT同层级的 ./result 文件夹中

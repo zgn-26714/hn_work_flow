@@ -50,8 +50,8 @@ double pbc(double dx,double box);
 void loadMessageAtom(Matrix_3d<real>& data, t_trxframe* fr, int* index, 
 					 int N_mol, int Natom_mol, int message, rvec* f_global = NULL);
 void loadMessageMol(Matrix<real>& posc, int com, t_trxframe* fr, int* index, 
-					int N_mol, int Natom_mol, int message, vector<float>& mass,
-					vector<float>& charge, rvec* f_global = NULL);
+					int N_mol, int Natom_mol, int message, vector<real>& mass,
+					vector<real>& charge, rvec* f_global = NULL);
 void dw_boundary(real* Lbox);
 double array_angle(vector<double>& array1,vector<double>& array2);
 
@@ -170,7 +170,6 @@ static void do_vcomponent(	const char *traj_file, t_topology *top, const char *n
                         if(count[i][j] != 0)
                             angle[i][j] /=  count[i][j];
                         fprintf(outfile, "%10g	", angle[i][j]);
-                        std::cout<<angle[i][j]<<std::endl;
                     }
                     else{
                         angle[i][j] = 0;
@@ -277,8 +276,8 @@ double pbc(double dx,double box)
 }
 
 void loadMessageMol(Matrix<real>& posc, int com, t_trxframe* fr, int* index,
-					int N_mol, int Natom_mol, int message, vector<float>& mass,
-					vector<float>& charge, rvec* f_global)
+					int N_mol, int Natom_mol, int message, vector<real>& mass,
+					vector<real>& charge, rvec* f_global)
 {
 	int    i, j, k, molN;
 	int    n = 0;

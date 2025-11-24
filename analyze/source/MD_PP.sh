@@ -11,6 +11,8 @@ num=${analyze_begin_case}
 end_num=${analyze_end_case}
 count=0
 execu_bin="${bash_dir}/../../bin/${analyze_cpp}"
+# execu_bin="gmx density"
+# export analyze_cpp="gmx_density"
 src_file="${bash_dir}/module_C++/${analyze_cpp}.cpp"
 mkdir -p ./deal_data/${analyze_cpp}
 bash ${bash_dir}/../build_gmx_cpp.sh "${src_file}" "${execu_bin}"
@@ -25,10 +27,11 @@ while (( "$num" <= "$end_num" )); do
         PP_command="-f "./case$num/rerun_case/${DEFFNM}.${xtcORtrr}" -s "./case$num/rerun_case/${DEFFNM}.tpr" -n "./case$num/rerun_case/index.ndx""
     else
         PP_command="-f "./case$num/${DEFFNM}.${xtcORtrr}" -s "./case$num/${DEFFNM}.tpr" -n "./case$num/index.ndx""
+        # PP_command="-f "./case$num/frame${num}.${xtcORtrr}" -s "./case$num/${DEFFNM}.tpr" -n "./case$num/index.ndx""
     fi
     
     out_command="-o "./deal_data/${analyze_cpp}/${num}${analyze_cpp}.xvg""
-    if echo  ${analyze_mol} | ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command} -e 1 >> ./result/analyze.log 2>&1; then
+    if echo -e ${analyze_mol} | ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command} -e 1 >> ./result/analyze.log 2>&1; then
         echo -e "${OK} command works fine. Starting analysis..."
     else
         echo -e "${YELLOW}WARNING! Incorrect location—this may be due to an error in the molecule name or duplicate molecule names in the index.${NC}"
@@ -42,7 +45,8 @@ while (( "$num" <= "$end_num" )); do
             exit 1
         fi
     fi
-    # echo ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command} | tee -a ./result/analyze.log >&2
+
+    echo ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command} >> ./result/analyze.log 2>&1
     {
         echo  ${analyze_mol} | ${execu_bin}  ${PP_command} ${out_command} ${analysis_extra_command}
     } >> ./result/analyze.log 2>&1 &

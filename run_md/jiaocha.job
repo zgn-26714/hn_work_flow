@@ -1,0 +1,56 @@
+#!/bin/bash
+#SBATCH --job-name=DVS-I    ### 设置该作业的作业名
+#SBATCH --nodes=1           ### 指定该作业需要1个节点数
+#SBATCH --partition=iirmas-cpu
+#SBATCH --ntasks-per-node=56 ### 每个节点所运行的进程数为56
+#SBATCH --time=900:00:00 ### 作业最大的运行时间，超过时间后作业资源会被SLURM回收
+#SBATCH --comment=public_cluster ### 指定从哪个项目扣费。如果没有这条参数，则从个人账户扣费
+module load app/intel/2020
+module load  mpi/openmpi/4.0.4/intel
+
+V=0
+j=0
+k=1
+i=0
+h=10
+mdbin="/home/u2013010165/users/huangnan/app/hnScanrate/bin/gmx_d "
+name=slownvt
+mode=$1
+workdir="xxx"
+isRerun=0
+traj_to_rerun="../*.xtc"
+while [ "$i" -lt "$h" ]; do
+    casedir="${workdir}/case"$k""
+    cd "$casedir" || exit 1  
+    if [ "$mode" == "append" ]; then 
+        rm -rf *.tpr
+        rm -rf *.xvg
+    else
+        rm -rf *.tpr
+        rm -rf dens*.onfly
+        rm -rf CPM_electrodeCharge.dat
+        rm -rf CPM_potential.dat
+        rm -rf "$name"*
+    fi
+    export ONFLY_DENSITY3D="-low [0 0 20] -up [4.3 4.3 30] -nbin [1 1 1000] -n index.ndx -sel [Na CLO PC]  -calc 3"
+    
+    if [[ "${isRerun}" -eq 1 ]]; then
+        $mdbin grompp -f case_rerun.mdp -p topol.top -c "../frame${k}.gro" -o "$name" -maxwarn 2 -n index.ndx
+        if [ "$mode" == "append" ]; then
+            $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp 56 -append -cpi "${name}.cpt" -rerun traj_to_rerun* -s "$name"
+        else
+            $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp 56 -rerun traj_to_rerun* -s "$name"
+        fi
+    else
+        $mdbin grompp -f grompp.mdp -p topol.top -c "frame${k}.gro" -o "$name" -maxwarn 2 -n index.ndx
+        if [ "$mode" == "append" ]; then
+            $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp 56 -append -cpi "${name}.cpt" -s "$name"
+        else
+            $mdbin mdrun -deffnm "$name" -v -ntmpi 1 -ntomp 56 -s "$name"
+        fi
+    fi
+
+    wait
+    ((k++))
+    ((i++))
+done

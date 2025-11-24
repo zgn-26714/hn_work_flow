@@ -20,6 +20,7 @@ make_job() {
        "eninstein") cp "$SCRIPT_PATH/eninstein.job" "$objjob" ;;
         "4090")     cp "$SCRIPT_PATH/4090.job" "$objjob" ;; 
         "wuchao")   cp "$SCRIPT_PATH/wuchao.job" "$objjob" ;;
+        "jiaocha")  cp "$SCRIPT_PATH/jiaocha.job" "$objjob" ;;
     esac
     # 
     
@@ -95,6 +96,27 @@ make_job() {
         dsub -s $objjob
         cd -
         ;;
+    "jiaocha")
+        sed -i "
+            2s|.*|#SBATCH --job-name=chargingcase${start_case}-${end_case}${V}V${ic}|;
+            /k=/s|.*|k=$start_case|;
+            /h=/s|.*|h=$num|;
+            /workdir=/s|.*|workdir=$rundir|;
+            /mode=/s|.*|mode=$mode|;
+            /isRerun=/s|.*|isRerun=$isRerun|;
+            /^[[:space:]]*name=/s|.*|name=$DEFFNM|
+        " "$objjob" 
+        sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
+        chmod +x $objjob
+        if [[ "${isRerun}" -eq 1 ]]; then
+            cd "$rundir"/case"$start_case"/rerun_case
+            sed -i "/casedir=/s|.*|casedir=\$workdir/case\$k/rerun_case|" "$objjob"
+        else
+            cd "$rundir"/case"$start_case"
+        fi
+        sbatch -s $objjob
+        cd -
+        ;;
     *)  
         echo "❌ Unknown server machine: $server_machine" | tee -a ./result/run_md.log >&2
         return 1
@@ -106,7 +128,6 @@ esac
 main() {
     # 
     workdir="$(pwd)"
-    echo $workdir |tee  /data1/huangnan/PC/charging/298k/2V/0ps/debug 
     local current_cas=${START}
     local batch_num=1
     
