@@ -144,7 +144,8 @@ static void do_vcomponent(	const char *traj_file, t_topology *top, const char *n
 								<< " invalid tmp_ang = " << tmp_ang << std::endl;
 						continue;
 					}
-                    angle[i][nowz] += tmp_ang;
+long double pi = acos(0.0) * 2;
+                    angle[i][nowz] += cos(tmp_ang/180.0*pi);
 					int bin = int(tmp_ang / (180.0 / dipoleBin)); // 180.0 is the max angle
 					if (bin < 0) bin = 0;
                     if (bin >= dipoleBin) {

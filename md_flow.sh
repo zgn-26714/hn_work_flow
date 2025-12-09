@@ -48,6 +48,7 @@ case "$ACTION" in
             bash "$SCRIPT_DIR"/build_model/run_for_bulk.sh
             ;;
           slit)
+            export isSlit=1
             bash "$SCRIPT_DIR"/build_model/build_slit.sh
             ;;
           *)

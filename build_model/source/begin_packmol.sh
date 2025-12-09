@@ -40,6 +40,11 @@ rm -f *#
 echo q | gmx make_ndx -f "${name}s".gro >> ./result/b_model.log 2>&1
 
 # Step 6: (Optional) Update box vectors in the .gro file
+if (( isSlit == 1)); then
+    last_line=$(tail -n 1 ./model/single_electrode.gro)
+    read -r xbox ybox zbox <<< "$last_line"
+fi
+
 echo "Setting box vectors in ${name}s.gro to: $xbox x $ybox x $zbox nm" | tee -a ./result/b_model.log >&2
 formatted_line=$(printf "%8.4f%8.4f%8.4f" $xbox $ybox $zbox)
 sed -i "\$ s/^.*$/      $formatted_line/" "${name}s".gro

@@ -2,6 +2,7 @@
 ######### INPUT for build_model #########
 #########################################
 # Simulation box dimensions (in nanometers)
+# if you do slit, xbox ybox zbox can be ignored
 xbox           = 5             # Box length in X direction (nm)
 ybox           = 6             # Box length in Y direction (nm)
 zbox           = 10            # Box length in Z direction (nm)
@@ -40,11 +41,16 @@ factor         = 0.1           # Scaling factor per iteration for box resizing (
 max_iter       = 3             # Maximum number of iterations for density adjustment
 onlyUP         = 1             # 1=only accept density upper setting; 0=accept both upper and lower settings
 
-#slit parameters
+# slit parameters 
+# molecule names of electrode are EL ER GRA 
 LLX = 3.4
 LLZ = 8
 dslit = 1.5
+len_bulk = 8
 is_auto_top=1
+MOL = ACN Na CLO
+MOL_num = 3000 40 40
+MOL_num_bulk = 3000 40 40
 ###This item is used to adjust the bulk density in NVT simulations of the electrode system. 
 #It can be either automatically generated or manually added. 
 #Automatic generation implies performing bulk-phase modeling and analyzing the equilibrium bulk density.
