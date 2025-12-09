@@ -42,7 +42,9 @@ while (( "$num" <= "$end_num" )); do
             echo -e "${OK} command works fine. Starting analysis..."
         else 
             echo -e "${ERROR} command failed in case${num} again!${NC}"
-            exit 1
+            # exit 1
+            ((num++))
+            continue;
         fi
     fi
 
