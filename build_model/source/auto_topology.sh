@@ -3,7 +3,8 @@
 set -euo pipefail
 
 echo "[ molecules ]" >> ${TOP}.top
-
+cat tmp >> ${TOP}.top
+rm -rf tmp
 
 awk '
 /^structure / { 
