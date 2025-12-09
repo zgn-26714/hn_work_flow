@@ -8,7 +8,10 @@
     # Density analysis parameters
     调密度时的目标参数,范围,其他参数(gmx density -b {BE_TIME} -nbin {NZ}),以及允许的误差,每次调整幅度等
     # slit parameters
-    狭缝孔建模所需的孔长,宽,间距等参数,{is_auto_top}--是否自动生成拓扑
+    狭缝孔建模所需的孔长,宽,间距等参数,{is_auto_top}--是否自动生成拓扑和inp文件
+    len_bulk 体相长度(8-10左右)
+    MOL、MOL_num 分子名字和数量
+    MOL_num_bulk NPT时中各分子的数量
     ## MOL_name       = ACN Na CLO    # Space-separated list of molecule/ion names (e.g., for density groups)
     指定需要调节的分子名,注意提交任务时若需要设置onfly,那么onfly设置中的分子名也是这个
     ## set_density   = 940            # Target system density (kg/m³)
