@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+
 
 mkdir -p ./model
 bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -26,15 +28,19 @@ fi
 export BASH_DIR=$bash_dir
 ${execu_bin} ./model/single_electrode.gro
 
-n=$(wc -l < single_electrode.gro) | tee -a ./result/b_model.log  >&2
+n=$(wc -l < ./model/single_electrode.gro)
+echo "n=$n" | tee -a ./result/b_model.log >&2
 
 read min max < <(
 awk -v n="$n" 'NR>2 && NR<n {
     if(!i){min=max=$NF;i=1}
     if($NF<min)min=$NF
     if($NF>max)max=$NF
-} END{print min, max}' single_electrode.gro
-) | tee -a ./result/b_model.log  >&2
+} END{print min, max}' ./model/single_electrode.gro
+)
+
+# 记录 min 和 max 到日志
+echo "min=$min max=$max" | tee -a ./result/b_model.log >&2
 
 ##更改盒子大小和位置
 last_line=$(tail -n 1 ./model/single_electrode.gro)
@@ -51,13 +57,14 @@ gmx editconf -f ./model/single_electrode.gro -o ./model/single_electrode.pdb >> 
 echo "Box size updated to: $BOX_X x $BOX_Y x $now_BOX_Z nm" | tee -a ./result/b_model.log  >&2
 echo -e "${OK} get initial electrode, Z coordinate range: min=${min_ele}, max=${max_ele}${NC}" | tee -a ./result/b_model.log  >&2
 
-
+export min_ele
+export max_ele
 #自动生成packmol
 if [ "$is_auto_top" -eq 1 ]; then
     if bash ${bash_dir}/auto_packmol.sh >> ./result/b_model.log  2>&1; then
-        echo -e "${OK}Successfully generated topology for single electrode model." | tee -a ./result/b_model.log >&2
+        echo -e "${OK}Successfully generated ${packmol}.inp for single electrode model." | tee -a ./result/b_model.log >&2
     else
-        echo -e "${ERROR}Failed to generate topology for single electrode model.${NC}" | tee -a ./result/b_model.log >&2
+        echo -e "${ERROR}Failed to generate ${packmol}.inp for single electrode model.${NC}" | tee -a ./result/b_model.log >&2
         exit 1
     fi
 fi

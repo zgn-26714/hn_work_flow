@@ -49,5 +49,5 @@ END {
             }
         }
     }
-}' ${bulk_pa}.inp| tail -n +2 | sed 's/\.pdb//' >> ${TOP}.top
+}' ${bulk_pa}.inp | sed 's/\.pdb//' >> ${bulk_top}.top
 # echo -e "${OK}Successfully appended molecule counts from Packmol input to topology.${NC}"

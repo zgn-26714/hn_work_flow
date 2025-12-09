@@ -43,14 +43,15 @@ onlyUP         = 1             # 1=only accept density upper setting; 0=accept b
 
 # slit parameters 
 # molecule names of electrode are EL ER GRA 
-LLX = 3.4
-LLZ = 8
-dslit = 1.5
-len_bulk = 8
-is_auto_top=1
-MOL = ACN Na CLO
-MOL_num = 3000 40 40
-MOL_num_bulk = 3000 40 40
+LLX            = 3.4           # high of electrode (nm)
+LLZ            = 8             # length of slit (nm)
+dslit          = 1.5           # high of slit (nm)
+len_bulk       = 8             # length of bulk region (nm)
+is_auto_top    =1              # 1=auto generate top/inp file
+MOL            = ACN Na CLO    # mol name you want to insert
+MOL_num        = 3000 40 40    # Number of each molecule to insert into slit system
+MOL_num_bulk   = 3000 40 40    # Number of each molecule to insert into bulk system(NPT)
+
 ###This item is used to adjust the bulk density in NVT simulations of the electrode system. 
 #It can be either automatically generated or manually added. 
 #Automatic generation implies performing bulk-phase modeling and analyzing the equilibrium bulk density.
