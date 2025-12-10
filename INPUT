@@ -36,7 +36,8 @@ BE_TIME        = 1000          # Start time for density analysis (in ps, to skip
 BE_Z           = 21            # Start Z-position for density analysis (in nm)
 END_Z          = 29            # End Z-position for density analysis (in nm)
 error          = 5             # Allowed density error threshold (%)
-factor         = 0.1           # Scaling factor per iteration for box resizing (0.1 mean: low 0.9; up 1.1)
+## removed on 2025-12-10 based on NYJ's idea
+# factor         = 0.1           # Scaling factor per iteration for box resizing (0.1 mean: low 0.9; up 1.1)
 
 max_iter       = 3             # Maximum number of iterations for density adjustment
 onlyUP         = 1             # 1=only accept density upper setting; 0=accept both upper and lower settings

@@ -1,5 +1,6 @@
 #!/bin/bash
 rm setting.log
+rm -rf result/density_result.dat
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
