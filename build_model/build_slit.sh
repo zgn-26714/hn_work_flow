@@ -107,6 +107,7 @@ if bash ${bash_dir}/get_frames.sh; then
     rm ./build/*#
     rm ./model/*#
     rm ./nvt20/*#
+    rm bak_*
     echo ""
             echo -e "\033[1;32m🎉🎉🎉  ALL STEPS COMPLETED SUCCESSFULLY!  🎉🎉🎉\033[0m">&2
             echo -e "\033[1;36m      ____  ____  ____  ____  ____  ____       \033[0m">&2

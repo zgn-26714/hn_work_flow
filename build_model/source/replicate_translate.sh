@@ -1,7 +1,12 @@
 #!/bin/bash
 
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+set -euo pipefail
 
+bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+if (( isSlit == 1)); then
+    last_line=$(tail -n 1 ./model/single_electrode.gro)
+    read -r xbox ybox zbox <<< "$last_line"
+fi
 if gmx editconf -f ./build/pre_eq.gro -o ./build/pre_eq2.gro -translate 0 0 ${zbox} >> ./result/b_model.log 2>&1;then
     echo -e "${OK}Successfully translated structure along z-axis by ${zbox} nm." | tee -a ./result/b_model.log >&2
 else
@@ -16,17 +21,13 @@ bash ${bash_dir}/../../bin/build_cpp.sh ${cpp_src} ${execu_bin}
 ${execu_bin} ./build/pre_eq.gro ./build/pre_eq2.gro
 
 double_z_box=$(echo "$zbox * 2" | bc -l)
-if (( isSlit == 1)); then
-    last_line=$(tail -n 1 ./model/single_electrode.gro)
-    read -r xbox ybox zbox <<< "$last_line"
-fi
 formatted_line=$(printf "%8.4f%8.4f%8.4f" $xbox $ybox $double_z_box)
 sed -i "\$ s/^.*$/      $formatted_line/" ./build/pre_eq_merge.gro
 echo -e "${OK}${GREEN}merge two gro successfully!${NC}" | tee -a ./result/b_model.log >&2
 
 cpp_src=${bash_dir}/double_slit_top.cpp
 execu_bin=${bash_dir}/../../bin/double_slit_top
-bash ${bash_dir}/../../build_cpp.sh ${cpp_src} ${execu_bin}
+bash ${bash_dir}/../../bin/build_cpp.sh ${cpp_src} ${execu_bin}
 ${execu_bin} >> ./result/b_model.log 2>&1
 mv ${TOP}.top.processed ${TOP}.top
 # #从generate_slit开始规范名字，关闭此功能

@@ -25,7 +25,7 @@ END {
     }
 }' ${packmol}.inp| tail -n +2 | sed 's/\.pdb//' >> ${TOP}.top
 
-
+cp ${TOP}.top bak_${TOP}.top
 
 
 ##### 生成bulk_top.top
