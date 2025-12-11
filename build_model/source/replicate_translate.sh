@@ -48,10 +48,8 @@ rm -f *#
 mv build/pre_eq_merge.gro build/pre_eq.gro
 
 echo "[step 1] genenrate .tpr (mini_energy) (grompp)" | tee -a ./result/b_model.log >&2
-cp "${MDP}".mdp ./build/grompp_rebalance.mdp
+
 cp "${mini_MDP}".mdp ./build/mini.mdp
-sed -i "s/^[[:space:]]*nsteps[[:space:]]*=.*/nsteps = ${nsteps_reB}/" ./build/grompp_rebalance.mdp
-sed -i -e 's/^freezegrps.*$/freezegrps = CL  CR  GRA/' -e 's/^freezedim.*$/freezedim   = Y Y Y Y Y Y Y Y Y/' ./build/grompp_rebalance.mdp
 sed -i -e 's/^freezegrps.*$/freezegrps = CL  CR  GRA/' -e 's/^freezedim.*$/freezedim   = Y Y Y Y Y Y Y Y Y/' ./build/mini.mdp
 
 echo q| gmx make_ndx -f ./build/pre_eq.gro -o ./build/index.ndx >> ./result/b_model.log  2>&1
