@@ -70,7 +70,6 @@ while { (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($densi
     if [ ! -f "${execu_bin}" ]; then
         echo "Executable ${execu_bin} does not exist, starting compilation..."
         bash ${build_dir} ${src_cpp} ${execu_bin}
-        
         # Check if compilation was successful
         if [ $? -eq 0 ] && [ -f "${execu_bin}" ]; then
             echo "Compilation successful!"

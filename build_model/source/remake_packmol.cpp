@@ -28,10 +28,10 @@ struct PackmolEntry {
 
 /* ================= Utility ================= */
 void calc_factor(vector<MolRecord>& records, double factor) {
-    const char* fixed_mol_env = getenv("FIXED_MOL");
-    int is_force_scale_env = stoi(string(getenv("IS_FORCE_SCALE")));
-    if (!fixed_mol_env || !is_force_scale_env)
-        throw std::runtime_error("Environment variables not set");
+    string fixed_mol_env = getenv("FIXED_MOL") ? getenv("FIXED_MOL") : "";
+    string force_scale_str = getenv("IS_FORCE_SCALE") ? getenv("IS_FORCE_SCALE") : "0";
+
+    int is_force_scale_env = stoi(force_scale_str);
     
     std::string fixed_mol(fixed_mol_env);
     std::unordered_set<std::string> fixed_set;
@@ -107,8 +107,6 @@ void calc_factor(vector<MolRecord>& records, double factor) {
     }
 
 }
-
-
 
 
 static inline string trim(const string& s) {
