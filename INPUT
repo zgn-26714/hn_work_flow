@@ -42,6 +42,7 @@ error          = 5             # Allowed density error threshold (%)
 max_iter       = 3             # Maximum number of iterations for density adjustment
 onlyUP         = 1             # 1=only accept density upper setting; 0=accept both upper and lower settings
 
+
 # slit parameters 
 # molecule names of electrode are EL ER GRA 
 LLX            = 3.4           # high of electrode (nm)
@@ -60,6 +61,10 @@ set_density   = 940            # Target system density (kg/m³)
 
 #################  NOTICE : Molecule names for 'md_run' onfly setting and modeling
 MOL_name       = ACN Na CLO    # Space-separated list of molecule/ion names (e.g., for density groups)
+FIXED_MOL      = Na CLO        # notice! It's a important and sensitive parameter, please read README.md carefully before you set it.
+IS_FORCE_SCALE = 0             # If you set it to 1, and open "FIXED_MOL", You may never reach the correct density!! never!!!
+                               # Please read README.md carefully before you set it.
+
 
 #########################################
 ######### INPUT for md_run ##############

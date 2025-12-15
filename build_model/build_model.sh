@@ -62,10 +62,27 @@ while { (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($densi
         scale_factor=$(echo "$density / $set_density" | bc -l)
         echo "Density too low, compressing system by factor $scale_factor" | tee -a ./result/b_model.log >&2
     fi
-    # remake_packmol.py remake packmol and top
+    #remake packmol and top
     export scale_factor
-    if ! python3 "$SCRIPT_DIR"/source/remake_packmol.py "$scale_factor" packmol_; then
-        echo -e "${ERROR}Error: remake_packmol.py failed with scale factor $scale_factor${NC}"  | tee -a ./result/b_model.log >&2
+    build_dir=${SCRIPT_DIR}/../bin/build_cpp.sh
+    src_cpp=${SCRIPT_DIR}/source/remake_packmol.cpp
+    execu_bin=${SCRIPT_DIR}/../bin/remake_packmol
+    if [ ! -f "${execu_bin}" ]; then
+        echo "Executable ${execu_bin} does not exist, starting compilation..."
+        bash ${build_dir} ${src_cpp} ${execu_bin}
+        
+        # Check if compilation was successful
+        if [ $? -eq 0 ] && [ -f "${execu_bin}" ]; then
+            echo "Compilation successful!"
+        else
+            echo "Compilation failed!"
+            exit 1
+        fi
+    else
+        echo "Executable ${execu_bin} already exists, skipping compilation."
+    fi
+    if  ${execu_bin} "$scale_factor" packmol_; then
+        echo -e "${ERROR}Error: remake_packmol failed with scale factor $scale_factor${NC}"  | tee -a ./result/b_model.log >&2
         exit 1
     fi
     sh "$SCRIPT_DIR"/source/begin_packmol.sh  | tee -a ./result/b_model.log >&2
