@@ -29,14 +29,14 @@ make_job() {
         sed -i "
             2s|.*|#PBS -q $queue|;
             3s|.*|#PBS -N chargingcase${start_case}-${end_case}${V}V${ic}|;
-            /k=/s|.*|k=$start_case|;
-            /h=/s|.*|h=$num|;
-            /workdir=/s|.*|workdir=$rundir|;
-            /mode=/s|.*|mode=$mode|;
-            /isRerun=/s|.*|isRerun=$isRerun|;
-            /name=/s|.*|name=$DEFFNM|;
-            /mdbin=/s|.*|mdbin=$GMX_run|
-        " "$objjob" 
+            /^[[:space:]]*k[[:space:]]*=/s|.*|k=$start_case|;
+            /^[[:space:]]*h[[:space:]]*=/s|.*|h=$num|;
+            /^[[:space:]]*workdir[[:space:]]*=/s|.*|workdir=$rundir|;
+            /^[[:space:]]*mode[[:space:]]*=/s|.*|mode=$mode|;
+            /^[[:space:]]*isRerun[[:space:]]*=/s|.*|isRerun=$isRerun|;
+            /^[[:space:]]*name[[:space:]]*=/s|.*|name=$DEFFNM|;
+            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|
+        " "$objjob"
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         case "$queue" in
             short)  sed -i '6s/.*/#PBS -l walltime=36:00:00/' "$objjob" ;;
@@ -59,14 +59,15 @@ make_job() {
         sed -i "
             5s|.*|#SBATCH --partition=${queue}|;
             2s|.*|#SBATCH --job-name=chargingcase${start_case}-${end_case}${V}V${ic}|;
-            /k=/s|.*|k=$start_case|;
-            /h=/s|.*|h=$num|;
-            /workdir=/s|.*|workdir=$rundir|;
-            /mode=/s|.*|mode=$mode|;
-            /isRerun=/s|.*|isRerun=$isRerun|;
-            /name=/s|.*|name=$DEFFNM|;
-            /mdbin=/s|.*|mdbin=$GMX_run|
-        " "$objjob" 
+
+            /^[[:space:]]*k[[:space:]]*=/s|.*|k=$start_case|;
+            /^[[:space:]]*h[[:space:]]*=/s|.*|h=$num|;
+            /^[[:space:]]*workdir[[:space:]]*=/s|.*|workdir=$rundir|;
+            /^[[:space:]]*mode[[:space:]]*=/s|.*|mode=$mode|;
+            /^[[:space:]]*isRerun[[:space:]]*=/s|.*|isRerun=$isRerun|;
+            /^[[:space:]]*name[[:space:]]*=/s|.*|name=$DEFFNM|;
+            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|
+        " "$objjob"
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         if [[ "${isRerun}" -eq 1 ]]; then
             cd "$rundir"/case"$start_case"/rerun_case
@@ -80,13 +81,13 @@ make_job() {
     "wuchao") 
         sed -i "
             7s|.*|#DSUB -n chargingcase${start_case}-${end_case}${V}V${ic}|;
-            /k=/s|.*|k=$start_case|;
-            /h=/s|.*|h=$num|;
-            /workdir=/s|.*|workdir=$rundir|;
-            /mode=/s|.*|mode=$mode|;
-            /isRerun=/s|.*|isRerun=$isRerun|;
-            /name=/s|.*|name=$DEFFNM|;
-            /mdbin=/s|.*|mdbin=$GMX_run|
+            /^[[:space:]]*k[[:space:]]*=/s|.*|k=$start_case|;
+            /^[[:space:]]*h[[:space:]]*=/s|.*|h=$num|;
+            /^[[:space:]]*workdir[[:space:]]*=/s|.*|workdir=$rundir|;
+            /^[[:space:]]*mode[[:space:]]*=/s|.*|mode=$mode|;
+            /^[[:space:]]*isRerun[[:space:]]*=/s|.*|isRerun=$isRerun|;
+            /^[[:space:]]*name[[:space:]]*=/s|.*|name=$DEFFNM|;
+            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|
         " "$objjob" 
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         chmod +x $objjob
@@ -102,13 +103,13 @@ make_job() {
     "jiaocha")
         sed -i "
             2s|.*|#SBATCH --job-name=chargingcase${start_case}-${end_case}${V}V${ic}|;
-            /k=/s|.*|k=$start_case|;
-            /h=/s|.*|h=$num|;
-            /workdir=/s|.*|workdir=$rundir|;
-            /mode=/s|.*|mode=$mode|;
-            /isRerun=/s|.*|isRerun=$isRerun|;
-            /^[[:space:]]*name=/s|.*|name=$DEFFNM|;
-            /mdbin=/s|.*|mdbin=$GMX_run|
+            /^[[:space:]]*k[[:space:]]*=/s|.*|k=$start_case|;
+            /^[[:space:]]*h[[:space:]]*=/s|.*|h=$num|;
+            /^[[:space:]]*workdir[[:space:]]*=/s|.*|workdir=$rundir|;
+            /^[[:space:]]*mode[[:space:]]*=/s|.*|mode=$mode|;
+            /^[[:space:]]*isRerun[[:space:]]*=/s|.*|isRerun=$isRerun|;
+            /^[[:space:]]*name[[:space:]]*=/s|.*|name=$DEFFNM|;
+            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|
         " "$objjob" 
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         chmod +x $objjob
