@@ -56,11 +56,10 @@ while { (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($densi
     echo "Iteration $iter: Current density = $density, Target = $set_density" | tee -a ./result/b_model.log >&2
     # set factor
     diff=$(echo "$density - $set_density" | bc -l)
+    scale_factor=$(echo "$set_density / $density" | bc -l)
     if (( $(echo "$diff > 0" | bc -l) )); then
-        scale_factor=$(echo "$set_density / $density" | bc -l)
         echo "Density too high, expanding system by factor $scale_factor"  | tee -a ./result/b_model.log >&2
     else
-        scale_factor=$(echo "$density / $set_density" | bc -l)
         echo "Density too low, compressing system by factor $scale_factor" | tee -a ./result/b_model.log >&2
     fi
     #remake packmol and top
