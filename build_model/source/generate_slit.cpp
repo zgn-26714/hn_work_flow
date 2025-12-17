@@ -103,7 +103,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
         for (int j = 1; j <= 28; j++) {
             if (j-1 < Unit4.size() && idx < Natom) {
                 Coor[idx].resNum = idx + 1;
-                Coor[idx].resName = "CL";
+                Coor[idx].resName = "EL";
                 Coor[idx].atomName = "C";
                 Coor[idx].atomNum = idx + 1;
                 Coor[idx].x = Unit4[j-1][0];  // MATLAB j对应C++ j-1
@@ -118,7 +118,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     for (int i = 1; i <= 14 && i-1 < Unit4.size(); i++) {
         if (idx < Natom) {
             Coor[idx].resNum = idx + 1;
-            Coor[idx].resName = "CL";
+            Coor[idx].resName = "EL";
             Coor[idx].atomName = "C";
             Coor[idx].atomNum = idx + 1;
             Coor[idx].x = Unit4[i-1][0];  // MATLAB i对应C++ i-1
@@ -132,7 +132,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     int startCpo = 0;
     for (int i = 1; i <= N4 && idx < Natom; i++) {
         Coor[idx].resNum = idx + 1;
-        Coor[idx].resName = "CL";
+        Coor[idx].resName = "EL";
         Coor[idx].atomName = "C";
         Coor[idx].atomNum = idx + 1;
         Coor[idx].x = Lx0 + (nx - 7) * dc;
@@ -142,7 +142,7 @@ void GenElec_zl(double llx, double llz, std::vector<Atom>& Coor, Box& box, NList
     }
     
     int CL_idx = idx;
-    std::string command = "echo CL " + std::to_string(CL_idx) + " >tmp"; // 修复类型问题
+    std::string command = "echo EL " + std::to_string(CL_idx) + " >tmp"; // 修复类型问题
     system(command.c_str());
 
     // ===== Cvo 区域 =====
