@@ -24,23 +24,14 @@ if [ $? -ne 0 ] || ! echo "$output" | grep -q "^OUTPUT:"; then
     echo -e "${ERROR} get_bulk_density.sh failed${NC}" | tee -a ./result/b_model.log  >&2
     exit 1
 else
-    echo -e "${OK}success get bulk density ${output}" | tee -a ./result/b_model.log >&2
-    density=$(echo "$output" | grep "^OUTPUT:" | cut -d' ' -f2)
-    if ! [[ "$density" =~ ^[+-]?[0-9]*\.?[0-9]+([eE][+-]?[0-9]+)?$ ]]; then
-        echo -e "${ERROR}Error: Invalid density value returned: $density${NC}" | tee -a ./result/b_model.log >&2
-        echo -e "${ERROR} get_bulk_density.sh failed${NC}" | tee -a ./result/b_model.log  >&2
-        exit 1
-    else
-        echo -e "${OK}success WRITE bulk density ${density}" | tee -a ./result/b_model.log >&2
-    fi
+    echo -e "${OK}success get a bulk box for simulation." | tee -a ./result/b_model.log >&2
 fi
-density=$(printf "%.10f" "$density")
-export set_density="${density}"
+
 
 echo -e "${GREEN}"
 echo "##############################################">&2
 echo "  I. success! ">&2
-echo "  The bulk density has been equilibrated.">&2
+echo "  The bulk has been pre-equilibrated.">&2
 echo "##############################################">&2
 echo -e "${NC}"
 rm step*.pdb

@@ -104,28 +104,30 @@ echo -e "\t[CMD]${mdrun_cmd[*]}" | tee -a ./result/b_model.log >&2
 "${mdrun_cmd[@]}" >> ./result/b_model.log  2>&1
 
 
+if ((isBulk != 1));then
+    echo "[STEP 4]Computing density profile" | tee -a ./result/b_model.log >&2
+    if echo 0|gmx density \
+        -f ./bulk/bulk.xtc \
+        -s ./bulk/bulk.tpr \
+        -n ./bulk/bulk.index \
+        -sl 100 \
+        -b "$BE_TIME" \
+        -o ./bulk/density.xvg >> ./result/b_model.log 2>&1; then
+        echo -e "${OK}Density calculation completed" | tee -a ./result/b_model.log >&2
+    else
+        echo -e "${ERROR}gmx density execution failed${NC}" | tee -a ./result/b_model.log >&2
+        exit 1
+    fi
 
-echo "[STEP 4]Computing density profile" | tee -a ./result/b_model.log >&2
-if echo 0|gmx density \
-    -f ./bulk/bulk.xtc \
-    -s ./bulk/bulk.tpr \
-    -n ./bulk/bulk.index \
-    -sl 100 \
-    -b "$BE_TIME" \
-    -o ./bulk/density.xvg >> ./result/b_model.log 2>&1; then
-    echo -e "${OK}Density calculation completed" | tee -a ./result/b_model.log >&2
+    # =============================
+    # Step 4: Extract average density in Z range
+    # =============================
+
+    low_bound=$(echo "$bulk_zbox * 0.1" | bc)
+    up_bound=$(echo "$bulk_zbox * 0.9" | bc)
+    echo "[STEP 6] Analyzing density in Z range [${low_bound} - ${up_bound}] nm" | tee -a ./result/b_model.log >&2
+    density=$(gmx analyze -f ./bulk/density.xvg -b ${low_bound} -e ${up_bound} 2>/dev/null | grep "^SS1" | awk '{print $2}')
 else
-    echo -e "${ERROR}gmx density execution failed${NC}" | tee -a ./result/b_model.log >&2
-    exit 1
+    density=0
 fi
-
-# =============================
-# Step 4: Extract average density in Z range
-# =============================
-
-low_bound=$(echo "$bulk_zbox * 0.1" | bc)
-up_bound=$(echo "$bulk_zbox * 0.9" | bc)
-echo "[STEP 6] Analyzing density in Z range [${low_bound} - ${up_bound}] nm" | tee -a ./result/b_model.log >&2
-density=$(gmx analyze -f ./bulk/density.xvg -b ${low_bound} -e ${up_bound} 2>/dev/null | grep "^SS1" | awk '{print $2}')
-
 echo "OUTPUT: $density" 
