@@ -41,7 +41,7 @@ for i in "${!MOL_arr[@]}"; do
     cat >> "$outfile" << EOF
 structure ${MOL_arr[$i]}.pdb
 number ${MOLnum_arr[$i]}
-inside box 0. 0. $max_ele  $BOX_X  $BOX_Y  $BOX_Z
+inside box 0. 0. $(( $max_ele + 5 ))  $BOX_X  $BOX_Y  $BOX_Z
 end structure
 
 EOF
@@ -56,7 +56,7 @@ for i in "${!MOL_arr[@]}"; do
     cat >> "$outfile" << EOF
 structure ${MOL_arr[$i]}.pdb
 number ${MOLnum_arr[$i]}
-inside box 0. 0. 0.  $BOX_X  $BOX_Y  $min_ele
+inside box 0. 0. 0.  $BOX_X  $BOX_Y  $(( $min_ele -5 ))
 end structure
 
 EOF

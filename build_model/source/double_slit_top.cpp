@@ -104,10 +104,10 @@ int main() {
 
     // 输出处理后的 molecules 内容
     if (firstMoleculeSet) {
-        // 输出第一个分子(CL)
+        // 输出第一个分子(EL)
         outFile << firstMolecule <<" "<< firstCount << std::endl;
-        // 输出第一个分子的复制品(CR)
-        outFile << "CR " << firstCount << std::endl;
+        // 输出第一个分子的复制品(ER)
+        outFile << "ER " << firstCount << std::endl;
     }
 
     // 输出其他分子，数量翻倍

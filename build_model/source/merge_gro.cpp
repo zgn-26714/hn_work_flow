@@ -154,5 +154,5 @@ void changeMol_name(string& line){
     string space2;
     if (space_add > 2)
         space2 = string(space_add - 2, ' ');
-    line = space + tmp + "CR" + space2 + line;
+    line = space + tmp + "ER" + space2 + line;
 }
