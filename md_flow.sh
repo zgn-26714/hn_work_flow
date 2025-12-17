@@ -42,11 +42,13 @@ case "$ACTION" in
         case "$setting" in
           default)
             export isBulk=0 
+            export isSlit=0
             bash "$SCRIPT_DIR"/build_model/run.sh
             ;;
           bulk)
             export TOP=${bulk_top}
             export isBulk=1
+            export isSlit=0
             bash "$SCRIPT_DIR"/build_model/run_for_bulk.sh
             ;;
           slit)

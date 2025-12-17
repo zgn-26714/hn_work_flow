@@ -27,7 +27,7 @@ nsteps_bulk    = 100           # MD steps for get bulk density run (2 fs/step)
 nsteps_den     = 100           # MD steps for check_density run (electrode)
 nsteps_equ     = 100           # MD steps for equilibration run
 nsteps_ini     = 100           # MD steps for product initial frames run
-XOUT_FRAMES    = 100           # Frequency of tajectory output (in steps)
+XOUT_FRAMES    = 100           # Frequency of tajectory output (in steps), can't be too small, io will become heavy
 num_intialframes = 100         # Numbers of initial frames
 
 # Density analysis parameters
@@ -36,12 +36,9 @@ BE_TIME        = 1000          # Start time for density analysis (in ps, to skip
 BE_Z           = 21            # Start Z-position for density analysis (in nm)
 END_Z          = 29            # End Z-position for density analysis (in nm)
 error          = 5             # Allowed density error threshold (%)
-## removed on 2025-12-10 based on NYJ's idea
-# factor         = 0.1           # Scaling factor per iteration for box resizing (0.1 mean: low 0.9; up 1.1)
-
 max_iter       = 3             # Maximum number of iterations for density adjustment
 onlyUP         = 1             # 1=only accept density upper setting; 0=accept both upper and lower settings
-
+# factor       = 0.1         ## removed on 2025-12-10 based on NYJ # Scaling factor per iteration for box resizing (0.1 mean: low 0.9; up 1.1)
 
 # slit parameters 
 # molecule names of electrode are EL ER GRA 
@@ -49,17 +46,16 @@ LLX            = 3.4           # high of electrode (nm)
 LLZ            = 8             # length of slit (nm)
 dslit          = 1.5           # high of slit (nm)
 len_bulk       = 8             # length of bulk region (nm)
-is_auto_top    =1              # 1=auto generate top/inp file
+is_auto_top    = 1             # 1=auto generate top/inp file
 MOL            = ACN Na CLO    # mol name you want to insert
 MOL_num        = 3000 40 40    # Number of each molecule to insert into slit system
 MOL_num_bulk   = 3000 40 40    # Number of each molecule to insert into bulk system(NPT)
 
-###This item is used to adjust the bulk density in NVT simulations of the electrode system. 
-#It can be either automatically generated or manually added. 
-#Automatic generation implies performing bulk-phase modeling and analyzing the equilibrium bulk density.
+##This item is used to set the target density in NVT simulations of the electrode system.
+#If not set, the target density will be automatically calculated and assigned.
 set_density   = 940            # Target system density (kg/m³)
 
-#################  NOTICE : Molecule names for 'md_run' onfly setting and modeling
+# modify molecule numbers 
 MOL_name       = ACN Na CLO    # Space-separated list of molecule/ion names (e.g., for density groups)
 FIXED_MOL      = Na CLO        # notice! It's a important and sensitive parameter, please read README.md carefully before you set it.
 IS_FORCE_SCALE = 0             # If you set it to 1, and open "FIXED_MOL", You may never reach the correct density!! never!!!
@@ -104,7 +100,8 @@ isRerun        = 0
 rerun_start    = 1
 rerun_end      = 1
 
-#onfly settings
+#onfly settings 
+MOL_name_run   = ACN Na CLO    # onfly_setting
 LOW_ONFLY      = 0 0 20        # onfly_setting
 UP_ONFLY       = 4.3 4.3 30    # onfly_setting
 NBIN_ONFLY     = 1 1 1000      # onfly_setting
@@ -117,9 +114,8 @@ MODE_ONFLY     = 3             # onfly_setting
 analysis_begin_t      = 0        # Start time for analysis (in ps)
 analysis_end_t        = 0        # End time for analysis (in ps, with default value 0 mean all time)
 analysis_ONFLY_isD    = 1        # Enable dynamic output in onfly analysis: 1=yes, 0=no
-#analysis_ONFLY_isGeo  = 1       #
-analysis_ONFLY_in     = densMNC3D  # Input file name for onfly analysis file
-MODE_ONFLY            = 3             # onfly_setting
+analysis_ONFLY_in     = densMNC3D# Input file name for onfly analysis file
+MODE_ONFLY_analysis   = 3        # onfly_setting
 
 # analysis case settings
 analyze_begin_case    = 1        # Starting case number for analysis

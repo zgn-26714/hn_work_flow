@@ -1,0 +1,66 @@
+                 :-) GROMACS - gmx trjconv, 2020.4-MODIFIED (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf      Artem Zhmurov   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2019, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx trjconv, version 2020.4-MODIFIED
+Executable:   /share/apps/GMX2020/bin/gmx
+Data prefix:  /share/apps/GMX2020
+Working dir:  /data1/huangnan/github/hn_work_flow/example/channel/set_density/test
+Command line:
+  gmx trjconv -f ./initial/initial.trr -s ./initial/initial.tpr -b 1.999000 -e 2.001000 -o 298k/frame1.gro
+
+Will write gro: Coordinate file in Gromos-87 format
+Reading file ./initial/initial.tpr, VERSION 2020.4-MODIFIED (single precision)
+Reading file ./initial/initial.tpr, VERSION 2020.4-MODIFIED (single precision)
+Group     0 (         System) has 20948 elements
+Group     1 (          Other) has  4080 elements
+Group     2 (             EL) has   680 elements
+Group     3 (             ER) has   680 elements
+Group     4 (            GRA) has  2720 elements
+Group     5 (             NA) has   100 elements
+Group     6 (             CL) has   100 elements
+Group     7 (          Water) has 16668 elements
+Group     8 (            SOL) has 16668 elements
+Group     9 (      non-Water) has  4280 elements
+Group    10 (            Ion) has   200 elements
+Group    11 (             EL) has   680 elements
+Group    12 (             ER) has   680 elements
+Group    13 (            GRA) has  2720 elements
+Group    14 (             NA) has   100 elements
+Group    15 (             CL) has   100 elements
+Group    16 ( Water_and_ions) has 16868 elements
+Select a group: trr version: GMX_trn_file (single precision)
+Skipping frame      0 time    0.000   Skipping frame      1 time    0.200   Skipping frame      2 time    0.400   Skipping frame      3 time    0.600   Skipping frame      4 time    0.800   Skipping frame      5 time    1.000   Skipping frame      6 time    1.200   Skipping frame      7 time    1.400   Skipping frame      8 time    1.600   Skipping frame      9 time    1.800   Reading frame      10 time    2.000   
+Back Off! I just backed up 298k/frame1.gro to 298k/#frame1.gro.1#
+ ->  frame      0 time    2.000      Last frame         10 time    2.000   
+
+
+GROMACS reminds you: "I Need Love, Not Games" (Iggy Pop & Kate Pierson)
+
+Note that major changes are planned in future for trjconv, to improve usability and utility.
+Select group for output
+Selected 0: 'System'

@@ -1,0 +1,48 @@
+title		=hnministeep;
+cpp		=/lib/cpp;
+constraints	=h-bonds;
+integrator	=steep;
+dt		=0.0001
+emtol		=500;
+nsteps		=5000;
+nstcomm		=0;(去除质心运动的频率)
+nstvout         =0      ;
+nstfout         =0      ;
+nstlog          =1000   ;
+nstxout-compressed  =500        ;500步写入一次位置坐标
+
+cutoff-scheme	=Verlet
+ns-type		=grid;(?)
+
+;electric and short range
+coulombtype     =PME    ;
+rcoulomb        =1.2    ;库伦截断半径1.2nm
+;fourierspacing  =0.12   ;傅里叶间距（PME默认值）
+;pme_order       =4      ;PME插值顺序，4等于三次插值
+;ewald_rtol      =1e-5   ;Ewald？
+vdwtype         =Cut-off;vdw代表范德华力
+rvdw            =1.2    ;LJ截断半径1.2nm
+rlist           =1.2    ;邻居列表截断半径1.2nm
+DispCorr        =EnerPres ;对能量和压力使用远程色散校正
+ewald_geometry  =3dc    ;在z向使用电位校正
+
+;temperature coupling;
+Tcoupl          =no  ;温度耦合方式
+tc-grps         =system    ;控温组
+tau_t           =1      ;耦合时间常数，-1表示无温度耦合
+ref-t           =298    ;控温温度
+nhchainlength   =1      ;Verlet积分与温度耦合之间的一个参数，一般为1
+
+
+;Pressure coupling is on
+Pcoupl          =no   ;耦合方式
+Pcoupltype      =isotropic      ;压力耦合的各向异性类型
+tau_p           =1.0    ;压力耦合系数
+compressibility =4.5e-5         ;可压缩性，对1atm  300K的水是4.5e-5
+ref_p           =1              ;控压压力
+
+freezegrps = EL 	ER	 GRA
+freezedim  = Y Y Y 	Y Y Y 	Y Y Y   
+;
+userint1                =1000
+userint2                =1000

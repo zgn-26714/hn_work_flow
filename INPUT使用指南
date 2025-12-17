@@ -1,19 +1,26 @@
 1.frames部分
     # Simulation box dimensions (in nanometers)
     这里是gro最后一行的尺寸,包括电极体系`xbox`，以及体相`bulk_xbox`
+    因为packmol建模后的pdb不含盒子大小信息,所以需要在这里指定
+    在进行slit建模时,会自动生成含有正确盒子尺寸的电极文件,此时xbox,ybox,zbox参数可忽略,而需要在 'slit parameters' 指定slit电极信息
+    slit建模不设置'set_density'仍然需要 bulk_xbox, bulk_ybox, bulk_zbox参数
     # input file prefixes (without extensions)
-    README所说的一系列初始文件的名字
+    README所说的一系列初始文件的名字,不要加后缀类型名! (不要写topol.top, 而要写topol)
     # gromacs settings
-    指定使用的gromacs版本并行参数,以及每一阶段模拟的步数
+    指定使用的gromacs版本, 并行参数, 以及每一阶段模拟的步数
     # Density analysis parameters
-    调密度时的目标参数,范围,其他参数(gmx density -b {BE_TIME} -nbin {NZ}),以及允许的误差等
+    调密度时bin的划分,起始时间等(gmx density -b {BE_TIME} -nbin {NZ})
+    误差阈值{error}和最大迭代次数{max_iter}以及分析密度的z方向范围{BE_Z}到{END_Z}
     # slit parameters
-    狭缝孔建模所需的孔长,宽,间距等参数,{is_auto_top}--是否自动生成拓扑和inp文件
+    狭缝孔建模所需的孔长,宽,间距等参数
+    {is_auto_top}--是否自动生成拓扑和inp文件,强烈建议首次使用时打开,但非首次使用请关闭
     len_bulk 体相长度(8-10左右)
-    MOL、MOL_num 分子名字和数量
-    MOL_num_bulk NPT时中各分子的数量
-    ## MOL_name       = ACN Na CLO    # Space-separated list of molecule/ion names (e.g., for density groups)
-    指定需要调节的分子名,注意提交任务时若需要设置onfly,那么onfly设置中的分子名也是这个
+    MOL、MOL_num 电解液分子名字和数量
+    MOL_num_bulk 不设置set_density时, 跑体相NPT时各分子的数量
+    # modify molecule numbers 
+    指定调密度时候需要调节数量的分子名, 需要固定数量比例的分子(Fe2O3中Fe和O的比例必须 2:3 )
+    因为每次调整密度时会乘上一个调整因子,再四舍五入取整,所以分子数量和调整因子都很小时可能每步的调整量为0
+    IS_FORCE_SCALE参数让每步至少调整1个分子, 但并不建议无脑打开,特别配合FIXED_MOL使用时很可能导致密度无法收敛
     ## set_density   = 940            # Target system density (kg/m³)
     目标密度,可以注释掉,见README
 
@@ -25,13 +32,16 @@
     # job settings
     作业提交相关参数,包括使用的计算队列,每个节点任务数量{num},开始case和结束case编号,集群名称
     gmx mdrun -s {DEFFNM}.tpr -deffnm {DEFFNM} []/[-cpi {DEFFNM}.cpt -append] -v -ntmpi 1 -ntomp {硬编码}
+    {硬编码}位置见 ./run_md/sub_job.sh
     # job control settings  
-    是否生成case文件夹,是否提交任务
+    是否重新生成case文件夹,是否提交任务
     # scan settings
     扫描电压文件生成相关参数,包括总时间{TIME},跳过时间{SKIPTIME_PS}(不加电的时间),电压上升时间{TAO}
     # onfly settings
+    export ONFLY_DENSITY3D = "-low [] -up [] -nbin [] -n index.ndx -sel [Na CLO aACN]"
     {MODE_ONFLY}只有使用改写的onfly时才需要这个参数,默认3
-
+    # rerun settings
+    rerun settings
 
 3. INPUT for analysis
     # onfly analysis settings
@@ -41,9 +51,9 @@
     # analysis case settings
     分析的case范围
     analyze_T analyze_V analyze_tau 为你自己case的T/V/tau值,影响最终输出文件的命名
-    analyze_mol  analyze_core   为分析的分子名称
+    analyze_mol     需要分析的分子名称,index中有重名分子时,自动取第一个
     # Analysis program settings (MD_PP)
     并行执行多少个cpp程序?{analyze_core}
-    {analyze_is_skip_first_line}: 少数后处理程序的输出第一行不需要平均,强烈建议保持为0即可
+    {analyze_is_skip_first_line}: 少数后处理程序的输出第一行不需要平均,建议保持为0即可
     其他参数见README:
         <analyze_cpp> -f ./case1/slownvt.{xtcORtrr} -s ./case1/slownvt.tpr -o ./deal_data/<analyze_cpp>/1<analyze_cpp>.xvg {analysis_extra_command}

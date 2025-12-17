@@ -1,0 +1,7 @@
+TITLE     ss
+REMARK    THIS IS A SIMULATION BOX
+CRYST1   41.760   42.540  480.000  90.00  90.00  90.00 P 1           1
+MODEL        1
+ATOM      1  NA   NA  9714       9.250  28.740 250.060  1.00  0.00            
+TER
+ENDMDL

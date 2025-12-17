@@ -1,0 +1,28 @@
+tolerance 2.0
+
+filetype pdb
+
+output initial.pdb
+
+
+structure electrode.pdb
+number 1
+fixed  0. 0. 0. 0. 0. 0.
+end structure
+
+structure sol.pdb
+number 5556
+inside box 0. 0. 200. 41.76 42.54 300.
+
+end structure
+
+structure Na.pdb
+number 100
+inside box 0. 0. 200. 41.76 42.54 300.
+end structure
+
+structure CLO.pdb
+number 100
+inside box 0. 0. 200. 41.76 42.54 300.
+end structure
+

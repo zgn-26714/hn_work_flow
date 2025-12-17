@@ -1,0 +1,856 @@
+                  :-) GROMACS - gmx mdrun, 2020.4-MODIFIED (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf      Artem Zhmurov   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2019, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx mdrun, version 2020.4-MODIFIED
+Executable:   /share/apps/GMX2020/bin/gmx
+Data prefix:  /share/apps/GMX2020
+Working dir:  /data1/huangnan/github/hn_work_flow/example/channel/set_density/test
+Process ID:   5386
+Command line:
+  gmx mdrun -s ./bulk/mini_bulk.tpr -deffnm ./bulk/mini_bulk -ntmpi 1 -ntomp 24 -v
+
+GROMACS version:    2020.4-MODIFIED
+This program has been built from source code that has been altered and does not match the code released as part of the official GROMACS version 2020.4-MODIFIED. If you did not intend to use an altered GROMACS version, make sure to download an intact source distribution and compile that before proceeding.
+If you have modified the source code, you are strongly encouraged to set your custom version suffix (using -DGMX_VERSION_STRING_OF_FORK) which will can help later with scientific reproducibility but also when reporting bugs.
+Release checksum: 79c2857291b034542c26e90512b92fd4b184a1c9d6fa59c55f2e24ccf14e7281
+Computed checksum: d5079f50f1208772040f6899e15d1e4f2c5b743703f0f75bde06cf4283c740cc
+Precision:          single
+Memory model:       64 bit
+MPI library:        thread_mpi
+OpenMP support:     enabled (GMX_OPENMP_MAX_THREADS = 64)
+GPU support:        disabled
+SIMD instructions:  AVX_256
+FFT library:        fftw-3.3.9-sse2
+RDTSCP usage:       enabled
+TNG support:        enabled
+Hwloc support:      disabled
+Tracing support:    disabled
+C compiler:         /share/apps/gcc-9.4.0/bin/gcc GNU 9.4.0
+C compiler flags:   -mavx -fexcess-precision=fast -funroll-all-loops -O3 -DNDEBUG
+C++ compiler:       /share/apps/gcc-9.4.0/bin/g++ GNU 9.4.0
+C++ compiler flags: -mavx -fexcess-precision=fast -funroll-all-loops -fopenmp -O3 -DNDEBUG
+
+
+Running on 1 node with total 16 cores, 32 logical cores
+Hardware detected:
+  CPU info:
+    Vendor: Intel
+    Brand:  Intel(R) Xeon(R) CPU E5-2650 v2 @ 2.60GHz
+    Family: 6   Model: 62   Stepping: 4
+    Features: aes apic avx clfsh cmov cx8 cx16 f16c htt intel lahf mmx msr nonstop_tsc pcid pclmuldq pdcm pdpe1gb popcnt pse rdrnd rdtscp sse2 sse3 sse4.1 sse4.2 ssse3 tdt x2apic
+  Hardware topology: Basic
+    Sockets, cores, and logical processors:
+      Socket  0: [   0  16] [   1  17] [   2  18] [   3  19] [   4  20] [   5  21] [   6  22] [   7  23]
+      Socket  1: [   8  24] [   9  25] [  10  26] [  11  27] [  12  28] [  13  29] [  14  30] [  15  31]
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+M. J. Abraham, T. Murtola, R. Schulz, S. Páll, J. C. Smith, B. Hess, E.
+Lindahl
+GROMACS: High performance molecular simulations through multi-level
+parallelism from laptops to supercomputers
+SoftwareX 1 (2015) pp. 19-25
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+S. Páll, M. J. Abraham, C. Kutzner, B. Hess, E. Lindahl
+Tackling Exascale Software Challenges in Molecular Dynamics Simulations with
+GROMACS
+In S. Markidis & E. Laure (Eds.), Solving Software Challenges for Exascale 8759 (2015) pp. 3-27
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+S. Pronk, S. Páll, R. Schulz, P. Larsson, P. Bjelkmar, R. Apostolov, M. R.
+Shirts, J. C. Smith, P. M. Kasson, D. van der Spoel, B. Hess, and E. Lindahl
+GROMACS 4.5: a high-throughput and highly parallel open source molecular
+simulation toolkit
+Bioinformatics 29 (2013) pp. 845-54
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+B. Hess and C. Kutzner and D. van der Spoel and E. Lindahl
+GROMACS 4: Algorithms for highly efficient, load-balanced, and scalable
+molecular simulation
+J. Chem. Theory Comput. 4 (2008) pp. 435-447
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+D. van der Spoel, E. Lindahl, B. Hess, G. Groenhof, A. E. Mark and H. J. C.
+Berendsen
+GROMACS: Fast, Flexible and Free
+J. Comp. Chem. 26 (2005) pp. 1701-1719
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+E. Lindahl and B. Hess and D. van der Spoel
+GROMACS 3.0: A package for molecular simulation and trajectory analysis
+J. Mol. Mod. 7 (2001) pp. 306-317
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+H. J. C. Berendsen, D. van der Spoel and R. van Drunen
+GROMACS: A message-passing parallel molecular dynamics implementation
+Comp. Phys. Comm. 91 (1995) pp. 43-56
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE CITE THE DOI FOR THIS VERSION OF GROMACS ++++
+https://doi.org/10.5281/zenodo.4054979
+-------- -------- --- Thank You --- -------- --------
+
+Input Parameters:
+   integrator                     = steep
+   tinit                          = 0
+   dt                             = 0.0001
+   nsteps                         = 5000
+   init-step                      = 0
+   simulation-part                = 1
+   comm-mode                      = None
+   nstcomm                        = 0
+   bd-fric                        = 0
+   ld-seed                        = -66399797
+   emtol                          = 500
+   emstep                         = 0.01
+   niter                          = 20
+   fcstep                         = 0
+   nstcgsteep                     = 1000
+   nbfgscorr                      = 10
+   rtpi                           = 0.05
+   nstxout                        = 0
+   nstvout                        = 0
+   nstfout                        = 0
+   nstlog                         = 1000
+   nstcalcenergy                  = 100
+   nstenergy                      = 1000
+   nstxout-compressed             = 500
+   compressed-x-precision         = 1000
+   cutoff-scheme                  = Verlet
+   nstlist                        = 10
+   pbc                            = xyz
+   periodic-molecules             = false
+   verlet-buffer-tolerance        = 0.005
+   rlist                          = 1.26
+   coulombtype                    = PME
+   coulomb-modifier               = Potential-shift
+   rcoulomb-switch                = 0
+   rcoulomb                       = 1.2
+   epsilon-r                      = 1
+   epsilon-rf                     = inf
+   vdw-type                       = Cut-off
+   vdw-modifier                   = Potential-shift
+   rvdw-switch                    = 0
+   rvdw                           = 1.2
+   DispCorr                       = EnerPres
+   table-extension                = 1
+   fourierspacing                 = 0.12
+   fourier-nx                     = 42
+   fourier-ny                     = 42
+   fourier-nz                     = 42
+   pme-order                      = 4
+   ewald-rtol                     = 1e-05
+   ewald-rtol-lj                  = 0.001
+   lj-pme-comb-rule               = Geometric
+   ewald-geometry                 = 1
+   epsilon-surface                = 0
+   tcoupl                         = No
+   nsttcouple                     = -1
+   nh-chain-length                = 0
+   print-nose-hoover-chain-variables = false
+   pcoupl                         = No
+   pcoupltype                     = Isotropic
+   nstpcouple                     = -1
+   tau-p                          = 1
+   compressibility (3x3):
+      compressibility[    0]={ 4.50000e-05,  0.00000e+00,  0.00000e+00}
+      compressibility[    1]={ 0.00000e+00,  4.50000e-05,  0.00000e+00}
+      compressibility[    2]={ 0.00000e+00,  0.00000e+00,  4.50000e-05}
+   ref-p (3x3):
+      ref-p[    0]={ 1.00000e+00,  0.00000e+00,  0.00000e+00}
+      ref-p[    1]={ 0.00000e+00,  1.00000e+00,  0.00000e+00}
+      ref-p[    2]={ 0.00000e+00,  0.00000e+00,  1.00000e+00}
+   refcoord-scaling               = No
+   posres-com (3):
+      posres-com[0]= 0.00000e+00
+      posres-com[1]= 0.00000e+00
+      posres-com[2]= 0.00000e+00
+   posres-comB (3):
+      posres-comB[0]= 0.00000e+00
+      posres-comB[1]= 0.00000e+00
+      posres-comB[2]= 0.00000e+00
+   QMMM                           = false
+   QMconstraints                  = 0
+   QMMMscheme                     = 0
+   MMChargeScaleFactor            = 1
+qm-opts:
+   ngQM                           = 0
+   constraint-algorithm           = Lincs
+   continuation                   = false
+   Shake-SOR                      = false
+   shake-tol                      = 0.0001
+   lincs-order                    = 4
+   lincs-iter                     = 1
+   lincs-warnangle                = 30
+   nwall                          = 0
+   wall-type                      = 9-3
+   wall-r-linpot                  = -1
+   wall-atomtype[0]               = -1
+   wall-atomtype[1]               = -1
+   wall-density[0]                = 0
+   wall-density[1]                = 0
+   wall-ewald-zfac                = 3
+   pull                           = false
+   awh                            = false
+   rotation                       = false
+   interactiveMD                  = false
+   disre                          = No
+   disre-weighting                = Conservative
+   disre-mixed                    = false
+   dr-fc                          = 1000
+   dr-tau                         = 0
+   nstdisreout                    = 100
+   orire-fc                       = 0
+   orire-tau                      = 0
+   nstorireout                    = 100
+   free-energy                    = no
+   cos-acceleration               = 0
+   deform (3x3):
+      deform[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+      deform[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+      deform[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   simulated-tempering            = false
+   swapcoords                     = no
+   userint1                       = 1000
+   userint2                       = 1000
+   userint3                       = 0
+   userint4                       = 0
+   userreal1                      = 0
+   userreal2                      = 0
+   userreal3                      = 0
+   userreal4                      = 0
+   applied-forces:
+     electric-field:
+       x:
+         E0                       = 0
+         omega                    = 0
+         t0                       = 0
+         sigma                    = 0
+       y:
+         E0                       = 0
+         omega                    = 0
+         t0                       = 0
+         sigma                    = 0
+       z:
+         E0                       = 0
+         omega                    = 0
+         t0                       = 0
+         sigma                    = 0
+     density-guided-simulation:
+       active                     = false
+       group                      = protein
+       similarity-measure         = inner-product
+       atom-spreading-weight      = unity
+       force-constant             = 1e+09
+       gaussian-transform-spreading-width = 0.2
+       gaussian-transform-spreading-range-in-multiples-of-width = 4
+       reference-density-filename = reference.mrc
+       nst                        = 1
+       normalize-densities        = true
+       adaptive-force-scaling     = false
+       adaptive-force-scaling-time-constant = 4
+grpopts:
+   nrdf:       16968
+   ref-t:           0
+   tau-t:           0
+annealing:          No
+annealing-npoints:           0
+   acc:	           0           0           0
+   nfreeze:           N           N           N
+   energygrp-flags[  0]: 0
+
+Using 1 MPI thread
+
+Non-default thread affinity set, disabling internal thread affinity
+
+Using 24 OpenMP threads 
+
+System total charge: 0.000
+Will do PME sum in reciprocal space for electrostatic interactions.
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+U. Essmann, L. Perera, M. L. Berkowitz, T. Darden, H. Lee and L. G. Pedersen 
+A smooth particle mesh Ewald method
+J. Chem. Phys. 103 (1995) pp. 8577-8592
+-------- -------- --- Thank You --- -------- --------
+
+Using the Ewald3DC correction for systems with a slab geometry.
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+Y. In-Chul and M. L. Berkowitz
+Ewald summation for systems with slab geometry
+J. Chem. Phys. 111 (1999) pp. 3155-3162
+-------- -------- --- Thank You --- -------- --------
+
+Using a Gaussian width (1/beta) of 0.384195 nm for Ewald
+Potential shift: LJ r^-12: -1.122e-01 r^-6: -3.349e-01, Ewald -8.333e-06
+Initialized non-bonded Ewald tables, spacing: 1.02e-03 size: 1176
+
+
+Using SIMD 4x4 nonbonded short-range kernels
+
+Using a 4x4 pair-list setup:
+  updated every 10 steps, buffer 0.060 nm, rlist 1.260 nm
+
+Using Lorentz-Berthelot Lennard-Jones combination rule
+
+Long Range LJ corr.: <C6> 3.1377e-04
+
+Removing pbc first time
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+S. Miyamoto and P. A. Kollman
+SETTLE: An Analytical Version of the SHAKE and RATTLE Algorithms for Rigid
+Water Models
+J. Comp. Chem. 13 (1992) pp. 952-962
+-------- -------- --- Thank You --- -------- --------
+
+
+Note that activating steepest-descent energy minimization via the integrator .mdp option and the command gmx mdrun may be available in a different form in a future version of GROMACS, e.g. gmx minimize and an .mdp option.
+Initiating Steepest Descents
+Started Steepest Descents on rank 0 Tue Dec 16 20:42:35 2025
+
+
+Steepest Descents:
+   Tolerance (Fmax)   =  5.00000e+02
+   Number of steps    =         5000
+           Step           Time
+              0        0.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.88750e+08   -4.32381e+02   -2.76903e+04    2.56278e+04    1.88747e+08
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    8.70063e+07
+
+           Step           Time
+              1        1.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    2.25735e+07   -4.32381e+02   -2.79509e+04    2.56518e+04    2.25707e+07
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    1.00624e+07
+
+           Step           Time
+              2        2.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    5.30065e+06   -4.32381e+02   -2.81051e+04    2.56501e+04    5.29776e+06
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    2.59538e+06
+
+           Step           Time
+              3        3.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.34449e+06   -4.32381e+02   -2.81975e+04    2.56473e+04    1.34151e+06
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    7.05442e+05
+
+           Step           Time
+              4        4.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    3.62825e+05   -4.32381e+02   -2.81841e+04    2.56428e+04    3.59851e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    2.04853e+05
+
+           Step           Time
+              5        5.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    2.08222e+05   -4.32381e+02   -2.80635e+04    2.56306e+04    2.05356e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    1.26510e+05
+
+           Step           Time
+              6        6.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.30962e+05   -4.32381e+02   -2.82344e+04    2.55208e+04    1.27816e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    8.49958e+04
+
+           Step           Time
+              7        7.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.06827e+05   -4.32381e+02   -2.91712e+04    2.55552e+04    1.02779e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    7.12010e+04
+
+           Step           Time
+              8        8.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    6.29253e+04   -4.32381e+02   -3.39510e+04    2.61740e+04    5.47159e+04
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    4.47168e+04
+
+           Step           Time
+              9        9.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    3.55360e+04   -4.32381e+02   -4.34428e+04    2.40588e+04    1.57197e+04
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    2.62547e+04
+
+           Step           Time
+             10       10.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    3.02555e+04   -4.32381e+02   -4.68291e+04    2.28686e+04    5.86267e+03
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    2.24453e+04
+
+           Step           Time
+             11       11.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.59838e+04   -4.32381e+02   -6.63517e+04    1.55716e+04   -3.52287e+04
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    1.03827e+04
+
+           Step           Time
+             12       12.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.32400e+04   -4.32381e+02   -7.18535e+04    1.33109e+04   -4.57350e+04
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    7.75716e+03
+
+
+step 13: One or more water molecules can not be settled.
+Check for bad contacts and/or reduce the timestep if appropriate.
+Wrote pdb files with previous and current coordinates
+           Step           Time
+             13       13.00000
+
+           Step           Time
+             14       14.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.13673e+04   -4.32381e+02   -7.86941e+04    1.22020e+04   -5.55572e+04
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    5.45733e+03
+
+           Step           Time
+             15       15.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    9.59922e+03   -4.32381e+02   -8.95401e+04    7.21474e+03   -7.31585e+04
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    2.63148e+03
+
+
+step 16: One or more water molecules can not be settled.
+Check for bad contacts and/or reduce the timestep if appropriate.
+Wrote pdb files with previous and current coordinates
+           Step           Time
+             16       16.00000
+
+           Step           Time
+             17       17.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    8.91455e+03   -4.32381e+02   -9.08525e+04    8.00032e+03   -7.43700e+04
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00    1.98655e+03
+
+           Step           Time
+             18       18.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    7.69765e+03   -4.32381e+02   -9.98268e+04    5.31463e+03   -8.72469e+04
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -1.37449e+02
+
+           Step           Time
+             19       19.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    7.21823e+03   -4.32381e+02   -1.08047e+05    3.30679e+03   -9.79542e+04
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -1.66358e+03
+
+           Step           Time
+             20       20.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    6.61224e+03   -4.32381e+02   -1.09454e+05    3.12633e+03   -1.00148e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -2.18127e+03
+
+           Step           Time
+             21       21.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    6.51261e+03   -4.32381e+02   -1.13527e+05    2.61781e+03   -1.04829e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -2.88437e+03
+
+           Step           Time
+             22       22.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    6.59407e+03   -4.32381e+02   -1.17195e+05    2.34034e+03   -1.08693e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -3.42878e+03
+
+
+step 23: One or more water molecules can not be settled.
+Check for bad contacts and/or reduce the timestep if appropriate.
+Wrote pdb files with previous and current coordinates
+           Step           Time
+             23       23.00000
+
+           Step           Time
+             24       24.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    6.39247e+03   -4.32381e+02   -1.17669e+05    2.64894e+03   -1.09060e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -3.57817e+03
+
+
+step 25: One or more water molecules can not be settled.
+Check for bad contacts and/or reduce the timestep if appropriate.
+Wrote pdb files with previous and current coordinates
+           Step           Time
+             25       25.00000
+
+           Step           Time
+             26       26.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    6.72237e+03   -4.32381e+02   -1.22432e+05    2.08119e+03   -1.14061e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -4.15068e+03
+
+           Step           Time
+             27       27.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    6.74033e+03   -4.32381e+02   -1.25589e+05    1.99077e+03   -1.17290e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -4.67623e+03
+
+           Step           Time
+             28       28.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    7.66627e+03   -4.32381e+02   -1.29575e+05    1.71252e+03   -1.20629e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -4.73676e+03
+
+           Step           Time
+             29       29.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    7.18802e+03   -4.32381e+02   -1.30194e+05    1.76062e+03   -1.21678e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -5.16424e+03
+
+           Step           Time
+             30       30.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    7.97552e+03   -4.32381e+02   -1.34505e+05    1.62010e+03   -1.25342e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -5.37548e+03
+
+           Step           Time
+             31       31.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    7.87862e+03   -4.32381e+02   -1.35468e+05    1.56242e+03   -1.26460e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -5.63369e+03
+
+
+step 32: One or more water molecules can not be settled.
+Check for bad contacts and/or reduce the timestep if appropriate.
+Wrote pdb files with previous and current coordinates
+           Step           Time
+             32       32.00000
+
+           Step           Time
+             33       33.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    8.74431e+03   -4.32381e+02   -1.39213e+05    1.55232e+03   -1.29349e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -5.67124e+03
+
+           Step           Time
+             34       34.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    8.68784e+03   -4.32381e+02   -1.40119e+05    2.01236e+03   -1.29851e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -5.86658e+03
+
+           Step           Time
+             35       35.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.09947e+04   -4.32381e+02   -1.44023e+05    1.51314e+03   -1.31947e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -5.04224e+03
+
+           Step           Time
+             36       36.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    9.84827e+03   -4.32381e+02   -1.43987e+05    1.66581e+03   -1.32905e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -5.81506e+03
+
+
+step 37: One or more water molecules can not be settled.
+Check for bad contacts and/or reduce the timestep if appropriate.
+Wrote pdb files with previous and current coordinates
+           Step           Time
+             37       37.00000
+
+           Step           Time
+             38       38.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    9.91149e+03   -4.32381e+02   -1.45541e+05    1.83685e+03   -1.34225e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -6.04720e+03
+
+           Step           Time
+             39       39.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.00939e+04   -4.32381e+02   -1.46563e+05    1.69401e+03   -1.35208e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -6.10286e+03
+
+           Step           Time
+             40       40.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.05199e+04   -4.32381e+02   -1.48120e+05    1.63202e+03   -1.36400e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -6.09384e+03
+
+           Step           Time
+             41       41.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.12125e+04   -4.32381e+02   -1.49903e+05    1.43588e+03   -1.37687e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -5.96091e+03
+
+           Step           Time
+             42       42.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.10046e+04   -4.32381e+02   -1.50296e+05    1.57167e+03   -1.38153e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -6.17528e+03
+
+           Step           Time
+             43       43.00000
+
+           Step           Time
+             44       44.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.12784e+04   -4.32381e+02   -1.51293e+05    1.51766e+03   -1.38930e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -6.16648e+03
+
+           Step           Time
+             45       45.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.15170e+04   -4.32381e+02   -1.52358e+05    1.49463e+03   -1.39779e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -6.20364e+03
+
+           Step           Time
+             46       46.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.19555e+04   -4.32381e+02   -1.53832e+05    1.64319e+03   -1.40665e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -6.17242e+03
+
+           Step           Time
+             47       47.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.25411e+04   -4.32381e+02   -1.55519e+05    1.50636e+03   -1.41904e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -6.11788e+03
+
+
+step 48: One or more water molecules can not be settled.
+Check for bad contacts and/or reduce the timestep if appropriate.
+Wrote pdb files with previous and current coordinates
+           Step           Time
+             48       48.00000
+
+           Step           Time
+             49       49.00000
+
+   Energies (kJ/mol)
+        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.      Potential
+    1.26868e+04   -4.32381e+02   -1.56427e+05    1.33856e+03   -1.42834e+05
+ Pres. DC (bar) Pressure (bar)
+    0.00000e+00   -6.18251e+03
+
+           Step           Time
+             50       50.00000
+
+           Step           Time
+             51       51.00000
+
+           Step           Time
+             52       52.00000
+
+           Step           Time
+             53       53.00000
+
+           Step           Time
+             54       54.00000
+
+           Step           Time
+             55       55.00000
+
+           Step           Time
+             56       56.00000
+
+           Step           Time
+             57       57.00000
+
+           Step           Time
+             58       58.00000
+
+           Step           Time
+             59       59.00000
+
+           Step           Time
+             60       60.00000
+
+           Step           Time
+             61       61.00000
+
+           Step           Time
+             62       62.00000
+
+           Step           Time
+             63       63.00000
+
+           Step           Time
+             64       64.00000
+
+           Step           Time
+             65       65.00000
+
+           Step           Time
+             66       66.00000
+
+
+Energy minimization has stopped, but the forces have not converged to the
+requested precision Fmax < 500 (which may not be possible for your system).
+It stopped because the algorithm tried to make a new step whose size was too
+small, or there was no change in the energy since last step. Either way, we
+regard the minimization as converged to within the available machine
+precision, given your starting configuration and EM parameters.
+
+Double precision normally gives you higher accuracy, but this is often not
+needed for preparing to run molecular dynamics.
+You might need to increase your constraint accuracy, or turn
+off constraints altogether (set constraints = none in mdp file)
+
+Steepest Descents converged to machine precision in 67 steps,
+but did not reach the requested Fmax < 500.
+Potential Energy  = -1.4283433e+05
+Maximum force     =  2.0079176e+03 on atom 8348
+Norm of force     =  8.1491222e+01
+Finished mdrun on rank 0 Tue Dec 16 20:42:37 2025
+

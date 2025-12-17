@@ -1,11 +1,12 @@
 #!/bin/bash
 
+set -euo pipefail
 
 other_condition() {
     if (( onlyUP == 1 )); then
         [ $(echo "$density <= $set_density" | bc -l) -eq 1 ]
     else
-        true
+        false
     fi
 }
 
@@ -15,7 +16,7 @@ abs_error=$(echo "scale=5; $set_density * $error / 100" | bc -l)
 echo -e "${BLUE}"
 echo "**********************************************************************"
 echo "     I.   build model"
-echo "⚙️  Parameters: target = $set_density ± $abs_error, max_iter = $max_iter, factor = $factor"
+echo "⚙️  Parameters: target = $set_density ± $abs_error, max_iter = $max_iter"
 echo "**********************************************************************"
 echo -e "${NC}"
 } | tee -a ./result/b_model.log >&2
@@ -50,7 +51,7 @@ echo "Initial density: $density" | tee -a ./result/b_model.log >&2
 
 cp "${TOP}".top baktop1.top
 # main iter circle
-while { (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($density - $set_density) > $abs_error" | bc -l) )) && [ $iter -lt $max_iter ]; } && other_condition; do
+while { (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($density - $set_density) > $abs_error" | bc -l) )) && [ $iter -lt $max_iter ]; } || other_condition; do
     iter=$((iter + 1))
     echo "Iteration $iter: Current density = $density, Target = $set_density" | tee -a ./result/b_model.log >&2
     # set factor
@@ -72,15 +73,15 @@ while { (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($densi
         bash ${build_dir} ${src_cpp} ${execu_bin}
         # Check if compilation was successful
         if [ $? -eq 0 ] && [ -f "${execu_bin}" ]; then
-            echo "Compilation successful!"
+            echo "Compilation successful!" | tee -a ./result/b_model.log >&2
         else
-            echo "Compilation failed!"
+            echo -e "${ERROR}Compilation failed!" | tee -a ./result/b_model.log >&2
             exit 1
         fi
     else
-        echo "Executable ${execu_bin} already exists, skipping compilation."
+        echo "Executable ${execu_bin} already exists, skipping compilation." | tee -a ./result/b_model.log >&2
     fi
-    if  ${execu_bin} "$scale_factor" packmol_; then
+    if  ! ${execu_bin} "$scale_factor" packmol_ | tee -a ./result/b_model.log >&2 ; then
         echo -e "${ERROR}Error: remake_packmol failed with scale factor $scale_factor${NC}"  | tee -a ./result/b_model.log >&2
         exit 1
     fi
