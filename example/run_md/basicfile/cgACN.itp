@@ -1,0 +1,23 @@
+;****************************************************
+;*MOLECULAR PHYSICS, 1984, VOL. 51, NO. 5, 1141-1161*
+;****************************************************
+[ moleculetype ]
+; Name nrexcl
+cgACN		2
+
+[ atoms ]
+;nr      type  resnr resid  atom  cgnr   charge  mass
+1        tN     1  cgACN     N     1   -0.398  14.01
+2        tC     1  cgACN     C     2   0.129   12.01
+3        tMe    1  cgACN     Me    3   0.269   15.04
+
+[ bonds ]
+;ai    aj funct    b0 (nm)      kb (kJ/mol.nm^2)
+1   2   1   0.117   242680
+2   3   1   0.146   242680
+
+[ angles ]
+1   2   3   1   180   468.608
+
+
+

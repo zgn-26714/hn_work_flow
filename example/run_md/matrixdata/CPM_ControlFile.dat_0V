@@ -1,0 +1,49 @@
+# This file was created by `calcMatrix newCPM_File`
+
+# Required commands:
+potential        =     -0.0       0.0  # potential of two electrodes
+potentialAtomNum =      680       680  # atom number of two electrodes
+NZeroChargeEle   =     2720            # number of electrode atoms with no potential applied, the charge of these atoms is 0
+freqQOutput      =       1            # output frequency of Charge
+bulkBoundary     =     24.0      26.0  # bulk boundary
+CPMMode=1
+
+# ================== Optional commands ================== #
+# Whether to output the charge per atom on the electrode.
+# The default value is 0, which means no output. 
+# When set to 1, output this according to the frequency of `freqQOutput`
+## outputAllCharge     = 0
+
+# The frequency at which the potential is calculated
+## freqPotentialCalc   = 10
+
+# The frequency of the potential output is `freqPotentialOutput` * `freqPotentialCalc`
+## freqPotentialOutput = 20
+
+
+# ===== DO NOT CHANGE the value below if you are not sure !!! =====
+# eta is the parameter of the gaussian charge of electrode atom, whose unit is A^-1. 
+# 1/eta is width of the gaussian charge with unit A (Angstrom)
+## eta           = 1.979
+
+# The frequency at which charge is calculated. 
+# This value must be set to 1 so that charge is calculated at each step
+## freqQCalc           = 1
+
+# Whether to use interpolation when calculating real-space potential
+## bUseInterp_phir     = 1
+
+# Interpolation interval of real-space potential calculation with interpolation method
+## dlog_phir           = 1e-3
+
+# Whether to use interpolation when calculating force
+## bUseInterp_force    = 0
+
+# The interpolation interval of force calculation with interpolation method
+## dlog_force          = 5e-4
+
+# The ratio of neighborlist box to rlist.
+# This value is generally about 0.5 to obtain the best performance, 
+# and 0 will automatically select the best value according to the initial structure
+## cellSizeRate        = 0
+

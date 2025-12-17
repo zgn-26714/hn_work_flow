@@ -1,0 +1,24 @@
+tolerance 2.0
+
+filetype pdb
+
+output initial.pdb
+
+
+structure SOL.pdb
+number 2778
+inside box 0. 0. 0. 50. 50. 50.
+
+end structure
+
+structure Na.pdb
+number 50
+inside box 0. 0. 0. 50. 50. 50.
+end structure
+ 
+structure CL.pdb
+number 50
+inside box 0. 0. 0. 50. 50. 50.
+end structure
+
+

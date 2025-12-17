@@ -1,0 +1,53 @@
+;********************************************
+;*Phys. Chem. Chem. Phys., 2005,7, 2771-2779*
+;********************************************
+;
+; Topology from .mol2 file
+; topolbuild
+;
+; The force field files to be included
+;#include "ffACN.itp"
+
+ [ moleculetype ]
+; name  nrexcl
+  aACN   3
+
+ [ atoms ]
+;  nr    type   resnr   residu   atom   cgnr    charge      mass
+    1        N1     1       aACN     NAB    1  -0.53200  14.00670       ;  -0.4800000
+    2        C1     1       aACN     CAC    1   0.48000  12.01100       ;  -0.3340000
+    3        C3     1       aACN     CAA    2  -0.47900  12.01100       ;  -0.1890000
+    4        HC     1       aACN     HAB    2   0.17700   1.00800       ;  -0.1260000
+    5        HC     1       aACN     HAC    2   0.17700   1.00800       ;  -0.0630000
+    6        HC     1       aACN     HAA    2   0.17700   1.00800       ;   0.0000000
+; total molecule charge =   0.0000000
+
+ [ bonds ]
+;   ai  aj   funct      b0          kb
+       2     1   1     0.11500      502080.       ;   CAC-   NAB
+       2     3   1     0.14580      334720.       ;   CAC-   CAA
+       3     4   1     0.10920      284520.       ;   CAA-   HAB
+       3     5   1     0.10920      284520.       ;   CAA-   HAC
+       3     6   1     0.10920      284520.       ;   CAA-   HAA
+;       3     1   1     0.26080      848934.       ; to replace the 180 angle between 1-2-3
+
+ [ pairs ]
+       1       4  1       ;   NAB-   HAB
+       1       5  1       ;   NAB-   HAC
+       1       6  1       ;   NAB-   HAA
+
+[ angles ]
+; ai  aj  ak  funct      th0         cth
+     3     2     1   1     180.000    669.4400     ;   CAA-   CAC-   NAB ; done by bond length constraints
+     2     3     4   1     110.000    292.8800     ;   CAC-   CAA-   HAB
+     2     3     5   1     110.000    292.8800     ;   CAC-   CAA-   HAC
+     2     3     6   1     110.000    292.8800     ;   CAC-   CAA-   HAA
+     5     3     4   1     109.500    255.2200     ;   HAC-   CAA-   HAB
+     6     3     4   1     109.500    255.2200     ;   HAA-   CAA-   HAB
+     6     3     5   1     109.500    255.2200     ;   HAA-   CAA-   HAC
+
+[ dihedrals ]
+; ai  aj   ak  al          funct    phi0          cp      mult
+     1     2     3     4   1     0.000       0.000         1  ; dih    NAB-   CAC-   CAA-   HAB
+     1     2     3     5   1     0.000       0.000         1  ; dih    NAB-   CAC-   CAA-   HAC
+     1     2     3     6   1     0.000       0.000         1  ; dih    NAB-   CAC-   CAA-   HAA

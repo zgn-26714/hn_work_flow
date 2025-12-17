@@ -5,7 +5,7 @@ filetype pdb
 output initial.pdb
 
 
-structure sol.pdb
+structure SOL.pdb
 number 2778
 inside box 0. 0. 0. 50. 50. 50.
 
@@ -16,7 +16,7 @@ number 50
 inside box 0. 0. 0. 50. 50. 50.
 end structure
  
-structure CLO.pdb
+structure CL.pdb
 number 50
 inside box 0. 0. 0. 50. 50. 50.
 end structure

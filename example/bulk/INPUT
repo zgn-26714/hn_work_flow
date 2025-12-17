@@ -1,0 +1,35 @@
+#########################################
+######### INPUT for build_model #########
+#########################################
+# Simulation box dimensions (in nanometers)
+# if you do slit, xbox ybox zbox can be ignored
+bulk_xbox      = 5             # Box length in bulk_X direction (nm)
+bulk_ybox      = 5             # Box length in bulk_Y direction (nm)
+bulk_zbox      = 5            # Box length in bulk_Z direction (nm)
+
+# input file prefixes (without extensions)
+bulk_top       = bulk_top      # Prefix for bulk topology file (e.g., 'topology')
+MDP            = grompp        # Prefix for mdp file (e.g., 'grompp')
+mini_MDP       = mini          # Prefix for Energy Minimization mdp file (e.g., 'mini')
+bulk_pa        = bulk_pack     # Prefix for bulk packmol inp file (e.g., 'packmol')
+
+# gromacs settings
+GMXRC          = /share/home/app/gromacs-2020.4/bin/GMXRC  # Path to GROMACS environment script (only modeling module)
+NPOS           = 4             # Number of OpenMP threads for CPU parallelization
+GPU            = 1             # Enable GPU acceleration: 1=yes, 0=no
+maxWarn        = 2             # Maximum number of warnings allowed during grompp preprocessing
+nsteps_bulk    = 2000000       # MD steps for get bulk density run (2 fs/step)
+nsteps_equ     = 10000000       # MD steps for equilibration run
+nsteps_ini     = 1000000      # MD steps for product initial frames run
+XOUT_FRAMES    = 100           # Frequency of tajectory output (in steps), can't be too small, io will become heavy
+num_intialframes = 100         # Numbers of initial frames
+
+# Density analysis parameters
+NZ             = 100           # Number of slices along Z-axis for density calculation
+BE_TIME        = 1          # Start time for density analysis (in ps, to skip equilibration)
+BE_Z           = 22            # Start Z-position for density analysis (in nm)
+END_Z          = 28            # End Z-position for density analysis (in nm)
+error          = 1             # Allowed density error threshold (%)
+max_iter       = 30             # Maximum number of iterations for density adjustment
+onlyUP         = 0             # 1=only accept density upper setting; 0=accept both upper and lower settings
+

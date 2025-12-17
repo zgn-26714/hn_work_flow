@@ -24,10 +24,10 @@ bash ${bash_dir}/../build_gmx_cpp.sh "${src_file}" "${execu_bin}"
 while (( "$num" <= "$end_num" )); do
     echo "Processing case$num..."
     if [[ ${isRerun} -eq 1 ]]; then
-        PP_command="-f "./case$num/rerun_case/${DEFFNM}.${xtcORtrr}" -s "./case$num/rerun_case/${DEFFNM}.tpr" -n "./case$num/rerun_case/index.ndx""
+        PP_command="-f "./case$num/rerun_case/${DEFFNM_analyze}.${xtcORtrr}" -s "./case$num/rerun_case/${DEFFNM_analyze}.tpr" -n "./case$num/rerun_case/index.ndx""
     else
-        PP_command="-f "./case$num/${DEFFNM}.${xtcORtrr}" -s "./case$num/${DEFFNM}.tpr" -n "./case$num/index.ndx""
-        # PP_command="-f "./case$num/frame${num}.${xtcORtrr}" -s "./case$num/${DEFFNM}.tpr" -n "./case$num/index.ndx""
+        PP_command="-f "./case$num/${DEFFNM_analyze}.${xtcORtrr}" -s "./case$num/${DEFFNM_analyze}.tpr" -n "./case$num/index.ndx""
+        # PP_command="-f "./case$num/frame${num}.${xtcORtrr}" -s "./case$num/${DEFFNM_analyze}.tpr" -n "./case$num/index.ndx""
     fi
     
     out_command="-o "./deal_data/${analyze_cpp}/${num}${analyze_cpp}.xvg""

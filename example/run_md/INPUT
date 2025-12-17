@@ -1,0 +1,46 @@
+#########################################
+######### INPUT for md_run ##############
+#########################################
+# input file folder prefixes
+GMX_run        = /home/wdczbq7y/whcs-share30/apps/gromacs-2020.4/bin/gmx #select gromacs to run simulation
+
+initialframes  = ./initialframes # Prefix for initial frames folder (e.g., 'initialframes')
+matrixdata     = ./matrixdata    # Prefix for electrode matrix data folder (e.g., 'matrixdata')
+basicfile      = ./basicfile     # Prefix for basic files(top, itp, mdp, ndx) folder (e.g., 'basicfile')
+
+# fold settings
+V              = 2             # voltage of simulation (V)
+ic             = 0             # scan rate of simulation(Rise Time, ps)
+Temperature    = 298           # Target simulation temperature (in Kelvin)
+
+#job settings
+START          = 1             # initial case number
+END            = 1             # end case number
+num            = 1             # each job simulate case number
+queue          = new           # PBS queue: short / new / fast / long (4090:normal/fast)
+mode           = default       # default/append (append: run md with append mode; default: default)
+DT             = 0.002         # time step for simulation(ps)
+DEFFNM         = slownvt       # outfile name for simulation
+server_machine = wuchao     # server machine name (eninstein / 4090 / wuchao)
+
+# job control settings
+ismakecase     = 1             # 1 to create case dirs, 0 to skip
+ismakejob      = 1             # 1 to generate & submit job, 0 to skip
+
+# scan settings
+TIME           = 10000         # total time for generate scan file time(not simulation time)(ps)
+SKIPTIME_PS    = 400           # skip time for generate scan file time(not simulation time)(ps)
+TAO            = 0             # Rise Time for generate scan rate file time(ps, it can be write "0 10 20 ..." ) 
+
+#rerun settings
+isRerun        = 0
+rerun_start    = 1
+rerun_end      = 1
+
+#onfly settings 
+MOL_name_run   = ACN Na CLO    # onfly_setting
+LOW_ONFLY      = 0 0 20        # onfly_setting
+UP_ONFLY       = 4.3 4.3 30    # onfly_setting
+NBIN_ONFLY     = 1 1 1000      # onfly_setting
+MODE_ONFLY     = 3             # onfly_setting
+

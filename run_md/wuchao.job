@@ -1,0 +1,59 @@
+#!/bin/sh
+#!/bin/bash
+#===========================================================
+#配置DSUB资源
+#===========================================================
+#DSUB --job_type cosched
+#DSUB -n IP1
+#DSUB -A root.wdczbq7y
+#DSUB -R cpu=32;mem=40960;gpu=1
+#DSUB -N 1
+#DSUB -e err_%J.log
+#DSUB -o out_%J.log
+
+#===========================================================
+#加载环境变量
+#===========================================================
+module use /home/HPCBase/modulefiles/
+module load compilers/bisheng/2.4.0
+module load mpi/hmpi/1.2.0_bs2.4.0
+module load libs/openblas/0.3.18_bs2.4.0
+module load libs/fftw/3.3.8_bs2.4.0_hmpi1.2.0
+
+#===========================================================
+#任务命令
+#===========================================================
+
+j=0
+k=1
+i=0
+h=10
+nofp=8;
+name=slownvt
+mode=$1
+mdbin="/share/home/huangnan_n/app/CUDA_CPMv1.1_scanrate/bin/gmx "
+workdir="/share/home/huangnan_n/heat_of_PC/10nm/charging/298k/2V/0ps"
+while [ "$i" -lt $h ];do
+	casedir="$workdir"/case"$k"
+    cd $casedir
+	if [ "$mode" == "append" ]; then 
+        rm -rf *.tpr
+        rm -rf *.xvg
+    else
+        rm -rf *.tpr
+        rm -rf dens*.onfly
+        rm -rf CPM_electrodeCharge.dat
+        rm -rf CPM_potential.dat
+        rm -rf "$name"*
+        
+    fi
+	rm -rf *.xvg
+    rm -rf slurm*.out
+	#export ONFLY_DENSITY3D="-low [0 0 20] -up [4.3 4.3 30] -nbin [1 1 500] -n index.ndx -sel [aACN] -calc 1 -xout 0"
+	export ONFLY_DENSITY3D="-low [0 0 20] -up [4.3 4.3 30] -nbin [1 1 1000] -n index.ndx -sel [Na CLO aACN]"
+	$mdbin grompp -f grompp.mdp -p topol.top -c frame"$k".gro -o $name -maxwarn 2 -n index.ndx
+	$mdbin mdrun  -s $name -deffnm $name -v -ntmpi 1 -ntomp "$nofp" -pme gpu -pmefft gpu -nb gpu -tunepme no
+	wait
+	((k++))
+	((i++))
+done

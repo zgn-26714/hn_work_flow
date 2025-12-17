@@ -1,12 +1,12 @@
 [ moleculetype ]
 ;Name	nrexcl
-NA    2
+Na    2
 
 
 
 [ atoms ]
 ; nr  type  resnr  residue  atom   cgnr  charge    mass
-  1    NA    1        NA     NA    1      +1       22.989 
+  1    Na    1        Na     Na    1      +1       22.989 
 
 [ moleculetype ]
 ;Name	nrexcl

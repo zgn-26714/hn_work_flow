@@ -66,6 +66,8 @@ IS_FORCE_SCALE = 0             # If you set it to 1, and open "FIXED_MOL", You m
 ######### INPUT for md_run ##############
 #########################################
 # input file folder prefixes
+GMX_run        = /home/wdczbq7y/whcs-share30/apps/gromacs-2020.4/bin/gmx #select gromacs to run simulation
+
 initialframes  = ./initialframes # Prefix for initial frames folder (e.g., 'initialframes')
 matrixdata     = ./matrixdata    # Prefix for electrode matrix data folder (e.g., 'matrixdata')
 basicfile      = ./basicfile     # Prefix for basic files(top, itp, mdp, ndx) folder (e.g., 'basicfile')
@@ -124,10 +126,11 @@ analyze_T             = 298      # Temperature value for analysis (in K)
 analyze_V             = 2        # Voltage value for analysis (in V)
 analyze_tau           = 0        # Rise time parameter for analysis (in ps)
 analyze_mol           = ACN      # Target molecule name for analysis(it can be write by "ACN Na CLO ..." ) 
+DEFFNM_analyze        = slownvt  # name(x) of analyze file(x.xtc/x.trr/x.tpr)
 
 # Analysis program settings (MD_PP)
 analyze_core          = 1
-analyze_cpp           = orientationwater2dmap_dynamic2  # Name of analysis C++ program
+analyze_cpp           = 3DdensityZl_dynamic2020  # Name of analysis C++ program
 build_gmx             = /share/home/huangnan_n/app/code-gmx-onfly/bin/GMXRC  # GMX environment needed to compile the above C++ code
 xtcORtrr              = xtc
 ############################################################################################################

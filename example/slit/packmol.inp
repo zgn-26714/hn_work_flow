@@ -1,0 +1,7 @@
+tolerance 2.2
+
+filetype pdb
+
+output initial.pdb
+
+

@@ -9,9 +9,9 @@
 ;
 ; Include forcefield parameters
 
-#include "ff-allatoms.itp"
+#include "ff-sol.itp"
 #include "GRA.itp"
-#include "NaCLO4.itp"
+#include "na.itp"
 #include "spce.itp"
 
 
@@ -22,4 +22,4 @@ SOL 6000
 [ molecules ]
 SOL 2778
 Na	50
-CLO	50
+CL	50

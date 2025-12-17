@@ -1,9 +1,0 @@
-TITLE     SOL 6000 t= 652.00000 step= 326000
-REMARK    THIS IS A SIMULATION BOX
-CRYST1   41.760   42.540  480.000  90.00  90.00  90.00 P 1           1
-MODEL        1
-ATOM      1  OW  SOL  4081      24.800  35.900 239.510  1.00  0.00            
-ATOM      2  HW1 SOL  4081      24.810  35.470 240.410  1.00  0.00            
-ATOM      3  HW2 SOL  4081      25.360  35.370 238.870  1.00  0.00            
-TER
-ENDMDL

@@ -1,0 +1,36 @@
+#########################################
+######### INPUT for analysis ############
+#########################################(待完善)
+# onfly analysis settings
+analysis_begin_t      = 0        # Start time for analysis (in ps)
+analysis_end_t        = 0        # End time for analysis (in ps, with default value 0 mean all time)
+analysis_ONFLY_isD    = 1        # Enable dynamic output in onfly analysis: 1=yes, 0=no
+analysis_ONFLY_in     = densMNC3D# Input file name for onfly analysis file
+MODE_ONFLY_analysis   = 3        # onfly_setting
+
+# analysis case settings
+analyze_begin_case    = 1        # Starting case number for analysis
+analyze_end_case      = 3        # Ending case number for analysis
+analyze_T             = 298      # Temperature value for analysis (in K)   
+analyze_V             = 2        # Voltage value for analysis (in V)
+analyze_tau           = 0        # Rise time parameter for analysis (in ps)
+analyze_mol           = ACN      # Target molecule name for analysis(it can be write by "ACN Na CLO ..." ) 
+DEFFNM_analyze        = slownvt  # name(x) of analyze file(x.xtc/x.trr/x.tpr)
+
+# Analysis program settings (MD_PP)
+analyze_core          = 4
+analyze_cpp           = 3DdensityZl_dynamic2020  # Name of analysis C++ program
+build_gmx             = /home/wdczbq7y/whcs-share30/apps/gromacs-2020.4/bin/GMXRC  # GMX environment needed to compile the above C++ code
+xtcORtrr              = xtc      # (x.xtc or x.trr)
+############################################################################################################
+# Additional command line arguments for analysis program #
+# Classic post-processing commands including -f -s -n -o are already configured. 
+# Note that the filenames required for -f and -s should remain consistent and use the DEFFNM parameter for specification.
+# Additional custom command parameters need to be entered here.
+analysis_extra_command =  -dens number -sl 100 100 1 -num2ave 100 -min 0 0 20 -max 4.176 4.254 21
+analyze_is_skip_first_line = 0
+
+### data base
+# 1.angleOF_dipole_Z: -sl 1 -zmin 21 -zmax 29 -n2ave 20 -out 1
+# 2.3DdensityZl_dynamic2020: -dens number -sl 100 100 1 -num2ave 100 -min 0 0 20 -max 4.176 4.254 21
+
