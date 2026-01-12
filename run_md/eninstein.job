@@ -32,6 +32,8 @@ while [ "$i" -lt "$h" ]; do
         rm -rf *.xvg
         rm -rf *.o*
     fi
+
+    export ONFLY_FLAGS=0
     export ONFLY_DENSITY3D="-low [0 0 20] -up [4.3 4.3 30] -nbin [1 1 1000] -n index.ndx -sel [Na CLO PC]  -calc 3"
     
     if [[ "${isRerun}" -eq 1 ]]; then

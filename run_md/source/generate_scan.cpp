@@ -45,7 +45,7 @@ int main() {
         double tini = 0.0;
         double tup = slow;
         double tend = 0.0;
-        double dt = 0.002;
+
         double tall = tup + tini + tend;
         
         // 计算时间点数量（整数）

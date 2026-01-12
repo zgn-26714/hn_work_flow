@@ -108,6 +108,7 @@ LOW_ONFLY      = 0 0 20        # onfly_setting
 UP_ONFLY       = 4.3 4.3 30    # onfly_setting
 NBIN_ONFLY     = 1 1 1000      # onfly_setting
 MODE_ONFLY     = 3             # onfly_setting
+ONFLY_FLAGS    = 0             # onfly_setting
 
 #########################################
 ######### INPUT for analysis ############

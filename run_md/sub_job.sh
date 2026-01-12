@@ -35,7 +35,8 @@ make_job() {
             /^[[:space:]]*mode[[:space:]]*=/s|.*|mode=$mode|;
             /^[[:space:]]*isRerun[[:space:]]*=/s|.*|isRerun=$isRerun|;
             /^[[:space:]]*name[[:space:]]*=/s|.*|name=$DEFFNM|;
-            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|
+            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|;
+            s|export ONFLY_FLAGS=0|export ONFLY_FLAGS=$ONFLY_FLAGS|
         " "$objjob"
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         case "$queue" in
@@ -66,7 +67,8 @@ make_job() {
             /^[[:space:]]*mode[[:space:]]*=/s|.*|mode=$mode|;
             /^[[:space:]]*isRerun[[:space:]]*=/s|.*|isRerun=$isRerun|;
             /^[[:space:]]*name[[:space:]]*=/s|.*|name=$DEFFNM|;
-            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|
+            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|;
+            s|export ONFLY_FLAGS=0|export ONFLY_FLAGS=$ONFLY_FLAGS|
         " "$objjob"
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         if [[ "${isRerun}" -eq 1 ]]; then
@@ -87,7 +89,8 @@ make_job() {
             /^[[:space:]]*mode[[:space:]]*=/s|.*|mode=$mode|;
             /^[[:space:]]*isRerun[[:space:]]*=/s|.*|isRerun=$isRerun|;
             /^[[:space:]]*name[[:space:]]*=/s|.*|name=$DEFFNM|;
-            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|
+            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|;
+            s|export ONFLY_FLAGS=0|export ONFLY_FLAGS=$ONFLY_FLAGS|
         " "$objjob" 
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         chmod +x $objjob
@@ -109,7 +112,8 @@ make_job() {
             /^[[:space:]]*mode[[:space:]]*=/s|.*|mode=$mode|;
             /^[[:space:]]*isRerun[[:space:]]*=/s|.*|isRerun=$isRerun|;
             /^[[:space:]]*name[[:space:]]*=/s|.*|name=$DEFFNM|;
-            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|
+            /^[[:space:]]*mdbin[[:space:]]*=/s|.*|mdbin=$GMX_run|;
+            s|export ONFLY_FLAGS=0|export ONFLY_FLAGS=$ONFLY_FLAGS|
         " "$objjob" 
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         chmod +x $objjob

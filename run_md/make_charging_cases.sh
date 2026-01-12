@@ -75,7 +75,7 @@ main() {
         echo -e "${GREEN}✅Success generating scan file...${NC}" | tee -a ./result/run_md.log >&2
     else
         echo -e "${ERROR} generate_scanfile.sh not found or error, exit!" | tee -a ./result/run_md.log >&2
-        eixt 1
+        exit 1
     fi
 
     local case_dirs=()

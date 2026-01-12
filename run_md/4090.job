@@ -29,7 +29,8 @@ while [ "$i" -lt $h ];do
     fi
 	rm -rf *.xvg
     rm -rf slurm*.out
-	#export ONFLY_DENSITY3D="-low [0 0 20] -up [4.3 4.3 30] -nbin [1 1 500] -n index.ndx -sel [aACN] -calc 1 -xout 0"
+
+    export ONFLY_FLAGS=0
 	export ONFLY_DENSITY3D="-low [0 0 20] -up [4.3 4.3 30] -nbin [1 1 1000] -n index.ndx -sel [Na CLO aACN]"
 	$mdbin grompp -f grompp.mdp -p topol.top -c frame"$k".gro -o $name -maxwarn 2 -n index.ndx
 	$mdbin mdrun  -s $name -deffnm $name -v -ntmpi 1 -ntomp "$nofp" -pme gpu -pmefft gpu -nb gpu -tunepme no
