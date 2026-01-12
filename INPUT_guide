@@ -40,6 +40,7 @@
     # onfly settings
     export ONFLY_DENSITY3D = "-low [] -up [] -nbin [] -n index.ndx -sel [Na CLO aACN]"
     {MODE_ONFLY}只有使用改写的onfly时才需要这个参数,默认3
+    {ONFLY_FLAGS}: 0(x) 1(v) 2(f) 3(xv) 4(xf) 5(vf) 6(xvf) 
     # rerun settings
     rerun settings
 
