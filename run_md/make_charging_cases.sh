@@ -45,12 +45,19 @@ make_case() {
     cp "$matrixdir/CPM_ControlFile.dat_0V" "$objdir/CPM_ControlFile.dat"
 
     # Remove old files and create symbolic links
-    rm -f "$objdir/allMatrixA.bin" "$objdir/Dphis_control.dat"
     ln -sf "$matrixdir/allMatrixA.bin" "$objdir/allMatrixA.bin"
     
     local dphis_file="$slowdir/Dphis_control.dat${V}_${ic}_${SKIPTIME_PS}"
     if [[ -f "$dphis_file" ]]; then
-        ln -sf "$dphis_file" "$objdir/Dphis_control.dat"
+        case "$server_machine" in
+        eninstein|jiaocha)
+            ln -sf "$dphis_file" "$objdir/Dphis_control.dat"
+            ;;
+        4090|wuchao)
+            ln -sf "$dphis_file" "$objdir/scanrate_input.dat"
+            ;;
+        esac
+        
     else
         echo "⚠️  Dphis file not found: $dphis_file" | tee -a  ./result/run_md.log >&2
     fi
