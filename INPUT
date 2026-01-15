@@ -87,6 +87,7 @@ mode           = default       # default/append (append: run md with append mode
 DT             = 0.002         # time step for simulation(ps)
 DEFFNM         = slownvt       # outfile name for simulation
 server_machine = eninstein     # server machine name (eninstein / 4090 / wuchao)
+server_core    = 48            # core nums in server mashine
 
 # job control settings
 ismakecase     = 1             # 1 to create case dirs, 0 to skip

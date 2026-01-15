@@ -41,8 +41,8 @@ make_job() {
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         case "$queue" in
             short)  sed -i '6s/.*/#PBS -l walltime=36:00:00/' "$objjob" ;;
-            new)    sed -i '5s/.*/#PBS -l nodes=1:ppn=32/' "$objjob" ;;
-            fast)   sed -i '5s/.*/#PBS -l nodes=1:ppn=24/' "$objjob" ;;
+            new)    sed -i "5s/.*/#PBS -l nodes=1:ppn=${server_core}/" "$objjob" ;;
+            fast)   sed -i "5s/.*/#PBS -l nodes=1:ppn=${server_core}/" "$objjob" ;;
             long)   sed -i '6s/.*/#PBS -l walltime=720:00:00/' "$objjob" ;;
         esac
 
