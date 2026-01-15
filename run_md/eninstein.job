@@ -25,12 +25,11 @@ while [ "$i" -lt "$h" ]; do
         rm -rf *.xvg
     else
         rm -rf *.tpr
-        rm -rf dens*.onfly
+        rm -rf *.onfly
         rm -rf CPM_electrodeCharge.dat
         rm -rf CPM_potential.dat
         rm -rf "$name"*
         rm -rf *.xvg
-        rm -rf *.o*
     fi
 
     export ONFLY_FLAGS=0
