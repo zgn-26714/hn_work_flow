@@ -40,10 +40,20 @@ make_job() {
         " "$objjob"
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
         case "$queue" in
-            short)  sed -i '6s/.*/#PBS -l walltime=36:00:00/' "$objjob" ;;
-            new)    sed -i "5s/.*/#PBS -l nodes=1:ppn=${server_core}/" "$objjob" ;;
-            fast)   sed -i "5s/.*/#PBS -l nodes=1:ppn=${server_core}/" "$objjob" ;;
-            long)   sed -i '6s/.*/#PBS -l walltime=720:00:00/' "$objjob" ;;
+            short)  
+                sed -i '6s/.*/#PBS -l walltime=36:00:00/' "$objjob"
+                sed -i "5s/.*/#PBS -l nodes=1:ppn=${server_core}/" "$objjob"
+                ;;
+            new)    
+                sed -i "5s/.*/#PBS -l nodes=1:ppn=${server_core}/" "$objjob" 
+                ;;
+            fast)   
+                sed -i "5s/.*/#PBS -l nodes=1:ppn=${server_core}/" "$objjob" 
+                ;;
+            long)   
+                sed -i '6s/.*/#PBS -l walltime=720:00:00/' "$objjob"
+                sed -i "5s/.*/#PBS -l nodes=1:ppn=${server_core}/" "$objjob" 
+                ;;
         esac
 
         if [[ "${isRerun}" -eq 1 ]]; then
@@ -71,6 +81,7 @@ make_job() {
             s|export ONFLY_FLAGS=0|export ONFLY_FLAGS=$ONFLY_FLAGS|
         " "$objjob"
         sed -i 's|.*export ONFLY_DENSITY3D=.*|export ONFLY_DENSITY3D="-low ['"${LOW_ONFLY}"'] -up ['"${UP_ONFLY}"'] -nbin ['"${NBIN_ONFLY}"'] -n index.ndx -sel ['"${MOL_name_run}"'] -calc '"${MODE_ONFLY}"'"|' "$objjob"
+        sed -i "s/^[[:space:]]*nofp[[:space:]]*=[[:space:]]*[0-9]\+;[[:space:]]*$/nofp=${server_core};/" "$objjob"
         if [[ "${isRerun}" -eq 1 ]]; then
             cd "$rundir"/case"$start_case"/rerun_case
             sed -i "/casedir=/s|.*|casedir=\$workdir/case\$k/rerun_case|" "$objjob"
