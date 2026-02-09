@@ -266,6 +266,19 @@ void modify_packmol(const string& inp_file,
         }
     }
 
+    if (records.empty()) {
+        throw std::runtime_error(
+            "No target molecules were matched for modification. "
+            "Please check that the PDB names in the Packmol input file "
+            "match the molecule names in the topology file, "
+            "and that the MOL_name specified in the INPUT environment "
+            "variable is correct."
+        );
+    }
+
+    /* ---------- 第二阶段：计算 ---------- */
+    calc_factor(records, factor);
+
     /* ---------- 第二阶段：计算 ---------- */
     calc_factor(records, factor);
     for (const auto& r : records) {
