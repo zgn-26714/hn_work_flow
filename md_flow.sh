@@ -34,17 +34,15 @@ echo -e "${GREEN}Finish reading INPUT${NC}"
 
 ACTION="${1:-help}"
 
-if bash "$SCRIPT_DIR"/check_file.sh; then
-    echo -e "Proceeding with action: $ACTION"
-else
-    echo -e "${ERROR} Failed to check files.${NC}"
-    exit 1
-fi
-
 mkdir -p result
 case "$ACTION" in
     frames)
-        echo ">>> Entering get frames branch..."
+        if bash "$SCRIPT_DIR"/check_file.sh "all"; then
+            echo ">>> Entering get frames branch..."
+        else
+            echo -e "${ERROR} Failed to check files.${NC}"
+            exit 1
+        fi
         setting="${2:-default}"
         case "$setting" in
           default)
