@@ -35,9 +35,9 @@ echo -e "${GREEN}Finish reading INPUT${NC}"
 ACTION="${1:-help}"
 
 if bash "$SCRIPT_DIR"/check_file.sh; then
-    echo -e "${OK} All required files are present. Proceeding with action: $ACTION${NC}"
+    echo -e "Proceeding with action: $ACTION"
 else
-    echo -e "${ERROR} Some required files are missing. Please check setting.log for details.${NC}"
+    echo -e "${ERROR} Failed to check files.${NC}"
     exit 1
 fi
 

@@ -6,6 +6,7 @@
 
 void change_inp(std::string inp_file, std::string pdb_name, std::string idx_str);
 void change_pdb_name(std::string pdb_file, std::string name);
+std::string find_pdb_file(const std::vector<std::string>& pdb_files, const std::string& mol_name);
 
 // 按空格分割字符串
 std::string trim(const std::string& s)
@@ -137,10 +138,12 @@ void get_file_name(std::string &top_file, std::string &inp_file,
             }
         }
     }
+    fin.close();
 
     /*get pdb file*/
     pdb_file.clear();
     fin.open(inp_file);
+    
     if (!fin.is_open())
     {
         std::cerr << "Error: cannot open input file " << inp_file << std::endl;
@@ -151,6 +154,7 @@ void get_file_name(std::string &top_file, std::string &inp_file,
         std::istringstream iss(line);
         std::string key, filename;
         iss >> key >> filename;
+
         // 只处理以 "structure" 开头的行
         if (key == "structure" && !filename.empty())
         {
@@ -203,25 +207,45 @@ int main(int argc, char* argv[])
 
     std::vector<std::string> set_rules = {"TOP", "bulk"};
 
-    for (int i = begin; i < end; ++i){
-        get_file_name(top_file, inp_file, itp_files, pdb_files, set_rules[i]);
+    
 
-        for (const auto& name : sel_name)
-        {
+    for (const auto& name : sel_name)
+    {
+        std::string pdb_name;
+        for (int i = begin; i < end; ++i){
+            get_file_name(top_file, inp_file, itp_files, pdb_files, set_rules[i]);
+            
+            // std::cout << "===== File info for set_rule: " << set_rules[i] << " =====" << std::endl;
+            // std::cout << "Top file: " << top_file << std::endl;
+            // std::cout << "Input file: " << inp_file << std::endl;
+
+            // std::cout << "ITP files: ";
+            // for (const auto& itp : itp_files)
+            //     std::cout << itp << " ";
+            // std::cout << std::endl;
+
+            // std::cout << "PDB files: ";
+            // for (const auto& pdb : pdb_files)
+            //     std::cout << pdb << " ";
+            // std::cout << std::endl;
+
+            // std::cout << "=========================================" << std::endl;
+            // std::cout<<"find mol: "<<name<<std::endl;
             bool found = false;
             std::string idx_top = find_in_top(top_file, name);//mol + num
             if (!idx_top.empty())
             {   
                 //另一种思路是根据top文件中的mol num找到inp文件中对应的structure行，找到对应的pdb文件，再根据pdb文件中的分子名找到对应的pdb文件
                 //但是可行性需要验证（当top中的名字和pdb中的，itp中的名字不一致会发生什么？）
-                std::string pdb_name = find_pdb_file(pdb_files, name);//找到名字对应的pdb文件，没找到会报错退出
+                pdb_name = find_pdb_file(pdb_files, name);//找到名字对应的pdb文件，没找到会报错退出
+                //std::cout<<"get_pdb_name: "<<pdb_name<<std::endl;
                 change_inp(inp_file, pdb_name, idx_top);//改变inp文件中对应的pdb文件的名字,并把下一行的number改成和top中一致
 
-                change_pdb_name(pdb_name, name);//重命名pdb文件
+                
                 // break; // 找到了就查下一个 name
             }
             else{
-                std::cerr << "Warning: molecule name '" << name << "' not found in top file." << std::endl;
+                std::cerr << "Error: molecule name '" << name << "' not found in top file." << std::endl;
                 std::cerr << "Please check your INPUT or  check your initial file by yourself!" << std::endl;
                 std::exit(1);
             }
@@ -262,6 +286,7 @@ int main(int argc, char* argv[])
             //     std::exit(1);
             // }
         }
+        change_pdb_name(pdb_name, name);//重命名pdb文件
     }
     
 
@@ -411,8 +436,12 @@ std::string find_pdb_file(const std::vector<std::string>& pdb_files, const std::
 
     std::cerr << "Error: molecule name '" << mol_name
               << "' (padded as '" << mol_name_padded
-              << "') not found in columns 18-21 of any ATOM record in the pdb files."
-              << std::endl;
+              << "') not found in columns 18-21 of any ATOM record in ";
+    for (const auto& pdb_file : pdb_files){
+        std::cerr << pdb_file << " ";
+    }
+    std::cerr << std::endl;
+
     std::exit(1);
 }
 
@@ -420,6 +449,9 @@ void change_pdb_name(std::string pdb_file, std::string name){
     std::string new_file = name + ".pdb";
     std::string cmd = "mv \"" + pdb_file + "\" \"" + new_file + "\"";
 
+    if(pdb_file == new_file){
+        return;
+    }
     int ret = std::system(cmd.c_str());
     if (ret != 0)
     {
