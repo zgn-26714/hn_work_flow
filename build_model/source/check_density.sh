@@ -62,9 +62,90 @@ echo "[STEP 3]Running grompp to generate pre_eq.tpr" | tee -a ./result/b_model.l
 
 cp "${MDP}".mdp ./build/grompp.mdp
 sed -i "s/^[[:space:]]*nsteps[[:space:]]*=.*/nsteps = ${nsteps_den}/" ./build/grompp.mdp
+
+eq_input_gro="./build/pre_eq.gro"
+if [[ "$ENABLE_ANNEAL" == "yes" ]]; then
+    echo "[STEP 3A]Annealing enabled. Preparing anneal.mdp (T=${ANNEAL_TEMP} K)" | tee -a ./result/b_model.log >&2
+    cp ./build/grompp.mdp ./build/anneal.mdp
+
+    if [[ -n "${ANNEAL_NSTEPS:-}" ]]; then
+        anneal_nsteps="${ANNEAL_NSTEPS}"
+    else
+        echo -e "${ERROR}ANNEAL_NSTEPS not set. "| tee -a ./result/b_model.log >&2
+        exit 1
+    fi
+
+    if ! [[ "$anneal_nsteps" =~ ^[0-9]+$ ]] || [[ "$anneal_nsteps" -le 0 ]]; then
+        echo -e "${ERROR}Invalid anneal nsteps: ${anneal_nsteps}. Check ANNEAL_TIME_PS/ANNEAL_NSTEPS.${NC}" | tee -a ./result/b_model.log >&2
+        exit 1
+    fi
+
+    if grep -Eq "^[[:space:]]*ref[-_]t[[:space:]]*=" ./build/anneal.mdp; then
+        sed -i -E "s/^[[:space:]]*ref[-_]t[[:space:]]*=.*/ref_t = ${ANNEAL_TEMP}/" ./build/anneal.mdp
+    else
+        echo -e "${ERROR}invalid anneal.mdp: ref_t parameter not found. " | tee -a ./result/b_model.log >&2
+        exit 1
+    fi
+
+    sed -i "s/^[[:space:]]*nsteps[[:space:]]*=.*/nsteps = ${anneal_nsteps}/" ./build/anneal.mdp
+
+    echo "[STEP 3B]Running grompp for annealing (nsteps=${anneal_nsteps})" | tee -a ./result/b_model.log >&2
+    if gmx grompp \
+        -f ./build/anneal.mdp \
+        -c "$eq_input_gro" \
+        -p "${TOP}.top" \
+        -n ./build/index.ndx \
+        -o ./build/anneal.tpr \
+        -maxwarn "${maxWarn}" >> ./result/b_model.log 2>&1; then
+        echo -e "${OK}anneal grompp completed successfully" | tee -a ./result/b_model.log >&2
+    else
+        echo -e "${ERROR}anneal grompp failed.${NC}" | tee -a ./result/b_model.log >&2
+        exit 1
+    fi
+
+    echo "[STEP 3C]Running mdrun for annealing" | tee -a ./result/b_model.log >&2
+    if [[ "$GPU" -eq 1 ]]; then
+        echo -e "\tUsing GPU acceleration for annealing" | tee -a ./result/b_model.log >&2
+        anneal_mdrun_cmd=(
+            gmx mdrun
+            -s ./build/anneal.tpr
+            -deffnm ./build/anneal
+            -ntmpi 1
+            -ntomp "$NPOS"
+            -pme gpu
+            -pmefft gpu
+            -nb gpu
+            -bonded gpu
+            -tunepme no
+            -v
+        )
+    else
+        echo -e "\tUsing CPU computation for annealing" | tee -a ./result/b_model.log >&2
+        anneal_mdrun_cmd=(
+            gmx mdrun
+            -s ./build/anneal.tpr
+            -deffnm ./build/anneal
+            -ntmpi 1
+            -ntomp "$NPOS"
+            -v
+        )
+    fi
+    "${anneal_mdrun_cmd[@]}" >> ./result/b_model.log 2>&1
+
+    if [[ -s ./build/anneal.gro ]]; then
+        echo -e "${OK}annealing completed successfully, anneal.gro will be used for normal pre-equilibration" | tee -a ./result/b_model.log >&2
+        eq_input_gro="./build/anneal.gro"
+    else
+        echo -e "${ERROR}annealing failed: anneal.gro not generated or empty${NC}" | tee -a ./result/b_model.log >&2
+        exit 1
+    fi
+else
+    echo "[STEP 3A]Annealing disabled (ENABLE_ANNEAL=${ENABLE_ANNEAL}). Continue with normal pre-equilibration." | tee -a ./result/b_model.log >&2
+fi
+
 if gmx grompp \
     -f ./build/grompp.mdp \
-    -c ./build/pre_eq.gro \
+    -c "$eq_input_gro" \
     -p "${TOP}.top" \
     -n ./build/index.ndx \
     -o ./build/pre_eq.tpr \
