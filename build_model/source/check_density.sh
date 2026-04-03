@@ -36,9 +36,10 @@ else
 fi
 
 # =============================
-# Step 2: mdrun - run simulation
+# Step 2: mdrun - run
 # =============================
 echo "[STEP 2]Running mdrun for pre-equilibration" | tee -a ./result/b_model.log >&2
+mini_pre_eq_overlap_risk=0
 if gmx mdrun \
     -s ./build/mini_pre_eq.tpr \
     -deffnm ./build/mini_pre_eq \
@@ -49,6 +50,16 @@ if gmx mdrun \
 else
     echo -e "${ERROR}min energy failed.${NC}" | tee -a ./result/b_model.log >&2
     exit 1
+fi
+mini_pre_eq_log=./build/mini_pre_eq.log
+if [[ -f "$mini_pre_eq_log" ]]; then
+    if grep -q "did not reach the requested Fmax" "$mini_pre_eq_log"; then
+        mini_pre_eq_overlap_risk=1
+        echo -e "${YELLOW}[WARNING]mini_pre_eq reached machine precision but did not reach requested Fmax.${NC}" | tee -a ./result/b_model.log >&2
+        echo -e "${YELLOW}[WARNING]Continue workflow. If next MD fails with 'The total potential energy is ... extremely high', script will stop and report overlap/box issue.${NC}" | tee -a ./result/b_model.log >&2
+    fi
+else
+    echo -e "${YELLOW}[WARNING]mini_pre_eq log not found: ${mini_pre_eq_log}. Skip Fmax safeguard check.${NC}" | tee -a ./result/b_model.log >&2
 fi
 
 # Rename output file
@@ -185,13 +196,28 @@ else
         -v
     )
 fi
-"${mdrun_cmd[@]}" >> ./result/b_model.log  2>&1 
+mdrun_failed=0
+if "${mdrun_cmd[@]}" >> ./result/b_model.log  2>&1 ; then
+    :
+else
+    mdrun_failed=1
+fi
 
 # Execute mdrun
-if [[ -s ./build/pre_eq.xtc ]]; then
+if [[ "$mdrun_failed" -eq 0 ]] && [[ -s ./build/pre_eq.xtc ]]; then
     echo -e "${OK}mdrun completed successfully" | tee -a ./result/b_model.log >&2
 else
-    echo -e "${ERROR}mdrun failed: pre_eq.edr not generated or empty${NC}" | tee -a ./result/b_model.log >&2
+    pre_eq_log=./build/pre_eq.log
+    if [[ -f "$pre_eq_log" ]] \
+        && grep -q "Fatal error:" "$pre_eq_log" \
+        && grep -Eq "The total potential energy is .*extremely high" "$pre_eq_log"; then
+        if [[ "$mini_pre_eq_overlap_risk" -eq 1 ]]; then
+            echo -e "${YELLOW}[WARNING]mini_pre_eq.log already reported 'did not reach the requested Fmax', indicating strong initial overlap risk.${NC}" | tee -a ./result/b_model.log >&2
+            echo -e "${ERROR} Energy minimization failed. Your molecules are too much OR Your box is too small!${NC}" | tee -a ./result/b_model.log >&2
+        fi
+    else
+        echo -e "${ERROR}mdrun failed, Unknown error${NC}" | tee -a ./result/b_model.log >&2
+    fi
     exit 1
 fi
 
