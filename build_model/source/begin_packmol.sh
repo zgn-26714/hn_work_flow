@@ -11,17 +11,17 @@ ${NC}" | tee -a ./result/b_model.log >&2
 
 # Step 1: Run Packmol to generate initial configuration
 echo "Running Packmol to generate PDB file..." | tee -a ./result/b_model.log >&2
-if packmol < packmol_.inp >> ./result/b_model.log 2>&1; then
+if packmol < "${packmol}.inp" >> ./result/b_model.log 2>&1; then
     echo -e "${OK}Packmol completed successfully." | tee -a ./result/b_model.log >&2
 else
-    echo -e "${RED}Error: Packmol failed. Check packmol.inp for errors.${NC}" | tee -a ./result/b_model.log >&2
+    echo -e "${RED}Error: Packmol failed. Check ${packmol}.inp for errors.${NC}" | tee -a ./result/b_model.log >&2
     exit 1
 fi
 
 # Step 2: Extract output filename from packmol.inp
-name=$(sed -n 's/^output \([^.]*\)\.pdb.*/\1/p' packmol_.inp)
+name=$(sed -n 's/^output \([^.]*\)\.pdb.*/\1/p' "${packmol}.inp")
 if [ -z "$name" ]; then
-    echo -e "${RED}Error: Could not extract output name from packmol.inp. Make sure 'output *.pdb' is defined.${NC}" | tee -a ./result/b_model.log >&2
+    echo -e "${RED}Error: Could not extract output name from ${packmol}.inp. Make sure 'output *.pdb' is defined.${NC}" | tee -a ./result/b_model.log >&2
     exit 1
 fi
 

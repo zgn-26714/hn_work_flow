@@ -69,7 +69,15 @@ echo -e "${NC}"
 # intial iter
 iter=0
 export iter
-cp "${packmol}".inp packmol_.inp
+backup_top_file=".top"
+backup_packmol_file=".inp"
+
+if [[ ! -f "$backup_top_file" ]]; then
+    cp "${TOP}.top" "$backup_top_file"
+fi
+if [[ ! -f "$backup_packmol_file" ]]; then
+    cp "${packmol}.inp" "$backup_packmol_file"
+fi
 {
     echo "# build_model iteration info"
     echo "# format: iter=<n> density=<value> mol1=<count> mol2=<count> ..."
@@ -99,8 +107,6 @@ fi
 density=$(printf "%.10f" "$density")
 echo "Initial density: $density" | tee -a ./result/b_model.log >&2
 log_build_model_info "$iter" "$density"
-
-cp "${TOP}".top baktop1.top
 # main iter circle
 while [ $iter -lt $max_iter ] && { (( $(echo "define abs(x) { if (x < 0) return -x; return x; }; abs($density - $set_density) > $abs_error" | bc -l) )) || other_condition; }; do
     iter=$((iter + 1))
@@ -125,7 +131,7 @@ while [ $iter -lt $max_iter ] && { (( $(echo "define abs(x) { if (x < 0) return 
             echo "Executable ${delete_execu_bin} already exists, skipping compilation." | tee -a ./result/b_model.log >&2
         fi
 
-        if ! "${delete_execu_bin}" "$scale_factor" "${name_value}.gro" "${TOP}.top" packmol_.inp | tee -a ./result/b_model.log >&2; then
+        if ! "${delete_execu_bin}" "$scale_factor" "${name_value}.gro" "${TOP}.top" "${packmol}.inp" | tee -a ./result/b_model.log >&2; then
             echo -e "${ERROR}Error: delete_molecules failed with scale factor $scale_factor${NC}" | tee -a ./result/b_model.log >&2
             exit 1
         fi
@@ -144,7 +150,7 @@ while [ $iter -lt $max_iter ] && { (( $(echo "define abs(x) { if (x < 0) return 
             echo "Executable ${remake_execu_bin} already exists, skipping compilation." | tee -a ./result/b_model.log >&2
         fi
 
-        if  ! "${remake_execu_bin}" "$scale_factor" packmol_ | tee -a ./result/b_model.log >&2 ; then
+        if  ! "${remake_execu_bin}" "$scale_factor" "${packmol}" | tee -a ./result/b_model.log >&2 ; then
             echo -e "${ERROR}Error: remake_packmol failed with scale factor $scale_factor${NC}"  | tee -a ./result/b_model.log >&2
             exit 1
         fi
@@ -184,4 +190,3 @@ else
     echo -e "Target: ${set_density} ± ${abs_error}" >&2
 fi
 rm "${name_value}".gro
-mv packmol_.inp result.inp

@@ -116,10 +116,6 @@ fi
 
 if [[ "$resume_step" -le 3 ]]; then
     if sh "${bash_dir}/get_frames.sh"; then
-        cp "${TOP}.top" result.top
-        if [[ -f baktop1.top ]]; then
-            mv baktop1.top "${TOP}.top"
-        fi
         restore_grompp_after_completion
         append_step_marker "STEP_GET_FRAMES_DONE"
         echo ""

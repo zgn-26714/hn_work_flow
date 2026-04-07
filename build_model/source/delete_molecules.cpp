@@ -235,7 +235,7 @@ static void modify_packmol(const string& inp_file,
     if (records.empty()) {
         throw runtime_error(
             "No target molecules were matched for deletion. "
-            "Please check MOL_name and packmol_.inp."
+            "Please check MOL_name and the working packmol input file."
         );
     }
 
