@@ -37,13 +37,17 @@ ACTION="${1:-help}"
 mkdir -p result
 case "$ACTION" in
     frames)
-        if bash "$SCRIPT_DIR"/check_file.sh "all"; then
-            echo ">>> Entering get frames branch..."
-        else
-            echo -e "${ERROR} Failed to check files.${NC}"
-            exit 1
-        fi
         setting="${2:-default}"
+        if [[ "$setting" == "slit" && "${is_auto_top:-0}" -eq 1 ]]; then
+            echo ">>> Entering get frames branch with slit auto-generation enabled..."
+        else
+            if bash "$SCRIPT_DIR"/check_file.sh "all"; then
+                echo ">>> Entering get frames branch..."
+            else
+                echo -e "${ERROR} Failed to check files.${NC}"
+                exit 1
+            fi
+        fi
         case "$setting" in
           default)
             export isBulk=0 
@@ -169,5 +173,4 @@ EOF
         exit 0
         ;;
 esac
-
 
