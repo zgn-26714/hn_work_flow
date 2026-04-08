@@ -1,19 +1,4 @@
-iter的表现形式和输出样式 （不急）
-
-集成deal_data模块（主要当作备份使用，JE模型的除外）(不急)
-
-slowdir参数的使用(不急)
-
-重整四大模块的输出(不急)
-
-INPUT文件一个集群一个？(不急)
-
-
-三维surf图
-remake_angle
-rotate model
-
-todo:
+1.0 -> 1.1:
 1. frames 
 调整密度后保持体系分子数的比例不变
 manage:
@@ -70,4 +55,11 @@ manage:
 3.analysis
     MD_PP不能使用gmx命令
 
-    todo: 增加检测,如果使用gmx xxx,进入新的分支
+   增加检测,如果使用gmx xxx,进入新的分支
+
+
+todo:
+    1.frames模块会生成很多文件夹，也需要很多文件，看上去有些混乱，需要重新整理一下
+    2.frames模块的输出方式，可能有些不太醒目，或者不太清晰，需要重新设计一下输出方式
+    3.将以前写过的有用的后处理code集成到MD_PP中
+    4.在deal_data模块中增加写过的有用的功能
