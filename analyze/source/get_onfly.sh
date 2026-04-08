@@ -20,7 +20,7 @@ echo "=================================================="
 echo "=> onflyPost_dens3D_dynamic..."
 bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-onfly_version="onflyPost_denANDBALJ3D_dynamic"
+onfly_version="${onflyPost_cpp}"
 
 g++ -o ${onfly_version} ${bash_dir}/module_C++/${onfly_version}.cpp -O3
 

@@ -120,6 +120,8 @@ analysis_end_t        = 0        # End time for analysis (in ps, with default va
 analysis_ONFLY_isD    = 1        # Enable dynamic output in onfly analysis: 1=yes, 0=no
 analysis_ONFLY_in     = densMNC3D# Input file name for onfly analysis file
 MODE_ONFLY_analysis   = 3        # onfly_setting
+ 
+onflyPost_cpp         = onflyPost_denANDBALJ3D_dynamic  #Name of C++ program for onfly analysis e.g., onflyPost_denANDBALJ3D_dynamic, onflyPost_DenVelForce, onflyPost_dens3D_dynamic.
 
 # analysis case settings
 analyze_begin_case    = 1        # Starting case number for analysis
