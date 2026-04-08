@@ -58,7 +58,7 @@ set_density   = 940            # Target system density (kg/m³)
 # modify molecule numbers 
 MOL_name       = ACN Na CLO    # Space-separated list of molecule/ion names (e.g., for density groups)
 FIXED_MOL      = Na CLO        # notice! It's a important and sensitive parameter, please read README.md carefully before you set it.
-IS_FORCE_SCALE = 0             # If you set it to 1, and open "FIXED_MOL", You may never reach the correct density!! never!!!
+IS_FORCE_SCALE = 0             # If you set it to 1 and open "FIXED_MOL", You may never reach the correct density!! never!!!
                                # Please read README.md carefully before you set it.
 
 
