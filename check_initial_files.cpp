@@ -383,20 +383,6 @@ void change_inp(std::string inp_file, std::string pdb_name, std::string idx_str)
 
 std::string find_pdb_file(const std::vector<std::string>& pdb_files, const std::string& mol_name)
 {
-    if (mol_name.size() > 4)
-    {
-        std::cerr << "Error: molecule name '" << mol_name
-                  << "' has length " << mol_name.size()
-                  << ", which is larger than 4. "
-                  << "A molecule name longer than 4 is invalid in the PDB 18-21 columns. "
-                  << "Please check the input or modify the file manually."
-                  << std::endl;
-        std::exit(1);
-    }
-
-    std::string mol_name_padded = mol_name;
-    mol_name_padded.append(4 - mol_name_padded.size(), ' ');
-
     for (const auto& pdb_file : pdb_files)
     {
         std::ifstream fin(pdb_file);
@@ -409,12 +395,10 @@ std::string find_pdb_file(const std::vector<std::string>& pdb_files, const std::
         std::string line;
         while (std::getline(fin, line))
         {
-            // 只检查 ATOM 行
-            if (line.size() < 21) continue;
             if (line.compare(0, 4, "ATOM") != 0) continue;
 
-            // PDB 第18-21列 -> C++ 下标 17, 长度 4
-            if (line.substr(17, 4) == mol_name_padded)
+            std::vector<std::string> fields = split_by_space(line);
+            if (fields.size() >= 4 && fields[3] == mol_name)
             {
                 return pdb_file;
             }
@@ -422,8 +406,7 @@ std::string find_pdb_file(const std::vector<std::string>& pdb_files, const std::
     }
 
     std::cerr << "Error: molecule name '" << mol_name
-              << "' (padded as '" << mol_name_padded
-              << "') not found in columns 18-21 of any ATOM record in ";
+              << "' not found as the 4th field of any ATOM record in ";
     for (const auto& pdb_file : pdb_files){
         std::cerr << pdb_file << " ";
     }
