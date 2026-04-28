@@ -69,8 +69,7 @@ else
     )
 fi
 echo -e "\t[CMD]${mdrun_cmd[*]}" | tee -a ./result/b_model.log >&2
-_progress_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${_progress_dir}/source/progress_filter.awk"
+stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
 mdrun_rc=${PIPESTATUS[0]}
 if [[ $mdrun_rc -ne 0 ]]; then
     echo -e "${ERROR}mdrun failed (exit code: $mdrun_rc)${NC}" | tee -a ./result/b_model.log >&2

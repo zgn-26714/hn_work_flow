@@ -52,7 +52,7 @@ stdbuf -o0 gmx mdrun \
     -deffnm ./bulk/mini_bulk \
     -ntmpi 1 \
     -ntomp "$NPOS" \
-    -v 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${bash_dir}/source/progress_filter.awk"
+    -v 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
 if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
     echo -e "${ERROR}min energy failed.${NC}" | tee -a ./result/b_model.log >&2
     exit 1
@@ -104,7 +104,7 @@ else
 fi
 
 echo -e "\t[CMD]${mdrun_cmd[*]}" | tee -a ./result/b_model.log >&2
-stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${bash_dir}/source/progress_filter.awk"
+stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
 mdrun_rc=${PIPESTATUS[0]}
 if [[ $mdrun_rc -ne 0 ]]; then
     echo -e "${ERROR}mdrun failed (exit code: $mdrun_rc)${NC}" | tee -a ./result/b_model.log >&2

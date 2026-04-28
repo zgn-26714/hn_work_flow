@@ -66,13 +66,12 @@ gmx grompp \
 
 #  mdrun
 echo "[step 2] mini_energy (grompp)" | tee -a ./result/b_model.log >&2
-_filter_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 stdbuf -o0 gmx mdrun \
     -s ./build/mini_re.tpr \
     -deffnm ./build/mini_re \
     -ntmpi 1 \
     -ntomp "$NPOS" \
-    -v 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${_filter_dir}/progress_filter.awk"
+    -v 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
 if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
     echo -e "${ERROR} gmx mdrun failed (mini_energy)${NC}" | tee -a ./result/b_model.log >&2
     exit 1
