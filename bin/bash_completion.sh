@@ -17,7 +17,9 @@ _md_flow() {
     case "${words[1]}" in
         frames)
             if [[ $cword -eq 2 ]]; then
-                COMPREPLY=($(compgen -W "default bulk slit" -- "$cur"))
+                COMPREPLY=($(compgen -W "default bulk slit clear" -- "$cur"))
+            elif [[ "${words[2]:-}" == "clear" ]]; then
+                COMPREPLY=($(compgen -W "--dry-run --keep-bin --help" -- "$cur"))
             fi
             ;;
         run)
