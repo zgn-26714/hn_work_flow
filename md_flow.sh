@@ -41,7 +41,15 @@ case "$ACTION" in
         if [[ "$setting" == "slit" && "${is_auto_top:-0}" -eq 1 ]]; then
             echo ">>> Entering get frames branch with slit auto-generation enabled..."
         else
-            if bash "$SCRIPT_DIR"/check_file.sh "all"; then
+            case "$setting" in
+                default|slit) check_mode="top" ;;
+                bulk)         check_mode="bulk" ;;
+                *)
+                    echo -e "${ERROR}Invalid frames setting: $setting${NC}" >&2
+                    exit 1
+                    ;;
+            esac
+            if bash "$SCRIPT_DIR"/check_file.sh "$check_mode"; then
                 echo ">>> Entering get frames branch..."
             else
                 echo -e "${ERROR} Failed to check files.${NC}"
@@ -50,7 +58,7 @@ case "$ACTION" in
         fi
         case "$setting" in
           default)
-            export isBulk=0 
+            export isBulk=0
             export isSlit=0
             bash "$SCRIPT_DIR"/build_model/run.sh
             ;;

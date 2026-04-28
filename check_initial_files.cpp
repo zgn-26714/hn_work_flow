@@ -79,24 +79,28 @@ std::string find_in_top(const std::string& filename, const std::string& target)
     return "";
 }
 
-void get_file_name(std::string &top_file, std::string &inp_file, 
-                   std::vector<std::string>& itp_file, 
+void get_file_name(std::string &top_file, std::string &inp_file,
                    std::vector<std::string>& pdb_file,
                    std::string TOPorBulkTop){
     const char* top_env, *packmol_env;
+    const char* top_var_name, *packmol_var_name;
     if(TOPorBulkTop == "TOP"){
         top_env = std::getenv("TOP");
         packmol_env = std::getenv("packmol");
+        top_var_name = "TOP";
+        packmol_var_name = "packmol";
     }
     else{
         top_env = std::getenv("bulk_top");
         packmol_env = std::getenv("bulk_pa");
+        top_var_name = "bulk_top";
+        packmol_var_name = "bulk_pa";
     }
     if (top_env != nullptr){
         top_file = std::string(top_env) + ".top";
     }
     else{
-        std::cerr << "Environment variable 'TOP' is not set." << std::endl;
+        std::cerr << "Environment variable '" << top_var_name << "' is not set." << std::endl;
         std::exit(1);
     }
 
@@ -104,51 +108,28 @@ void get_file_name(std::string &top_file, std::string &inp_file,
         inp_file = std::string(packmol_env) + ".inp";
     }
     else{
-        std::cerr << "Environment variable 'packmol' is not set." << std::endl;
+        std::cerr << "Environment variable '" << packmol_var_name << "' is not set." << std::endl;
         std::exit(1);
     }
-    
+
     std::ifstream fin(top_file);
     if (!fin.is_open())
     {
         std::cerr << "Error: cannot open top file: " << top_file << std::endl;
         std::exit(1);
     }
-
-    /*get itp file*/
-    std::string line;
-    while (std::getline(fin, line))
-    {
-        line = trim(line);
-        // 只处理 #include 行
-        if (line.find("#include") == 0)
-        {
-            size_t first_quote = line.find('"');
-            size_t second_quote = line.find('"', first_quote + 1);
-
-            if (first_quote != std::string::npos && second_quote != std::string::npos)
-            {
-                std::string fname = line.substr(first_quote + 1, second_quote - first_quote - 1);
-
-                // 只保留 .itp 文件
-                if (fname.size() >= 4 && fname.substr(fname.size() - 4) == ".itp")
-                {
-                    itp_file.push_back(fname);
-                }
-            }
-        }
-    }
     fin.close();
 
     /*get pdb file*/
     pdb_file.clear();
     fin.open(inp_file);
-    
+
     if (!fin.is_open())
     {
         std::cerr << "Error: cannot open input file " << inp_file << std::endl;
         std::exit(1);
     }
+    std::string line;
     while (std::getline(fin, line))
     {
         std::istringstream iss(line);
@@ -184,7 +165,7 @@ int main(int argc, char* argv[])
     std::vector<std::string> sel_name = split_by_space(MOL_name);
 
     std::string top_file, inp_file;
-    std::vector<std::string> itp_files, pdb_files;
+    std::vector<std::string> pdb_files;
 
     int begin, end;
     std::string mode = argv[1];
@@ -220,7 +201,7 @@ int main(int argc, char* argv[])
     {
         std::string pdb_name;
         for (int i = begin; i < end; ++i){
-            get_file_name(top_file, inp_file, itp_files, pdb_files, set_rules[i]);
+            get_file_name(top_file, inp_file, pdb_files, set_rules[i]);
             
             // std::cout << "===== File info for set_rule: " << set_rules[i] << " =====" << std::endl;
             // std::cout << "Top file: " << top_file << std::endl;
@@ -238,7 +219,6 @@ int main(int argc, char* argv[])
 
             // std::cout << "=========================================" << std::endl;
             // std::cout<<"find mol: "<<name<<std::endl;
-            bool found = false;
             std::string idx_top = find_in_top(top_file, name);//mol + num
             if (!idx_top.empty())
             {   
