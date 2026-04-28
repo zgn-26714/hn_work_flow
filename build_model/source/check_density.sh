@@ -41,6 +41,7 @@ fi
 echo "[STEP 2]Running mdrun for pre-equilibration" | tee -a ./result/b_model.log >&2
 mini_pre_eq_overlap_risk=0
 
+trap 'kill 0' INT
 set +o pipefail
 stdbuf -o0 gmx mdrun \
     -s ./build/mini_pre_eq.tpr \
@@ -50,6 +51,7 @@ stdbuf -o0 gmx mdrun \
     -v 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
 mdrun_rc=${PIPESTATUS[0]}
 set -o pipefail
+trap - INT
 if [[ $mdrun_rc -ne 0 ]]; then
     echo -e "${ERROR}min energy failed.${NC}" | tee -a ./result/b_model.log >&2
     exit 1
@@ -148,10 +150,12 @@ if [[ "${ENABLE_ANNEAL:-no}" == "yes" ]]; then
         )
     fi
     
+    trap 'kill 0' INT
     set +o pipefail
     stdbuf -o0 "${anneal_mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
     mdrun_rc=${PIPESTATUS[0]}
     set -o pipefail
+    trap - INT
     if [[ $mdrun_rc -ne 0 ]]; then
         echo -e "${ERROR}anneal mdrun failed (exit code: $mdrun_rc)${NC}" | tee -a ./result/b_model.log >&2
         exit 1
@@ -215,10 +219,12 @@ else
 fi
 mdrun_failed=0
 
+trap 'kill 0' INT
 set +o pipefail
 stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
 mdrun_rc=${PIPESTATUS[0]}
 set -o pipefail
+trap - INT
 if [[ $mdrun_rc -ne 0 ]]; then
     echo -e "${YELLOW}[WARNING]mdrun exited with code: $mdrun_rc${NC}" | tee -a ./result/b_model.log >&2
     mdrun_failed=1
