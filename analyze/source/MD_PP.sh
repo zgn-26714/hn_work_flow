@@ -8,7 +8,7 @@ fi
 
 # Script Function: Calculate dipole angles
 # Usage: script_name start_num end_num
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 
 num=${analyze_begin_case}

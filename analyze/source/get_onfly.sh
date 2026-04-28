@@ -18,7 +18,7 @@ echo "=================================================="
 
 # === 运行 onflyPost_dens3D_dynamic ===
 echo "=> onflyPost_dens3D_dynamic..."
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 onfly_version="${onflyPost_cpp}"
 

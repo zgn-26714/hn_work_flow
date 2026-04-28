@@ -1,0 +1,6 @@
+_SOURCEME_DIR="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_SOURCEME_DIR/bin/bash_completion.sh"
+chmod +x "$_SOURCEME_DIR/md_flow.sh"
+export PATH="$_SOURCEME_DIR:$PATH"
+unset _SOURCEME_DIR
+

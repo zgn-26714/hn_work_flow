@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 mkdir -p ./deal_data/mdHeat/
 build_dir=${bash_dir}/../../bin/build_cpp.sh

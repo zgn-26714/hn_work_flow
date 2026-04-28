@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 execu_bin="${bash_dir}/../bin/mod_ndx"
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-step_cpt="${bash_dir}/.step.cpt"
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+step_cpt="./.step.cpt"
 result_log="./result/b_model.log"
 workflow_succeeded=0
 
@@ -137,6 +137,7 @@ if [[ "$resume_step" -le 3 ]]; then
             cp .inp "${packmol}.inp"
         fi
         workflow_succeeded=1
+        : > "$step_cpt"
         echo ""
         echo -e "\033[1;32mALL STEPS COMPLETED SUCCESSFULLY\033[0m" >&2
         echo ""

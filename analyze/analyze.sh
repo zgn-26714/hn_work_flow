@@ -11,7 +11,7 @@ fi
 
 # 获取第一个参数作为命令
 command="$1"
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # 根据输入的命令执行不同操作
 case "$command" in
     eleQ)

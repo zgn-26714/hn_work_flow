@@ -3,7 +3,7 @@ set -euo pipefail
 
 echo "Starting script execution..."
 
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 echo "Script directory: ${bash_dir}"
 
 # 复制文件

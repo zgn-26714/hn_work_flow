@@ -2,8 +2,8 @@
 
 # set -euo pipefail
 
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-step_cpt="${bash_dir}/.build_slit.step.cpt"
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+step_cpt="./.build_slit.step.cpt"
 result_log="./result/b_model.log"
 
 append_step_marker() {
@@ -182,6 +182,7 @@ fi
 if [[ "$resume_step" -le 5 ]]; then
     if bash "${bash_dir}/get_frames.sh"; then
         append_step_marker "STEP_GET_FRAMES_DONE"
+        : > "$step_cpt"
         cleanup_temp_files
         echo -e "${GREEN}"
         echo "##############################################" >&2

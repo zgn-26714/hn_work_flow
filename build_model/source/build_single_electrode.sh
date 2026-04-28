@@ -3,7 +3,7 @@ set -euo pipefail
 
 
 mkdir -p ./model
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cpp_src=${bash_dir}/generate_slit.cpp
 execu_bin=${bash_dir}/../../bin/generate_slit
 

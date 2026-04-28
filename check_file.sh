@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+SCRIPT_DIR="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
 bash "$SCRIPT_DIR"/bin/build_cpp.sh "$SCRIPT_DIR"/check_initial_files.cpp "$SCRIPT_DIR"/bin/check_initial_files
 

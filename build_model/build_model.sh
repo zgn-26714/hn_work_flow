@@ -51,7 +51,7 @@ log_build_model_info() {
     printf "iter=%s density=%s %s\n" "$iter_id" "$density_value" "$molecule_counts" >> ./result/build_model_info.dat
 }
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+SCRIPT_DIR="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 abs_error=$(echo "scale=5; $set_density * $error / 100" | bc -l)
 build_dir=${SCRIPT_DIR}/../bin/build_cpp.sh
 remake_src_cpp=${SCRIPT_DIR}/source/remake_packmol.cpp

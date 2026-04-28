@@ -45,7 +45,8 @@ if gmx mdrun \
     -deffnm ./build/mini_pre_eq \
     -ntmpi 1 \
     -ntomp "$NPOS" \
-    -v >> ./result/b_model.log 2>&1 ; then
+    -v 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
+    [[ ${PIPESTATUS[0]} -eq 0 ]]; then
     echo -e "${OK}min energy completed successfully" | tee -a ./result/b_model.log >&2
 else
     echo -e "${ERROR}min energy failed.${NC}" | tee -a ./result/b_model.log >&2
@@ -126,7 +127,9 @@ if [[ "${ENABLE_ANNEAL:-no}" == "yes" ]]; then
             -pme gpu
             -pmefft gpu
             -nb gpu
-            -bonded gpu
+        )
+        [[ "${ENABLE_BONDED_GPU:-1}" -eq 1 ]] && anneal_mdrun_cmd+=(-bonded gpu)
+        anneal_mdrun_cmd+=(
             -tunepme no
             -v
         )
@@ -141,7 +144,7 @@ if [[ "${ENABLE_ANNEAL:-no}" == "yes" ]]; then
             -v
         )
     fi
-    "${anneal_mdrun_cmd[@]}" >> ./result/b_model.log 2>&1
+    "${anneal_mdrun_cmd[@]}" 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
 
     if [[ -s ./build/anneal.gro ]]; then
         echo -e "${OK}annealing completed successfully, anneal.gro will be used for normal pre-equilibration" | tee -a ./result/b_model.log >&2
@@ -182,6 +185,9 @@ if [[ "$GPU" -eq 1 ]]; then
         -pme gpu
         -pmefft gpu
         -nb gpu
+    )
+    [[ "${ENABLE_BONDED_GPU:-1}" -eq 1 ]] && mdrun_cmd+=(-bonded gpu)
+    mdrun_cmd+=(
         -tunepme no
         -v
     )
@@ -197,9 +203,8 @@ else
     )
 fi
 mdrun_failed=0
-if "${mdrun_cmd[@]}" >> ./result/b_model.log  2>&1 ; then
-    :
-else
+"${mdrun_cmd[@]}" 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
+if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
     mdrun_failed=1
 fi
 

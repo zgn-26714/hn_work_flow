@@ -1,7 +1,7 @@
 #!/bin/bash
 
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-step_cpt="${bash_dir}/.run_for_bulk.step.cpt"
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+step_cpt="./.run_for_bulk.step.cpt"
 result_log="./result/b_model.log"
 
 append_step_marker() {
@@ -118,6 +118,7 @@ if [[ "$resume_step" -le 3 ]]; then
     if sh "${bash_dir}/get_frames.sh"; then
         restore_grompp_after_completion
         append_step_marker "STEP_GET_FRAMES_DONE"
+        : > "$step_cpt"
         echo ""
         echo -e "\033[1;32mALL STEPS COMPLETED SUCCESSFULLY\033[0m" >&2
         echo ""

@@ -39,6 +39,9 @@ if [[ "$GPU" -eq 1 ]]; then
         -pme gpu
         -pmefft gpu
         -nb gpu
+    )
+    [[ "${ENABLE_BONDED_GPU:-1}" -eq 1 ]] && mdrun_cmd+=(-bonded gpu)
+    mdrun_cmd+=(
         -tunepme no
         -v
     )
@@ -55,5 +58,5 @@ else
 fi
 
 echo -e "\t${mdrun_cmd[*]}" | tee -a ./result/b_model.log >&2
-"${mdrun_cmd[@]}" >> ./result/b_model.log  2>&1
+"${mdrun_cmd[@]}" 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
 echo -e "${GREEN}Successfully performed a balanced simulation..${NC}" | tee -a ./result/b_model.log >&2

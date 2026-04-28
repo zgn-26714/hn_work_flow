@@ -4,7 +4,7 @@ rm -rf result/density_result.dat
 rm -rf tmp
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+SCRIPT_DIR="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 INPUT_FILE="INPUT"
 
 export BLUE='\033[0;34m'

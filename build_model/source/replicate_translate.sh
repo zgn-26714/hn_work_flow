@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 if (( isSlit == 1)); then
     last_line=$(tail -n 1 ./model/single_electrode.gro)
     read -r xbox ybox zbox <<< "$last_line"
@@ -71,7 +71,8 @@ gmx mdrun \
     -deffnm ./build/mini_re \
     -ntmpi 1 \
     -ntomp "$NPOS" \
-    -v >> ./result/b_model.log  2>&1 \
+    -v 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
+    [[ ${PIPESTATUS[0]} -eq 0 ]] \
     || { echo -e "${ERROR} gmx mdrun failed (mini_energy)${NC}" | tee -a ./result/b_model.log >&2; exit 1; }
 
 echo -e "${GREEN}Successfully performed a balanced simulation..${NC}" | tee -a ./result/b_model.log >&2
