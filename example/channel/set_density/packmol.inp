@@ -12,17 +12,17 @@ end structure
 
 structure SOL.pdb
 number 5556
-inside box 0. 0. 205. 41.76 42.54 295.
+inside box 0. 0. 200. 41.76 42.54 300.
 
 end structure
 
 structure Na.pdb
 number 100
-inside box 0. 0. 210. 41.76 42.54 290.
+inside box 0. 0. 200. 41.76 42.54 290.
 end structure
 
 structure CL.pdb
 number 100
-inside box 0. 0. 210. 41.76 42.54 290.
+inside box 0. 0. 200. 41.76 42.54 290.
 end structure
 

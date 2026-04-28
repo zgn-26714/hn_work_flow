@@ -40,14 +40,14 @@ fi
 # =============================
 echo "[STEP 2]Running mdrun for pre-equilibration" | tee -a ./result/b_model.log >&2
 mini_pre_eq_overlap_risk=0
-_filter_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
 set +o pipefail
 stdbuf -o0 gmx mdrun \
     -s ./build/mini_pre_eq.tpr \
     -deffnm ./build/mini_pre_eq \
     -ntmpi 1 \
     -ntomp "$NPOS" \
-    -v 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${_filter_dir}/progress_filter.awk"
+    -v 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
 mdrun_rc=${PIPESTATUS[0]}
 set -o pipefail
 if [[ $mdrun_rc -ne 0 ]]; then
@@ -147,9 +147,9 @@ if [[ "${ENABLE_ANNEAL:-no}" == "yes" ]]; then
             -v
         )
     fi
-    _filter_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    
     set +o pipefail
-    stdbuf -o0 "${anneal_mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${_filter_dir}/progress_filter.awk"
+    stdbuf -o0 "${anneal_mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
     mdrun_rc=${PIPESTATUS[0]}
     set -o pipefail
     if [[ $mdrun_rc -ne 0 ]]; then
@@ -214,9 +214,9 @@ else
     )
 fi
 mdrun_failed=0
-_filter_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
 set +o pipefail
-stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${_filter_dir}/progress_filter.awk"
+stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
 mdrun_rc=${PIPESTATUS[0]}
 set -o pipefail
 if [[ $mdrun_rc -ne 0 ]]; then
