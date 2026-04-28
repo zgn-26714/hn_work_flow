@@ -14,13 +14,14 @@ mini_MDP       = mini          # Prefix for Energy Minimization mdp file (e.g., 
 packmol        = packmol       # Prefix for packmol inp file (e.g., 'packmol')
 
 # gromacs settings
-GMXRC          = /share/home/app/gromacs-2020.4/bin/GMXRC  # Path to GROMACS environment script (only modeling module)
+GMXRC          = /home/wdczbq7y/whcs-share30/apps/gromacs-2020.4/bin/GMXRC  # Path to GROMACS environment script (only modeling module)
 NPOS           = 4             # Number of OpenMP threads for CPU parallelization
 GPU            = 1             # Enable GPU acceleration: 1=yes, 0=no
+ENABLE_BONDED_GPU = 0           # Enable bonded interactions on GPU: 1=yes, 0=no (set 0 for bond-free systems)
 maxWarn        = 2             # Maximum number of warnings allowed during grompp preprocessing
-nsteps_den     = 200000        # MD steps for check_density run (electrode)
-nsteps_equ     = 1000000       # MD steps for equilibration run
-nsteps_ini     = 100000        # MD steps for product initial frames run
+nsteps_den     = 2000        # MD steps for check_density run (electrode)
+nsteps_equ     = 1000       # MD steps for equilibration run
+nsteps_ini     = 1000        # MD steps for product initial frames run
 XOUT_FRAMES    = 100           # Frequency of tajectory output (in steps), can't be too small, io will become heavy
 num_intialframes = 100         # Numbers of initial frames
 
@@ -37,6 +38,11 @@ onlyUP         = 0             # 1=only accept density upper setting; 0=accept b
 ##This item is used to set the target density in NVT simulations of the electrode system.
 #If not set, the target density will be automatically calculated and assigned.
 set_density   = 940            # Target system density (kg/m³)
+
+# Annealing parameters
+ENABLE_ANNEAL = yes             # Enable simulated annealing: yes=anneal, no=skip
+ANNEAL_TEMP   = 400            # Annealing temperature (K)
+ANNEAL_NSTEPS = 50000          # MD steps for annealing simulation
 
 # modify molecule numbers 
 MOL_name       = SOL Na CL    # Space-separated list of molecule/ion names (e.g., for density groups)

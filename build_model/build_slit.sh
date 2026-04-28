@@ -45,6 +45,14 @@ prepare_mdp_for_equilibration() {
     fi
 }
 
+restore_mdp_from_backup() {
+    local bak_mdp="bak_${MDP}.mdp"
+    if [[ -f "$bak_mdp" ]]; then
+        cp "$bak_mdp" "${MDP}.mdp"
+        echo -e "${YELLOW}[INFO]Restored ${MDP}.mdp from backup (freezegrps without ER) for restart.${NC}" | tee -a "$result_log" >&2
+    fi
+}
+
 cleanup_temp_files() {
     rm -f ./step*.pdb
     rm -f ./bulk/*#
@@ -129,6 +137,7 @@ elif [ -z "${set_density:-}" ] && [[ "$resume_step" -gt 2 ]]; then
 fi
 
 if [[ "$resume_step" -le 2 ]]; then
+    restore_mdp_from_backup
     if bash "${bash_dir}/build_model.sh"; then
         append_step_marker "STEP_BUILD_MODEL_DONE"
         echo -e "${GREEN}"

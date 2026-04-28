@@ -4,7 +4,7 @@ rm ./result/run_md.log
 
 set -euo pipefail
 
-bash_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 mkdir -p result
 if (( ${ismakecase} == 1 )); then
     if bash "${bash_dir}"/make_charging_cases.sh; then

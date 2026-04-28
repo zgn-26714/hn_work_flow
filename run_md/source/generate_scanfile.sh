@@ -7,7 +7,7 @@ mkdir -p "${workdir}/slowdir"
 export SLOWDIR="${workdir}/slowdir/"
 
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+SCRIPT_DIR="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 case "$server_machine" in
     "eninstein"|"jiaocha")
         if [ -f "generate_scanfile" ]; then

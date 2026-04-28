@@ -14,7 +14,7 @@ make_job() {
     fi
     mkdir -p "$workdir/jobfile"
     local SCRIPT_PATH
-    SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+    SCRIPT_PATH="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
     
     case "$server_machine" in
        "eninstein") cp "$SCRIPT_PATH/eninstein.job" "$objjob" ;;

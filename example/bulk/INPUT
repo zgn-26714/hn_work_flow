@@ -14,13 +14,14 @@ mini_MDP       = mini          # Prefix for Energy Minimization mdp file (e.g., 
 bulk_pa        = bulk_pack     # Prefix for bulk packmol inp file (e.g., 'packmol')
 
 # gromacs settings
-GMXRC          = /share/home/app/gromacs-2020.4/bin/GMXRC  # Path to GROMACS environment script (only modeling module)
+GMXRC          = /home/wdczbq7y/whcs-share30/apps/gromacs-2020.4/bin/GMXRC  # Path to GROMACS environment script (only modeling module)
 NPOS           = 4             # Number of OpenMP threads for CPU parallelization
 GPU            = 1             # Enable GPU acceleration: 1=yes, 0=no
+ENABLE_BONDED_GPU = 0           # Enable bonded interactions on GPU: 1=yes, 0=no (set 0 for bond-free systems)
 maxWarn        = 2             # Maximum number of warnings allowed during grompp preprocessing
-nsteps_bulk    = 2000000       # MD steps for get bulk density run (2 fs/step)
-nsteps_equ     = 10000000       # MD steps for equilibration run
-nsteps_ini     = 1000000      # MD steps for product initial frames run
+nsteps_bulk    = 200000       # MD steps for get bulk density run (2 fs/step)
+nsteps_equ     = 100000       # MD steps for equilibration run
+nsteps_ini     = 100000      # MD steps for product initial frames run
 XOUT_FRAMES    = 100           # Frequency of tajectory output (in steps), can't be too small, io will become heavy
 num_intialframes = 100         # Numbers of initial frames
 
@@ -32,4 +33,10 @@ END_Z          = 28            # End Z-position for density analysis (in nm)
 error          = 1             # Allowed density error threshold (%)
 max_iter       = 30             # Maximum number of iterations for density adjustment
 onlyUP         = 0             # 1=only accept density upper setting; 0=accept both upper and lower settings
-# factor       = 0.1         ## removed on 2025-12-10 based on NYJ # Scaling factor per iteration for box resizing (0.1 mean: low 0.9; up 1.1)
+
+# Annealing parameters
+ENABLE_ANNEAL = no             # Enable simulated annealing: yes=anneal, no=skip
+ANNEAL_TEMP   = 400            # Annealing temperature (K)
+ANNEAL_NSTEPS = 50000          # MD steps for annealing simulation
+
+MOL_name       = SOL
