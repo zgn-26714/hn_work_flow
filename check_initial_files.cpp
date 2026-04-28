@@ -173,7 +173,14 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::string MOL_name = std::getenv("MOL_name");
+    const char* mol_env = std::getenv("MOL_name");
+    if (mol_env == nullptr)
+    {
+        std::cerr << "Error: Environment variable 'MOL_name' is not set." << std::endl;
+        std::cerr << "Please define MOL_name in the INPUT file." << std::endl;
+        return 1;
+    }
+    std::string MOL_name(mol_env);
     std::vector<std::string> sel_name = split_by_space(MOL_name);
 
     std::string top_file, inp_file;
