@@ -22,6 +22,8 @@ bulk_pa        = bulk_pack     # Prefix for bulk packmol inp file (e.g., 'packmo
 GMXRC          = /share/home/app/gromacs-2020.4/bin/GMXRC  # Path to GROMACS environment script (only modeling module)
 NPOS           = 4             # Number of OpenMP threads for CPU parallelization
 GPU            = 1             # Enable GPU acceleration: 1=yes, 0=no
+ENABLE_BONDED_GPU = 1           # Enable bonded interactions on GPU: 1=yes, 0=no (set 0 for bond-free systems)
+                               # sometimes enable bonded will cauese error
 maxWarn        = 1             # Maximum number of warnings allowed during grompp preprocessing
 nsteps_bulk    = 100           # MD steps for get bulk density run (2 fs/step)
 nsteps_den     = 100           # MD steps for check_density run (electrode)
