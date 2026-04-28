@@ -64,15 +64,18 @@ gmx grompp \
     -n ./build/index.ndx  >> ./result/b_model.log  2>&1 \
     || { echo -e "${ERROR} gmx grompp failed (mini_energy)${NC}" | tee -a ./result/b_model.log >&2; exit 1; }
 
-#  mdrun 
+#  mdrun
 echo "[step 2] mini_energy (grompp)" | tee -a ./result/b_model.log >&2
-gmx mdrun \
+_filter_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+stdbuf -o0 gmx mdrun \
     -s ./build/mini_re.tpr \
     -deffnm ./build/mini_re \
     -ntmpi 1 \
     -ntomp "$NPOS" \
-    -v 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
-    [[ ${PIPESTATUS[0]} -eq 0 ]] \
-    || { echo -e "${ERROR} gmx mdrun failed (mini_energy)${NC}" | tee -a ./result/b_model.log >&2; exit 1; }
+    -v 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${_filter_dir}/progress_filter.awk"
+if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
+    echo -e "${ERROR} gmx mdrun failed (mini_energy)${NC}" | tee -a ./result/b_model.log >&2
+    exit 1
+fi
 
 echo -e "${GREEN}Successfully performed a balanced simulation..${NC}" | tee -a ./result/b_model.log >&2

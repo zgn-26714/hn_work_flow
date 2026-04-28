@@ -40,18 +40,21 @@ fi
 # =============================
 echo "[STEP 2]Running mdrun for pre-equilibration" | tee -a ./result/b_model.log >&2
 mini_pre_eq_overlap_risk=0
-if gmx mdrun \
+_filter_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+set +o pipefail
+stdbuf -o0 gmx mdrun \
     -s ./build/mini_pre_eq.tpr \
     -deffnm ./build/mini_pre_eq \
     -ntmpi 1 \
     -ntomp "$NPOS" \
-    -v 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
-    [[ ${PIPESTATUS[0]} -eq 0 ]]; then
-    echo -e "${OK}min energy completed successfully" | tee -a ./result/b_model.log >&2
-else
+    -v 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${_filter_dir}/progress_filter.awk"
+mdrun_rc=${PIPESTATUS[0]}
+set -o pipefail
+if [[ $mdrun_rc -ne 0 ]]; then
     echo -e "${ERROR}min energy failed.${NC}" | tee -a ./result/b_model.log >&2
     exit 1
 fi
+echo -e "${OK}min energy completed successfully" | tee -a ./result/b_model.log >&2
 mini_pre_eq_log=./build/mini_pre_eq.log
 if [[ -f "$mini_pre_eq_log" ]]; then
     if grep -q "did not reach the requested Fmax" "$mini_pre_eq_log"; then
@@ -144,7 +147,15 @@ if [[ "${ENABLE_ANNEAL:-no}" == "yes" ]]; then
             -v
         )
     fi
-    "${anneal_mdrun_cmd[@]}" 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
+    _filter_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    set +o pipefail
+    stdbuf -o0 "${anneal_mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${_filter_dir}/progress_filter.awk"
+    mdrun_rc=${PIPESTATUS[0]}
+    set -o pipefail
+    if [[ $mdrun_rc -ne 0 ]]; then
+        echo -e "${ERROR}anneal mdrun failed (exit code: $mdrun_rc)${NC}" | tee -a ./result/b_model.log >&2
+        exit 1
+    fi
 
     if [[ -s ./build/anneal.gro ]]; then
         echo -e "${OK}annealing completed successfully, anneal.gro will be used for normal pre-equilibration" | tee -a ./result/b_model.log >&2
@@ -203,8 +214,13 @@ else
     )
 fi
 mdrun_failed=0
-"${mdrun_cmd[@]}" 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
-if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
+_filter_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+set +o pipefail
+stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${_filter_dir}/progress_filter.awk"
+mdrun_rc=${PIPESTATUS[0]}
+set -o pipefail
+if [[ $mdrun_rc -ne 0 ]]; then
+    echo -e "${YELLOW}[WARNING]mdrun exited with code: $mdrun_rc${NC}" | tee -a ./result/b_model.log >&2
     mdrun_failed=1
 fi
 

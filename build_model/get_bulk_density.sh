@@ -47,18 +47,17 @@ fi
 
 
 echo "[STEP 2]Running mdrun for pre-equilibration" | tee -a ./result/b_model.log >&2
-if gmx mdrun \
+stdbuf -o0 gmx mdrun \
     -s ./bulk/mini_bulk.tpr \
     -deffnm ./bulk/mini_bulk \
     -ntmpi 1 \
     -ntomp "$NPOS" \
-    -v 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
-    [[ ${PIPESTATUS[0]} -eq 0 ]]; then
-    echo -e "${OK}min energy completed successfully" | tee -a ./result/b_model.log >&2
-else
+    -v 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${bash_dir}/source/progress_filter.awk"
+if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
     echo -e "${ERROR}min energy failed.${NC}" | tee -a ./result/b_model.log >&2
     exit 1
 fi
+echo -e "${OK}min energy completed successfully" | tee -a ./result/b_model.log >&2
 
 
 echo "[step 3] genenrate .tpr (grompp)" | tee -a ./result/b_model.log >&2
@@ -105,8 +104,12 @@ else
 fi
 
 echo -e "\t[CMD]${mdrun_cmd[*]}" | tee -a ./result/b_model.log >&2
-"${mdrun_cmd[@]}" 2>&1 | tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step.*remaining/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
-
+stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk -f "${bash_dir}/source/progress_filter.awk"
+mdrun_rc=${PIPESTATUS[0]}
+if [[ $mdrun_rc -ne 0 ]]; then
+    echo -e "${ERROR}mdrun failed (exit code: $mdrun_rc)${NC}" | tee -a ./result/b_model.log >&2
+    exit 1
+fi
 
 if ((isBulk != 1));then
     echo "[STEP 4]Computing density profile" | tee -a ./result/b_model.log >&2
