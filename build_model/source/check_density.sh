@@ -75,8 +75,8 @@ cp "${MDP}".mdp ./build/grompp.mdp
 sed -i "s/^[[:space:]]*nsteps[[:space:]]*=.*/nsteps = ${nsteps_den}/" ./build/grompp.mdp
 
 eq_input_gro="./build/pre_eq.gro"
-if [[ "$ENABLE_ANNEAL" == "yes" ]]; then
-    echo "[STEP 3A]Annealing enabled. Preparing anneal.mdp (T=${ANNEAL_TEMP} K)" | tee -a ./result/b_model.log >&2
+if [[ "${ENABLE_ANNEAL:-no}" == "yes" ]]; then
+    echo "[STEP 3A]Annealing enabled. Preparing anneal.mdp (T=${ANNEAL_TEMP:-400} K)" | tee -a ./result/b_model.log >&2
     cp ./build/grompp.mdp ./build/anneal.mdp
 
     if [[ -n "${ANNEAL_NSTEPS:-}" ]]; then
@@ -92,7 +92,7 @@ if [[ "$ENABLE_ANNEAL" == "yes" ]]; then
     fi
 
     if grep -Eq "^[[:space:]]*ref[-_]t[[:space:]]*=" ./build/anneal.mdp; then
-        sed -i -E "s/^[[:space:]]*ref[-_]t[[:space:]]*=.*/ref_t = ${ANNEAL_TEMP}/" ./build/anneal.mdp
+        sed -i -E "s/^[[:space:]]*ref[-_]t[[:space:]]*=.*/ref_t = ${ANNEAL_TEMP:-400}/" ./build/anneal.mdp
     else
         echo -e "${ERROR}invalid anneal.mdp: ref_t parameter not found. " | tee -a ./result/b_model.log >&2
         exit 1
@@ -151,7 +151,7 @@ if [[ "$ENABLE_ANNEAL" == "yes" ]]; then
         exit 1
     fi
 else
-    echo "[STEP 3A]Annealing disabled (ENABLE_ANNEAL=${ENABLE_ANNEAL}). Continue with normal pre-equilibration." | tee -a ./result/b_model.log >&2
+    echo "[STEP 3A]Annealing disabled (ENABLE_ANNEAL=${ENABLE_ANNEAL:-no}). Continue with normal pre-equilibration." | tee -a ./result/b_model.log >&2
 fi
 
 if gmx grompp \

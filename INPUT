@@ -55,8 +55,15 @@ MOL_num_bulk   = 3000 40 40    # Number of each molecule to insert into bulk sys
 #If not set, the target density will be automatically calculated and assigned.
 set_density   = 940            # Target system density (kg/m³)
 
+# Annealing parameters
+ENABLE_ANNEAL = no             # Enable simulated annealing: yes=anneal, no=skip
+ANNEAL_TEMP   = 400            # Annealing temperature (K)
+ANNEAL_NSTEPS = 50000          # MD steps for annealing simulation
+
 # modify molecule numbers 
 MOL_name       = ACN Na CLO    # Space-separated list of molecule/ion names (e.g., for density groups)
+                               # Although no density adjustment is needed when generating only the `bulk` module, 
+                               # this parameter is still required for file validation.
 FIXED_MOL      = Na CLO        # notice! It's a important and sensitive parameter, please read README.md carefully before you set it.
 IS_FORCE_SCALE = 0             # If you set it to 1 and open "FIXED_MOL", You may never reach the correct density!! never!!!
                                # Please read README.md carefully before you set it.
