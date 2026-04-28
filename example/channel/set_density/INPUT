@@ -32,6 +32,7 @@ END_Z          = 28            # End Z-position for density analysis (in nm)
 error          = 1             # Allowed density error threshold (%)
 max_iter       = 30             # Maximum number of iterations for density adjustment
 onlyUP         = 0             # 1=only accept density upper setting; 0=accept both upper and lower settings
+# factor       = 0.1         ## removed on 2025-12-10 based on NYJ # Scaling factor per iteration for box resizing (0.1 mean: low 0.9; up 1.1)
 
 ##This item is used to set the target density in NVT simulations of the electrode system.
 #If not set, the target density will be automatically calculated and assigned.
@@ -40,5 +41,5 @@ set_density   = 940            # Target system density (kg/m³)
 # modify molecule numbers 
 MOL_name       = SOL Na CL    # Space-separated list of molecule/ion names (e.g., for density groups)
 FIXED_MOL      = Na CL        # notice! It's a important and sensitive parameter, please read README.md carefully before you set it.
-IS_FORCE_SCALE = 0             # If you set it to 1, and open "FIXED_MOL", You may never reach the correct density!! never!!!
+IS_FORCE_SCALE = 0             # If you set it to 1 and open "FIXED_MOL", You may never reach the correct density!! never!!!
                                # Please read README.md carefully before you set it.

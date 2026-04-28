@@ -8,6 +8,8 @@ analysis_ONFLY_isD    = 1        # Enable dynamic output in onfly analysis: 1=ye
 analysis_ONFLY_in     = densMNC3D# Input file name for onfly analysis file
 MODE_ONFLY_analysis   = 3        # onfly_setting
 
+onflyPost_cpp         = onflyPost_denANDBALJ3D_dynamic  #Name of C++ program for onfly analysis e.g., onflyPost_denANDBALJ3D_dynamic, onflyPost_DenVelForce, onflyPost_dens3D_dynamic.
+
 # analysis case settings
 analyze_begin_case    = 1        # Starting case number for analysis
 analyze_end_case      = 3        # Ending case number for analysis
@@ -33,4 +35,3 @@ analyze_is_skip_first_line = 0
 ### data base
 # 1.angleOF_dipole_Z: -sl 1 -zmin 21 -zmax 29 -n2ave 20 -out 1
 # 2.3DdensityZl_dynamic2020: -dens number -sl 100 100 1 -num2ave 100 -min 0 0 20 -max 4.176 4.254 21
-

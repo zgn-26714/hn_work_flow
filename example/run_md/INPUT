@@ -7,6 +7,7 @@ GMX_run        = /home/wdczbq7y/whcs-share30/apps/gromacs-2020.4/bin/gmx #select
 initialframes  = ./initialframes # Prefix for initial frames folder (e.g., 'initialframes')
 matrixdata     = ./matrixdata    # Prefix for electrode matrix data folder (e.g., 'matrixdata')
 basicfile      = ./basicfile     # Prefix for basic files(top, itp, mdp, ndx) folder (e.g., 'basicfile')
+#slowdir       = /data1/huangnan/scanratepotential
 
 # fold settings
 V              = 2             # voltage of simulation (V)
