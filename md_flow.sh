@@ -1,10 +1,18 @@
 #!/bin/bash
-rm setting.log
-rm -rf result/density_result.dat
-rm -rf tmp
 set -euo pipefail
 
 SCRIPT_DIR="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+if [[ "${1:-}" == "frames" && "${2:-}" == "clear" ]]; then
+    echo ">>> Entering frames clear branch..."
+    bash "$SCRIPT_DIR"/build_model/clear.sh "${@:3}"
+    exit $?
+fi
+
+rm -f setting.log
+rm -rf result/density_result.dat
+rm -rf tmp
+
 INPUT_FILE="INPUT"
 
 export BLUE='\033[0;34m'
@@ -156,6 +164,8 @@ Available Commands:
                      → command: $0 frames bulk
                     if modeling slit
                      → command: $0 frames slit
+                    if clearing build_model generated files
+                     → command: $0 frames clear
 
   run             Submit job to perform MD simulation.
                   → Executes: $SCRIPT_DIR/run_md/run.sh
@@ -172,6 +182,8 @@ Available Commands:
 Examples:
 
   $0 frames
+  $0 frames clear
+  $0 frames clear --dry-run
   $0 run
   $0 analyze
 
@@ -187,4 +199,3 @@ EOF
         exit 0
         ;;
 esac
-

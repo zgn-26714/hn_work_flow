@@ -79,6 +79,8 @@ chmod +x md_flow.sh
 ./md_flow.sh frames
 ./md_flow.sh frames bulk
 ./md_flow.sh frames slit
+./md_flow.sh frames clear
+./md_flow.sh frames clear --dry-run
 
 ./md_flow.sh run
 ./md_flow.sh run rerun
@@ -95,6 +97,7 @@ chmod +x md_flow.sh
 - `frames` 默认是电极体系 NVT 建模。
 - `frames bulk` 是体相建模。
 - `frames slit` 是狭缝孔建模。
+- `frames clear` 会清理 `frames/build_model` 生成的目录、断点文件、GROMACS 输出和临时文件；可先用 `frames clear --dry-run` 预览。
 - `run rerun` 会走 `run_md/rerun.sh`。
 - `analyze` 当前脚本里真正支持的分支名是 `eleQ`、`onfly`、`mdheat`、`MD_PP`。
 - 如果你需要新增了自己的分析分支，可以在 `analyze/analyze.sh` 中添加。
