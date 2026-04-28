@@ -42,7 +42,7 @@ case "$ACTION" in
             echo ">>> Entering get frames branch with slit auto-generation enabled..."
         else
             case "$setting" in
-                default|slit) check_mode="top" ;;
+                default|slit) check_mode="all" ;;
                 bulk)         check_mode="bulk" ;;
                 *)
                     echo -e "${ERROR}Invalid frames setting: $setting${NC}" >&2
