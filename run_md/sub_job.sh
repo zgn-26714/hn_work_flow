@@ -218,6 +218,7 @@ make_job() {
     local rundir="$3"
     local workdir="$4"
     local objjob template_path submit_dir
+    local V="${V//./_}"
 
     objjob="$(job_file_path "$start_case" "$end_case" "$workdir")"
     template_path="$(job_template_path)"

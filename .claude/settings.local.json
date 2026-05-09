@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(rm *)",
+      "Bash(where choco *)",
+      "Bash(where winget *)",
+      "Bash(choco install *)",
+      "Bash(winget install *)",
+      "Bash(pip install *)"
     ]
   }
 }

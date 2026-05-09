@@ -29,9 +29,7 @@
 ├─ analyze/                # 后处理分析框架
 ├─ deal_data/              # 旧数据处理模块，主要作为备份
 ├─ example/                # 各模块示例
-├─ check_file.sh           # 调用 C++ 程序检查输入文件
-├─ check_initial_files.cpp # 输入文件检查逻辑
-└─ bin/                    # 编译出的可执行文件
+└─ bin/                    # 编译工具/可执行文件
 ```
 
 `example/` 中已经给了完整示例：
@@ -234,7 +232,7 @@ echo ${analyze_mol} | <analyze_cpp> \
 - `INPUT` 里的文件名都写“前缀”，不要带扩展名。
   - 正确示范：`TOP = topol`
   - 错误示范：`TOP = topol.top`
-- `packmol` 中除电极外的 `pdb` 文件名必须与 `top` 中分子名保持一致。已设置 `check_file.sh` 来检查这个一致性。
+- `packmol` 中除电极外的 `pdb` 文件名必须与 `top` 中分子名保持一致。已通过 `build_model/check_file.sh` 来检查这个一致性。
 - 如果不设置 `set_density`，需要额外准备 bulk 建模所需的 `top` 和 `inp` 文件。
 - 如果只做 bulk 建模，`MDP` 中仍建议保留一行带注释的 `ewald-geometry = 3dc`，删掉或许会出现未知错误。
 - 如果不指定 `set_density`，请在 `MDP` 中写好压力耦合相关设置，并在模拟开始前保持关闭状态。

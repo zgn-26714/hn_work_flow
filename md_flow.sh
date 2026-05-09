@@ -63,7 +63,7 @@ case "$ACTION" in
                     exit 1
                     ;;
             esac
-            if bash "$SCRIPT_DIR"/check_file.sh "$check_mode"; then
+            if bash "$SCRIPT_DIR"/build_model/check_file.sh "$check_mode"; then
                 echo ">>> Entering get frames branch..."
             else
                 echo -e "${ERROR} Failed to check files.${NC}"
