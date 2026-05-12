@@ -3,8 +3,7 @@
 {
 echo -e "${BLUE}"
 echo "**********************************************************************"
-echo "    0.   Before the formal simulation"
-echo "⚙️  Parameters: nsteps = ${nsteps_bulk}"
+echo "    0.   Build bulk model"
 echo "**********************************************************************"
 echo -e "${NC}"
 } | tee -a ./result/b_model.log >&2
@@ -22,12 +21,7 @@ echo "[step 1] clear file" | tee -a ./result/b_model.log >&2
 rm -f *#
 
 mkdir -p bulk
-cp "${MDP}.mdp" ./bulk/bulk.mdp
 cp "${mini_MDP}.mdp" ./bulk/mini.mdp
-sed -i "s/Pcoupl[[:space:]]*=[[:space:]]*no/Pcoupl = Berendsen/" ./bulk/bulk.mdp
-sed -i '/^[[:space:]]*freezegrps/s/^/;/; /^[[:space:]]*freezedim/s/^/;/' ./bulk/bulk.mdp
-sed -i '/^[[:space:]]*ewald-geometry/s/^/;/' ./bulk/bulk.mdp
-sed -i "s/^[[:space:]]*nsteps[[:space:]]*=.*/nsteps = ${nsteps_bulk}/" ./bulk/bulk.mdp
 
 sed -i "s/Pcoupl[[:space:]]*=[[:space:]]*no/Pcoupl = Berendsen/" ./bulk/mini.mdp
 sed -i '/^[[:space:]]*ewald-geometry/s/^/;/' ./bulk/mini.mdp
@@ -62,60 +56,69 @@ fi
 echo -e "${OK}min energy completed successfully" | tee -a ./result/b_model.log >&2
 
 
-echo "[step 3] genenrate .tpr (grompp)" | tee -a ./result/b_model.log >&2
-echo q | gmx make_ndx -f ./bulk/mini_bulk.gro -o ./bulk/bulk.index >> ./result/b_model.log  2>&1
-
-gmx grompp \
-    -f ./bulk/bulk.mdp \
-    -c ./bulk/mini_bulk.gro \
-    -o ./bulk/bulk.tpr \
-    -maxwarn "${maxWarn}" \
-    -p "${bulk_top}.top" \
-    -n ./bulk/bulk.index  >> ./result/b_model.log  2>&1 \
-    || { echo -e "${ERROR}gmx grompp failed${NC}" | tee -a ./result/b_model.log  >&2; exit 1; }
-
-#  mdrun 
-echo "[step 3]  mdrun" | tee -a ./result/b_model.log >&2
-if [[ "$GPU" -eq 1 ]]; then
-    echo -e "\tUsing GPU acceleration"  | tee -a ./result/b_model.log >&2
-    mdrun_cmd=(
-        gmx mdrun
-        -s ./bulk/bulk.tpr
-        -deffnm ./bulk/bulk
-        -ntmpi 1
-        -ntomp "$NPOS"
-        -pme gpu
-        -pmefft gpu
-        -nb gpu
-    )
-    [[ "${ENABLE_BONDED_GPU:-1}" -eq 1 ]] && mdrun_cmd+=(-bonded gpu)
-    mdrun_cmd+=(
-        -tunepme no
-        -v
-    )
+if ((isBulk == 1)); then
+    cp ./bulk/mini_bulk.gro ./bulk/bulk.gro
+    density=0
 else
-    echo -e "\tUsing CPU computation"  | tee -a ./result/b_model.log >&2
-    mdrun_cmd=(
-        gmx mdrun
-        -s ./bulk/bulk.tpr
-        -deffnm ./bulk/bulk
-        -ntmpi 1
-        -ntomp "$NPOS"
-        -v
-    )
-fi
+    cp "${MDP}.mdp" ./bulk/bulk.mdp
+    sed -i "s/Pcoupl[[:space:]]*=[[:space:]]*no/Pcoupl = Berendsen/" ./bulk/bulk.mdp
+    sed -i '/^[[:space:]]*freezegrps/s/^/;/; /^[[:space:]]*freezedim/s/^/;/' ./bulk/bulk.mdp
+    sed -i '/^[[:space:]]*ewald-geometry/s/^/;/' ./bulk/bulk.mdp
+    sed -i "s/^[[:space:]]*nsteps[[:space:]]*=.*/nsteps = ${nsteps_bulk}/" ./bulk/bulk.mdp
 
-echo -e "\t[CMD]${mdrun_cmd[*]}" | tee -a ./result/b_model.log >&2
-trap 'kill 0' INT
-stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
-mdrun_rc=${PIPESTATUS[0]}
-trap - INT
-if [[ $mdrun_rc -ne 0 ]]; then
-    echo -e "${ERROR}mdrun failed (exit code: $mdrun_rc)${NC}" | tee -a ./result/b_model.log >&2
-    exit 1
-fi
+    echo "[step 3] genenrate .tpr (grompp)" | tee -a ./result/b_model.log >&2
+    echo q | gmx make_ndx -f ./bulk/mini_bulk.gro -o ./bulk/bulk.index >> ./result/b_model.log  2>&1
 
-if ((isBulk != 1));then
+    gmx grompp \
+        -f ./bulk/bulk.mdp \
+        -c ./bulk/mini_bulk.gro \
+        -o ./bulk/bulk.tpr \
+        -maxwarn "${maxWarn}" \
+        -p "${bulk_top}.top" \
+        -n ./bulk/bulk.index  >> ./result/b_model.log  2>&1 \
+        || { echo -e "${ERROR}gmx grompp failed${NC}" | tee -a ./result/b_model.log  >&2; exit 1; }
+
+    #  mdrun
+    echo "[step 3]  mdrun" | tee -a ./result/b_model.log >&2
+    if [[ "$GPU" -eq 1 ]]; then
+        echo -e "\tUsing GPU acceleration"  | tee -a ./result/b_model.log >&2
+        mdrun_cmd=(
+            gmx mdrun
+            -s ./bulk/bulk.tpr
+            -deffnm ./bulk/bulk
+            -ntmpi 1
+            -ntomp "$NPOS"
+            -pme gpu
+            -pmefft gpu
+            -nb gpu
+        )
+        [[ "${ENABLE_BONDED_GPU:-1}" -eq 1 ]] && mdrun_cmd+=(-bonded gpu)
+        mdrun_cmd+=(
+            -tunepme no
+            -v
+        )
+    else
+        echo -e "\tUsing CPU computation"  | tee -a ./result/b_model.log >&2
+        mdrun_cmd=(
+            gmx mdrun
+            -s ./bulk/bulk.tpr
+            -deffnm ./bulk/bulk
+            -ntmpi 1
+            -ntomp "$NPOS"
+            -v
+        )
+    fi
+
+    echo -e "\t[CMD]${mdrun_cmd[*]}" | tee -a ./result/b_model.log >&2
+    trap 'kill 0' INT
+    stdbuf -o0 "${mdrun_cmd[@]}" 2>&1 | stdbuf -o0 tee -a ./result/b_model.log | awk 'BEGIN{RS="\r|\n"} /^step/{printf "\r\033[K%s", $0 > "/dev/stderr"; fflush("/dev/stderr")} /^Performance/{printf "\n%s\n", $0 > "/dev/stderr"; fflush("/dev/stderr")}'
+    mdrun_rc=${PIPESTATUS[0]}
+    trap - INT
+    if [[ $mdrun_rc -ne 0 ]]; then
+        echo -e "${ERROR}mdrun failed (exit code: $mdrun_rc)${NC}" | tee -a ./result/b_model.log >&2
+        exit 1
+    fi
+
     echo "[STEP 4]Computing density profile" | tee -a ./result/b_model.log >&2
     if echo 0|gmx density \
         -f ./bulk/bulk.xtc \
@@ -130,15 +133,9 @@ if ((isBulk != 1));then
         exit 1
     fi
 
-    # =============================
-    # Step 4: Extract average density in Z range
-    # =============================
-
     low_bound=$(echo "$bulk_zbox * 0.1" | bc)
     up_bound=$(echo "$bulk_zbox * 0.9" | bc)
     echo "[STEP 6] Analyzing density in Z range [${low_bound} - ${up_bound}] nm" | tee -a ./result/b_model.log >&2
     density=$(gmx analyze -f ./bulk/density.xvg -b ${low_bound} -e ${up_bound} 2>/dev/null | grep "^SS1" | awk '{print $2}')
-else
-    density=0
 fi
-echo "OUTPUT: $density" 
+echo "OUTPUT: $density"
