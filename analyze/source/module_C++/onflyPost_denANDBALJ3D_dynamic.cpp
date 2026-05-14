@@ -222,7 +222,7 @@ int main(int argc, char** argv)
 
 	std::cout<<std::endl;
 	for (int count = 0; count < numFile; count++) {
-		std::cout << "\rAnalysis: " <<inputFnm <<" ..."<< std::fflush;
+		std::cout << "\rAnalysis: " <<inputFnm <<" ..."<< std::flush;
 		OnflyPostHandle hd(inputFnm);
 		hd.readHead();
 
@@ -279,7 +279,7 @@ int main(int argc, char** argv)
 			}
 		}
 		else if (0 == dynamic) {
-			std::cout << "\tTotFrames: " << nowTime << std::fflush;
+			std::cout << "\tTotFrames: " << nowTime << std::flush;
 			for (size_t t = 0; t < timeindex; t++)
 			{
 				while(true){
