@@ -46,8 +46,80 @@ const std::vector<std::string> matlabcode = { {R"(% function [ret, xyzRange, nbi
 %     ret = ret{1};
 % end
 % end)"},
-	{},
-	{}
+		{R"(% function [ret, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D_BA(fnm)
+% allData = importdata(fnm);
+% data = allData.data;
+% textData = allData.textdata;
+% Lbox = double(regexp(string(textData{2}), "[\d.+-]+", "match"));
+% lowPos = double(regexp(string(textData{3}), "[\d.+-]+", "match"));
+% upPos = double(regexp(string(textData{4}), "[\d.+-]+", "match"));
+% nbin = double(regexp(string(textData{6}), "[\d.+-]+", "match"));
+% totNbin = double(regexp(string(textData{8}), "[\d.+-]+", "match"));
+% totFrames = double(regexp(string(textData{9}), "[\d.+-]+", "match"));
+% xyzRange = cell(1);
+% for ii=1:length(nbin)
+%    xyzRange{ii} = linspace(lowPos(ii), upPos(ii), nbin(ii));
+% end
+% [~, col] = size(data);
+% nRegion = length(nbin) / 3;
+% ngrps = col / 2;
+% ret = cell(totFrames, 1);
+% for ii=1:totFrames
+%     tmpData = data((ii-1)*totNbin+1 : ii*totNbin, :);
+%     ret{ii} = getRetBA(tmpData, nRegion, nbin, ngrps);
+% end
+% end
+%
+% function ret=getRetBA(tmpData, nRegion, nbin, ngrps)
+% ret = struct('bond', cell(1), 'angle', cell(1));
+% tmpIndex = 0;
+% for ii = 1:nRegion
+%     eachNbin = nbin(3*(ii-1)+1) * nbin(3*(ii-1)+2) * nbin(3*ii);
+%     block = tmpData((tmpIndex+1):(tmpIndex+eachNbin), :);
+%     ret(ii).bond = squeeze(reshape(block(:, 1:ngrps), [nbin((3*(ii-1)+1):3*ii), ngrps]));
+%     ret(ii).angle = squeeze(reshape(block(:, ngrps+1:2*ngrps), [nbin((3*(ii-1)+1):3*ii), ngrps]));
+%     tmpIndex = tmpIndex + eachNbin;
+% end
+% if nRegion == 1
+%     ret = ret(1);
+% end
+% end)"},
+		{R"(% function [ret, zRange, nbin, lowPos, upPos, Lbox] = loadOnflyData_LJ(fnm)
+% allData = importdata(fnm);
+% data = allData.data;
+% textData = allData.textdata;
+% Lbox = double(regexp(string(textData{2}), "[\d.+-]+", "match"));
+% lowPos = double(regexp(string(textData{3}), "[\d.+-]+", "match"));
+% upPos = double(regexp(string(textData{4}), "[\d.+-]+", "match"));
+% nbin = double(regexp(string(textData{6}), "[\d.+-]+", "match"));
+% nbinZ = nbin(3);
+% totFrames = double(regexp(string(textData{9}), "[\d.+-]+", "match"));
+% zRange = linspace(lowPos(3), upPos(3), nbinZ);
+% [~, col] = size(data);
+% nPairs = col - 1;
+% N = (sqrt(1 + 8*nPairs) - 1) / 2;
+% ngrps = N - 2;
+% ret = cell(totFrames, 1);
+% for ii=1:totFrames
+%     tmpData = data((ii-1)*nbinZ+1 : ii*nbinZ, :);
+%     ret{ii}.allLJ = tmpData(:, 1);
+%     pairVec = tmpData(:, 2:end);
+%     pairMat = zeros(nbinZ, N, N);
+%     for row = 1:nbinZ
+%         mat = zeros(N);
+%         idx = 1;
+%         for i = 1:N
+%             for j = i:N
+%                 mat(i, j) = pairVec(row, idx);
+%                 mat(j, i) = pairVec(row, idx);
+%                 idx = idx + 1;
+%             end
+%         end
+%         pairMat(row, :, :) = mat;
+%     end
+%     ret{ii}.pair = squeeze(pairMat);
+% end
+% end)"},
 };
 
 typedef std::vector<std::vector<real>> realMatrix;
@@ -133,6 +205,12 @@ int main(int argc, char** argv)
 	outputFnms.emplace_back(outputFnm + "_dens.dat");
 	outputFnms.emplace_back(outputFnm + "_BA.dat");
 	outputFnms.emplace_back(outputFnm + "_LJ.dat");
+
+	std::vector<std::string> loadFnSign = {
+		"[data, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D(fnm);",
+		"[ret, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D_BA(fnm);",
+		"[ret, zRange, nbin, lowPos, upPos, Lbox] = loadOnflyData_LJ(fnm);"
+	};
 
 	std::cout << "\nMake sure you have this stucture:"
 		<< "\n\t./case1/file"
@@ -376,7 +454,7 @@ int main(int argc, char** argv)
 		ofile[file_idnex] << "% nRegion = " << ini.nRegion << ";\n";
 		ofile[file_idnex] << "% totNbin = " << ini.totNbin << ";\n";
 		ofile[file_idnex] << "% totframes = " << totFrames << ";\n";
-		ofile[file_idnex] << "% [data, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D(fnm);\n";
+		ofile[file_idnex] << "% " + loadFnSign[file_idnex] + "\n";
 		ofile[file_idnex] << "%\n";
 		ofile[file_idnex] << matlabcode[file_idnex];
 		ofile[file_idnex] << "\n";
