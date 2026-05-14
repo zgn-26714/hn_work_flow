@@ -63,26 +63,19 @@ const std::vector<std::string> matlabcode = { {R"(% function [ret, xyzRange, nbi
 % [~, col] = size(data);
 % nRegion = length(nbin) / 3;
 % ngrps = col / 2;
-% ret = cell(totFrames, 1);
-% for ii=1:totFrames
-%     tmpData = data((ii-1)*totNbin+1 : ii*totNbin, :);
-%     ret{ii} = getRetBA(tmpData, nRegion, nbin, ngrps);
-% end
+% ret = getRetBA(data, totFrames, nRegion, nbin, ngrps, totNbin);
 % end
 %
-% function ret=getRetBA(tmpData, nRegion, nbin, ngrps)
-% ret = struct('bond', cell(1), 'angle', cell(1));
-% tmpIndex = 0;
-% for ii = 1:nRegion
-%     eachNbin = nbin(3*(ii-1)+1) * nbin(3*(ii-1)+2) * nbin(3*ii);
-%     block = tmpData((tmpIndex+1):(tmpIndex+eachNbin), :);
-%     ret(ii).bond = squeeze(reshape(block(:, 1:ngrps), [nbin((3*(ii-1)+1):3*ii), ngrps]));
-%     ret(ii).angle = squeeze(reshape(block(:, ngrps+1:2*ngrps), [nbin((3*(ii-1)+1):3*ii), ngrps]));
-%     tmpIndex = tmpIndex + eachNbin;
+% function ret=getRetBA(data, totFrames, nRegion, nbin, ngrps, totNbin)
+% nX = nbin(1); nY = nbin(2); nZ = nbin(3);
+% bondAll = zeros(totFrames, nX, nY, nZ, ngrps);
+% angleAll = zeros(totFrames, nX, nY, nZ, ngrps);
+% for ii = 1:totFrames
+%     tmpData = data((ii-1)*totNbin+1 : ii*totNbin, :);
+%     bondAll(ii,:,:,:,:) = reshape(tmpData(:, 1:ngrps), [nX, nY, nZ, ngrps]);
+%     angleAll(ii,:,:,:,:) = reshape(tmpData(:, ngrps+1:2*ngrps), [nX, nY, nZ, ngrps]);
 % end
-% if nRegion == 1
-%     ret = ret(1);
-% end
+% ret = struct('bond', bondAll, 'angle', angleAll);
 % end)"},
 		{R"(% function [ret, zRange, nbin, lowPos, upPos, Lbox] = loadOnflyData_LJ(fnm)
 % allData = importdata(fnm);
