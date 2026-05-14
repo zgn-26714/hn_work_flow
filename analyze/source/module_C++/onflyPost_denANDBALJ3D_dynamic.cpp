@@ -401,7 +401,7 @@ int main(int argc, char** argv)
 	ofile[0].close();
 
 	std::cout<<"Writing BA data ..."<<std::endl;
-	if (output_mode != 1 && output_mode != 3) {
+	if (output_mode != 2 && output_mode != 3) {
 		for (size_t t = 0; t < totFrames; t++) {
 			for (int j = 0; j < ini.totNbin; j++)
 			{
@@ -417,7 +417,7 @@ int main(int argc, char** argv)
 	}
 	
 	std::cout<<"Writing LJ data ..."<<std::endl;
-	if (output_mode != 2 && output_mode != 3) {
+	if (output_mode != 1 && output_mode != 3) {
 		for (size_t t = 0; t < totFrames; t++) {
 			for (int j = 0; j < ini.nbin[2]; j++)
 			{
