@@ -147,8 +147,9 @@ int main(int argc, char* argv[]) {
         getframes.replace(getframes.find('?'), 1 , to_string(times[i] + 0.001));
         getframes.replace(getframes.find('?'), 1 , output);
         system(getframes.c_str());
-        std::cout<<"[frame"<<i<<"] success!"<<std::endl;
+        std::cout << "\r\033[K[frame" << i << "] success!" << std::flush;
     }
+    std::cout << std::endl;
 
     return 0;
 }
