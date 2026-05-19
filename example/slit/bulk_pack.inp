@@ -4,3 +4,18 @@ filetype pdb
 
 output initial.pdb
 
+structure SOL.pdb
+number 5000
+inside box 0. 0. 0. 50.000  50.000  50.000
+end structure
+
+structure Na.pdb
+number 50
+inside box 0. 0. 0. 50.000  50.000  50.000
+end structure
+
+structure CL.pdb
+number 50
+inside box 0. 0. 0. 50.000  50.000  50.000
+end structure
+

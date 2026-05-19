@@ -46,8 +46,8 @@ tau_p		=20
 compressibility	=4.5e-5
 ref_p		=1
 
-freezegrps = EL    GRA
-freezedim   = Y Y Y  Y Y Y 
+freezegrps = EL  ER  GRA
+freezedim   = Y Y Y Y Y Y Y Y Y
 ;onfly setting
 ;userint1        = 1
 ;userint2        = 50

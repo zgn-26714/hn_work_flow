@@ -4,4 +4,38 @@ filetype pdb
 
 output initial.pdb
 
+structure single_electrode.pdb
+number 1
+fixed  0. 0. 0. 0. 0. 0.
+end structure
+
+structure SOL.pdb
+number 2780
+inside box 1. 1. 135.680  48.000  30.000  180.680
+end structure
+
+structure Na.pdb
+number 27
+inside box 1. 1. 135.680  48.000  30.000  180.680
+end structure
+
+structure CL.pdb
+number 27
+inside box 1. 1. 135.680  48.000  30.000  180.680
+end structure
+
+structure SOL.pdb
+number 2780
+inside box 1. 1. 1.  48.000  30.000  45.000
+end structure
+
+structure Na.pdb
+number 27
+inside box 1. 1. 1.  48.000  30.000  45.000
+end structure
+
+structure CL.pdb
+number 27
+inside box 1. 1. 1.  48.000  30.000  45.000
+end structure
 
