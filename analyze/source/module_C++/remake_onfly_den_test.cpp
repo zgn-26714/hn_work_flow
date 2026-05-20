@@ -7,8 +7,18 @@
 #include <cmath>
 #include <algorithm>
 #include <iomanip>
+#include <cstdlib>
 
 using namespace std;
+
+const char* safe_getenv(const char* name) {
+    const char* val = getenv(name);
+    if (!val) {
+        cerr << "Error: environment variable '" << name << "' is not set." << endl;
+        exit(1);
+    }
+    return val;
+}
 
 // 4D数组: [nx][ny][nz][col]
 using Matrix4D = vector<vector<vector<vector<double>>>>;
@@ -305,8 +315,8 @@ int main() {
     double V = 2.0;
     double scanrate = 0.0;
     
-    string filename = std::string("./deal_data/onfly/onfly") + string(getenv("analyze_begin_case")) + "-" + 
-                        string(getenv("analyze_end_case")) + ".dat";
+    string filename = std::string("./deal_data/onfly/onfly") + string(safe_getenv("analyze_begin_case")) + "-" +
+                        string(safe_getenv("analyze_end_case")) + ".dat";
     
     std::cout << "Loading data..." << endl;
     

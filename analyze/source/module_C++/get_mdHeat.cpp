@@ -7,6 +7,15 @@
 #include <iomanip>
 #include "./include/matlab_to_C.h"
 
+const char* safe_getenv(const char* name) {
+    const char* val = getenv(name);
+    if (!val) {
+        std::cerr << "Error: environment variable '" << name << "' is not set." << std::endl;
+        exit(1);
+    }
+    return val;
+}
+
 bool saveDatFile(std::string filename, std::vector<double> time, std::vector<double> heat);
 
 struct Matrix {
@@ -21,8 +30,8 @@ struct Matrix {
 
 
 int main() {
-    const int begin_case = std::stoi(getenv("analyze_begin_case"));
-    const int end_case = std::stoi(getenv("analyze_end_case"));
+    const int begin_case = std::stoi(safe_getenv("analyze_begin_case"));
+    const int end_case = std::stoi(safe_getenv("analyze_end_case"));
     
     std::vector<double> heat;
     Matrix data;
@@ -33,7 +42,7 @@ int main() {
         // 构建edr文件路径
         
         std::ostringstream edr_oss;
-        std::string deffnm = getenv("DEFFNM");
+        std::string deffnm = safe_getenv("DEFFNM");
         edr_oss << "./case" << i << "/" << deffnm << ".edr";
         std::string edrdir = edr_oss.str();
         
@@ -108,9 +117,9 @@ int main() {
     }
     std::cout<<"Total cases processed: " << count << std::endl;
 
-    std::string molName = getenv("analyze_mol");
+    std::string molName = safe_getenv("analyze_mol");
     std::string filename = "./deal_data/mdHeat/" + molName + "mdHeat"
-                     + getenv("analyze_V") + "V" + getenv("analyze_tau") + "ps_"
+                     + safe_getenv("analyze_V") + "V" + safe_getenv("analyze_tau") + "ps_"
                      + std::to_string(begin_case) + "-" + std::to_string(end_case) + "_.dat";
                      
     if (saveDatFile(filename, time, heat)) {

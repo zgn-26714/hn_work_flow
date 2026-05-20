@@ -1,7 +1,17 @@
 #include "./include/matlab_to_C.h"
 #include "./include/matrix.h"
+#include <cstdlib>
 
 using namespace std;
+
+const char* safe_getenv(const char* name) {
+    const char* val = getenv(name);
+    if (!val) {
+        cerr << "Error: environment variable '" << name << "' is not set." << endl;
+        exit(1);
+    }
+    return val;
+}
 
 bool checkFileExist(const string& filename) {
     ifstream file(filename);
@@ -31,12 +41,12 @@ void fill_head(const string& filename, vector<string>& head) {
 
 
 int main() {
-    string analyze_cpp = getenv("analyze_cpp");
+    string analyze_cpp = safe_getenv("analyze_cpp");
     string file_fold = "./deal_data/" + analyze_cpp + "/";
-    string begin_cas = getenv("analyze_begin_case");
-    string mol_name = getenv("analyze_mol");
-    string end_cas = getenv("analyze_end_case");
-    string is_skip_first_line = getenv("analyze_is_skip_first_line");
+    string begin_cas = safe_getenv("analyze_begin_case");
+    string mol_name = safe_getenv("analyze_mol");
+    string end_cas = safe_getenv("analyze_end_case");
+    string is_skip_first_line = safe_getenv("analyze_is_skip_first_line");
     itp::Matrix<double> data;
     vector<string> head;
     
