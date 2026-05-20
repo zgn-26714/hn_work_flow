@@ -2,17 +2,27 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cstdlib>
 
 using namespace std;
 using real = double;
 
+const char* safe_getenv(const char* name) {
+    const char* val = getenv(name);
+    if (!val) {
+        cerr << "Error: environment variable '" << name << "' is not set." << endl;
+        exit(1);
+    }
+    return val;
+}
+
 int main(int argc, char *argv[]){
-    string begin = getenv("analyze_begin_case");
-    string end = getenv("analyze_end_case");
+    string begin = safe_getenv("analyze_begin_case");
+    string end = safe_getenv("analyze_end_case");
     string line;
-    string molecule = getenv("analyze_mol");
+    string molecule = safe_getenv("analyze_mol");
     vector<real> charge;
-    float qout, md_dt = stof(getenv("DT")); // Default value for md_dt
+    float qout, md_dt = stof(safe_getenv("MDDT_for_analysis"));
     string begin_dir = "./case" + begin + "/CPM_ControlFile.dat";
     ifstream CPM_Control(begin_dir);
     if (!CPM_Control.is_open()) {
@@ -57,19 +67,19 @@ int main(int argc, char *argv[]){
         charge[i] /= (stoi(end) - stoi(begin) + 1);
     }
     
-    string outfile = "./deal_data/eleQ/" + molecule + "_eleCharge" + string(getenv("analyze_V")) + "V" +
-                                string(getenv("analyze_tau")) + "ps_" + begin + "-" + end + ".dat";
+    string outfile = "./deal_data/eleQ/" + molecule + "_eleCharge" + string(safe_getenv("analyze_V")) + "V" +
+                                string(safe_getenv("analyze_tau")) + "ps_" + begin + "-" + end + ".dat";
     ofstream output(outfile);
-    
+
     if (!output) {
         cerr << "Error: Cannot open file " << outfile << endl;
         return 1;
     }
-    
+
     output << "# ElecCharge averaged from case " << begin << " to " << end << endl;
-    output << "# V = " << string(getenv("analyze_V")) << " V" << endl;
-    output << "# tau = " << string(getenv("analyze_tau")) << " ps" << endl;
-    output << "# MD dt = " << string(getenv("DT")) << " ps" << endl;
+    output << "# V = " << string(safe_getenv("analyze_V")) << " V" << endl;
+    output << "# tau = " << string(safe_getenv("analyze_tau")) << " ps" << endl;
+    output << "# MD dt = " << string(safe_getenv("MDDT_for_analysis")) << " ps" << endl;
     output << "# Unit: e" << endl;
     output << "# qout = " << qout << endl;
     for (int i = 0; i < charge.size(); i++){
