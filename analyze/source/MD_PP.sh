@@ -35,7 +35,7 @@ else
     fi
 fi
 
-read -r -a extra_cmd <<< "${analysis_extra_command:-}"
+read -r -a extra_cmd <<< "${analyze_extra_command:-}"
 export analyze_cpp="${analysis_program_label}"
 mkdir -p "./deal_data/${analysis_program_label}"
 

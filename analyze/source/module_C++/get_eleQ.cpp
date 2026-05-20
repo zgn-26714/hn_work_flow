@@ -25,7 +25,7 @@ int main(int argc, char *argv[]){
     string line;
     string molecule = safe_getenv("analyze_mol");
     vector<real> charge;
-    float qout, md_dt = stof(safe_getenv("MDDT_for_analysis"));
+    float qout, md_dt = stof(safe_getenv("MDDT_for_analyze"));
     string begin_dir = "./case" + begin + "/CPM_ControlFile.dat";
     ifstream CPM_Control(begin_dir);
     if (!CPM_Control.is_open()) {
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]){
     output << "# ElecCharge averaged from case " << begin << " to " << end << endl;
     output << "# V = " << string(safe_getenv("analyze_V")) << " V" << endl;
     output << "# tau = " << string(safe_getenv("analyze_tau")) << " ps" << endl;
-    output << "# MD dt = " << string(safe_getenv("MDDT_for_analysis")) << " ps" << endl;
+    output << "# MD dt = " << string(safe_getenv("MDDT_for_analyze")) << " ps" << endl;
     output << "# Unit: e" << endl;
     output << "# qout = " << qout << endl;
     for (int i = 0; i < charge.size(); i++){

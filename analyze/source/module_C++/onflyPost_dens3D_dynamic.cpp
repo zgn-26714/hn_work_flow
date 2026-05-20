@@ -367,8 +367,8 @@ bool OnflyPostHandle::readNextFrame()
 	while (true)
 	{
 		fid.read((char*)&magicNumber, sizeof(int));
-printf("get output?%d\n",magicNumber);
-					fflush(stdout);
+//printf("get output?%d\n",magicNumber);
+//					fflush(stdout);
 		if (magicNumber == 20201210)
 		{
 			for (int i = 0; i < ngrps; i++)
