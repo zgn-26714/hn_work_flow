@@ -29,7 +29,7 @@ fi
 g++ -o ${onfly_version} ${bash_dir}/module_C++/${onfly_version}.cpp -O3 ${precision_flag}
 
 command="./${onfly_version} "./case${analyze_begin_case}/${analyze_ONFLY_in}.onfly" \
--n "${analyze_num}" -d "${analyze_ONFLY_isD}" -o ./deal_data/onfly/${analyze_mol}onfly"${analyze_begin_case}-${analyze_end_case}" \
+-n "${analyze_num}" -d "${analyze_ONFLY_isD}" -o ./deal_data/onfly/${analyze_mol}onfly"${analyze_begin_case}-${analyze_end_case}.dat" \
 -b "${analyze_begin_t}" -e "${analyze_end_t}" -om "${MODE_ONFLY_analyze}""
 
 
