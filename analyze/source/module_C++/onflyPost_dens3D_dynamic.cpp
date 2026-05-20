@@ -10,7 +10,10 @@
 #include <vector>
 #include <iomanip>
 #include "include/core_getopt.h"
-using real = float;
+#ifndef ANALYZE_PRECISION
+#define ANALYZE_PRECISION float
+#endif
+using real = ANALYZE_PRECISION;
 
 
 

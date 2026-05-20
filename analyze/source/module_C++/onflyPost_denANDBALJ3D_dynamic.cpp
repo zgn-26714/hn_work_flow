@@ -10,7 +10,10 @@
 #include "./include/core_getopt.h"
 
 
-using real = double;
+#ifndef ANALYZE_PRECISION
+#define ANALYZE_PRECISION double
+#endif
+using real = ANALYZE_PRECISION;
 const std::vector<std::string> matlabcode = { {R"(% function [ret, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D(fnm)
 % allData = importdata(fnm);
 % data = allData.data;

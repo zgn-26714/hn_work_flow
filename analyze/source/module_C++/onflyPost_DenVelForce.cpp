@@ -14,7 +14,10 @@
 #include <iomanip>
 #include "include/core_getopt.h"
 
-using real = double;
+#ifndef ANALYZE_PRECISION
+#define ANALYZE_PRECISION double
+#endif
+using real = ANALYZE_PRECISION;
 using std::vector;
 using std::string;
 

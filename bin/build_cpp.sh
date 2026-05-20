@@ -10,7 +10,11 @@ if [[ ! -x "${execu_bin}" ]]; then
         exit 1
     fi
 
-    g++ "$cpp_src" -o "$execu_bin" -O3 -std=c++17
+    precision_flag=""
+    if [[ -n "${analyze_precision:-}" ]]; then
+        precision_flag="-DANALYZE_PRECISION=${analyze_precision}"
+    fi
+    g++ "$cpp_src" -o "$execu_bin" -O3 -std=c++17 ${precision_flag}
     if [[ $? -ne 0 ]]; then
         echo -e "${ERROR}Compilation of Executable file failed.${NC}" | tee -a ./result/b_model.log  >&2
         exit 1

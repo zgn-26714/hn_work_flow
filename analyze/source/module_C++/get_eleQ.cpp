@@ -5,7 +5,10 @@
 #include <cstdlib>
 
 using namespace std;
-using real = double;
+#ifndef ANALYZE_PRECISION
+#define ANALYZE_PRECISION double
+#endif
+using real = ANALYZE_PRECISION;
 
 const char* safe_getenv(const char* name) {
     const char* val = getenv(name);

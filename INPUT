@@ -128,11 +128,12 @@ analysis_begin_t      = 0        # Start time for analysis (in ps)
 analysis_end_t        = 0        # End time for analysis (in ps, with default value 0 mean all time)
 analysis_ONFLY_isD    = 1        # Enable dynamic output in onfly analysis: 1=yes, 0=no
 analysis_ONFLY_in     = densMNC3D# Input file name for onfly analysis file
-MODE_ONFLY_analysis   = 3        # onfly_setting
- 
+MODE_ONFLY_analysis   = 3        # onfly_setting 
 onflyPost_cpp         = onflyPost_denANDBALJ3D_dynamic  #Name of C++ program for onfly analysis e.g., onflyPost_denANDBALJ3D_dynamic, onflyPost_DenVelForce, onflyPost_dens3D_dynamic.
+analyze_precision     = double             # Precision for onfly/eley analysis C++ compilation: double or float
 
 # analysis case settings
+MDDT_for_analysis     = 0.002    # dt in mdp file by step 
 analyze_begin_case    = 1        # Starting case number for analysis
 analyze_end_case      = 1        # Ending case number for analysis
 analyze_T             = 298      # Temperature value for analysis (in K)   

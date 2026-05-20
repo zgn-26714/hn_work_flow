@@ -4,8 +4,12 @@ set -euo pipefail
 workdir="$(pwd)"
 bash_dir="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
+precision_flag=""
+if [[ -n "${analyze_precision:-}" ]]; then
+    precision_flag="-DANALYZE_PRECISION=${analyze_precision}"
+fi
 mkdir -p deal_data/eleQ/
-if g++ -o get_eleQ ${bash_dir}/module_C++/get_eleQ.cpp -O3 ; then #可能需要增加额外的静态链接库
+if g++ -o get_eleQ ${bash_dir}/module_C++/get_eleQ.cpp -O3 ${precision_flag} ; then #可能需要增加额外的静态链接库
     ./get_eleQ
     echo -e "${GREEN}EleQ data calculation completed!${NC}"
 else

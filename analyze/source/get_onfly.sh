@@ -22,7 +22,11 @@ bash_dir=$(builtin cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 onfly_version="${onflyPost_cpp}"
 
-g++ -o ${onfly_version} ${bash_dir}/module_C++/${onfly_version}.cpp -O3
+precision_flag=""
+if [[ -n "${analyze_precision:-}" ]]; then
+    precision_flag="-DANALYZE_PRECISION=${analyze_precision}"
+fi
+g++ -o ${onfly_version} ${bash_dir}/module_C++/${onfly_version}.cpp -O3 ${precision_flag}
 
 command="./${onfly_version} "./case${analyze_begin_case}/${analysis_ONFLY_in}.onfly" \
 -n "${analyze_num}" -d "${analysis_ONFLY_isD}" -o ./deal_data/onfly/${analyze_mol}onfly"${analyze_begin_case}-${analyze_end_case}" \
