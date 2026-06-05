@@ -25,4 +25,6 @@ case "$server_machine" in
     ;;
 esac
 
+
+chmod +x generate_scanfile
 ./generate_scanfile >> ./result/run_md.log 2>&1
