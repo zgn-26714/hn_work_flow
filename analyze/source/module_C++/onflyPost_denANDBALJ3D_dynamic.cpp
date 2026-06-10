@@ -2,6 +2,104 @@
  * 2025.04.16
  */
 
+/*
+ * MATLAB output data access notes
+ *
+ * 0) loadOnflyData3D(fnm) reads _dens.dat.
+ *
+ * Output:
+ *   [ret, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D(fnm);
+ *
+ * Text column order for each group:
+ *   massdens numdensM chargedens numdensG
+ *
+ * Row format:
+ *   g1_mass g1_numM g1_charge g1_numG g2_mass g2_numM g2_charge g2_numG ...
+ *
+ * ret is indexed by frame:
+ *   ret{frame}
+ *
+ * If nRegion == 1:
+ *   ret{frame}(ix, iy, iz, col)
+ *
+ * If nRegion > 1:
+ *   ret{frame}{region}(ix, iy, iz, col)
+ *
+ * Column index for group g:
+ *   massdens   : 4*(g-1) + 1
+ *   numdensM   : 4*(g-1) + 2
+ *   chargedens : 4*(g-1) + 3
+ *   numdensG   : 4*(g-1) + 4
+ *
+ * Examples:
+ *   chargeCol = 4*(g-1) + 3;
+ *   chargeVal = ret{frame}(ix, iy, iz, chargeCol);
+ *   chargeMap = squeeze(ret{frame}(:, :, iz, chargeCol));
+ *
+ * xyzRange:
+ *   xyzRange{1} = x grid
+ *   xyzRange{2} = y grid
+ *   xyzRange{3} = z grid
+ *
+ * Note:
+ *   tmpData = data((ii-1)*totNbin : ii*totNbin, :)
+ * should be:
+ *   tmpData = data((ii-1)*totNbin+1 : ii*totNbin, :)
+ *
+ * 
+ * 1) loadOnflyData3D_BA(fnm)
+ *
+ *    [ret, xyzRange, nbin, lowPos, upPos, Lbox] = loadOnflyData3D_BA(fnm);
+ *
+ *    _BA.dat columns are interleaved:
+ *        bond1 angle1 bond2 angle2 ... bondN angleN
+ *
+ *    ret.bond and ret.angle are logically:
+ *        totFrames x nbin(1) x nbin(2) x nbin(3) x ngrps
+ *
+ *    Access:
+ *        ret.bond(frame, ix, iy, iz, group)
+ *        ret.angle(frame, ix, iy, iz, group)
+ *
+ *    Note: the MATLAB code calls squeeze(), so singleton dimensions may be
+ *    removed when totFrames == 1, ngrps == 1, or another dimension is 1.
+ *
+ * 2) loadOnflyData_LJ(fnm)
+ *
+ *    [ret, zRange, nbin, lowPos, upPos, Lbox] = loadOnflyData_LJ(fnm);
+ *
+ *    ret is a cell array by frame:
+ *        ret{frame}.allLJ
+ *        ret{frame}.pair
+ *
+ *    _LJ.dat columns are:
+ *        allLJ(z) pair00(z) pair01(z) ... pairNN(z)
+ *
+ *    ret{frame}.allLJ is:
+ *        zbin x 1
+ *
+ *    ret{frame}.pair is logically:
+ *        zbin x N x N
+ *
+ *    where N = ngrps + 2 = selection.size() + 2:
+ *        1      : not selected
+ *        2..N-1 : groups selected by -sel
+ *        N      : electrode
+ *
+ *    Access:
+ *        totalAtZ = ret{frame}.allLJ(iz);
+ *        pairAtZ  = ret{frame}.pair(iz, a, b);
+ *        profile  = squeeze(ret{frame}.pair(:, a, b));
+ *
+ *    ret{frame}.pair is symmetric:
+ *        pair(iz,a,b) == pair(iz,b,a)
+ *
+ *    Note: the MATLAB code calls squeeze(pairMat), so if zbin == 1,
+ *    ret{frame}.pair may become N x N and should be accessed as pair(a,b).
+ */
+
+
+
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -32,7 +130,7 @@ const std::vector<std::string> matlabcode = { {R"(% function [ret, xyzRange, nbi
 % nRegion = length(nbin) / 3;
 % ret = cell(1);
 % for ii=1:totFrames
-%     tmpData = data((ii-1)*totNbin : ii*totNbin,:);
+%     tmpData = data((ii-1)*totNbin+1 : ii*totNbin,:);
 %     ret{ii} = getRet(tmpData,nRegion,nbin,col);
 % end
 % end
@@ -67,19 +165,58 @@ const std::vector<std::string> matlabcode = { {R"(% function [ret, xyzRange, nbi
 % nRegion = length(nbin) / 3;
 % ngrps = col / 2;
 % ret = getRetBA(data, totFrames, nRegion, nbin, ngrps, totNbin);
+% ret.bond = squeeze(ret.bond);
+% ret.angle = squeeze(ret.angle);
 % end
-%
+% 
 % function ret=getRetBA(data, totFrames, nRegion, nbin, ngrps, totNbin)
 % nX = nbin(1); nY = nbin(2); nZ = nbin(3);
 % bondAll = zeros(totFrames, nX, nY, nZ, ngrps);
 % angleAll = zeros(totFrames, nX, nY, nZ, ngrps);
+% bondCols  = 1:2:(2*ngrps);
+% angleCols = 2:2:(2*ngrps);
 % for ii = 1:totFrames
 %     tmpData = data((ii-1)*totNbin+1 : ii*totNbin, :);
-%     bondAll(ii,:,:,:,:) = reshape(tmpData(:, 1:ngrps), [nX, nY, nZ, ngrps]);
-%     angleAll(ii,:,:,:,:) = reshape(tmpData(:, ngrps+1:2*ngrps), [nX, nY, nZ, ngrps]);
+%     bondTmp = tmpData(:, bondCols);
+%     angleTmp = tmpData(:, angleCols);
+%     bondAll(ii,:,:,:,:) = reshape(bondTmp, [nX, nY, nZ, ngrps]);
+%     angleAll(ii,:,:,:,:) = reshape(angleTmp, [nX, nY, nZ, ngrps]);
 % end
 % ret = struct('bond', bondAll, 'angle', angleAll);
-% end)"},
+% end
+% 
+% function cmap = localDivergingMap(n)
+% if nargin < 1
+%     n = 256;
+% end
+% anchor_x = [0 0.25 0.5 0.75 1];
+% anchor_rgb = [0.02 0.12 0.35
+%               0.16 0.50 0.72
+%               0.96 0.96 0.90
+%               0.98 0.68 0.18
+%               0.65 0.05 0.05];
+% cmap = interp1(anchor_x,anchor_rgb,linspace(0,1,n),'pchip');
+% cmap = max(min(cmap,1),0);
+% end
+% 
+% function p = localPercentile(x,pct)
+% x = x(:);
+% x = sort(x(isfinite(x)));
+% if isempty(x)
+%     p = NaN;
+%     return
+% end
+% pct = max(0,min(100,pct));
+% pos = 1 + (numel(x)-1) * pct / 100;
+% lo = floor(pos);
+% hi = ceil(pos);
+% if lo == hi
+%     p = x(lo);
+% else
+%     p = x(lo) + (x(hi)-x(lo)) * (pos-lo);
+% end
+% end
+"},
 		{R"(% function [ret, zRange, nbin, lowPos, upPos, Lbox] = loadOnflyData_LJ(fnm)
 % allData = importdata(fnm);
 % data = allData.data;
